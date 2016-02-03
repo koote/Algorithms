@@ -160,7 +160,7 @@ string zigzagConvert(string s, int numRows)
 }
 
 // 7# Reverse Integer
-int reverse(int x)
+int reverseInteger(int x)
 {
     int sign = x < 0 ? -1 : 1;
     x = x < 0 ? -x : x;
@@ -184,4 +184,52 @@ int reverse(int x)
     }
 
     return digits.empty() ? result * sign : 0;
+}
+
+//8. String to Integer (atoi)
+int myAtoi(string str) 
+{
+	int int32max = (1 << 31) - 1;
+	int int32min = -(1 << 31);
+	int slen = str.length();
+
+	// 1. Trim heading whitespaces.
+	int i;
+	for (i = 0; i < slen && (str[i] == ' ' || str[i] == '\t' || str[i] == '\n' || str[i] == '\r'); ++i);
+
+	// 2. Process the sign of number.
+	int sign = 1;
+	if (str[i] == '-')
+	{
+		sign = -1;
+		++i;
+	}
+	else if (str[i] == '+')
+	{
+		++i;
+	}
+
+	// 3. Process overflow or underflow. 
+	int r = 0;
+	while (i < slen && str[i] >= '0' && str[i] <= '9')
+	{
+		int digit = str[i] - '0';
+
+		if (sign == 1 && (r > int32max / 10 || (r == int32max / 10 && digit > int32max % 10))) // overflow
+		{
+			return int32max;
+		}
+		else if (sign == -1 && (r > 0 - int32min / 10 || (r == 0 - int32min / 10 && digit > 0 - int32min % 10))) //underflow
+		{
+			return int32min;
+		}
+		else
+		{
+			r = r * 10;
+			r += digit;
+			++i;
+		}
+	}
+
+	return r * sign;
 }

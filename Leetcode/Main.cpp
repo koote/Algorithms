@@ -2,8 +2,9 @@
 using namespace std;
 
 extern string longestPalindrome(string s);
+extern int myAtoi(string str);
 
 void main()
 {
-    longestPalindrome("bb");
+	myAtoi("-1");
 }
