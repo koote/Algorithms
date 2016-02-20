@@ -7,8 +7,9 @@ extern string longestPalindrome(string s);
 extern int myAtoi(string str);
 extern bool isPalindrome(int x);
 extern bool isMatch(string s, string p);
+extern string longestCommonPrefix(vector<string>& strs);
 
 void main()
 {
-	bool x = isMatch("a", ".*..a*");
+    auto x = longestCommonPrefix(vector<string>(1, ""));
 }
