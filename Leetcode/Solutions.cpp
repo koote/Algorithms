@@ -348,3 +348,95 @@ string longestCommonPrefix(vector<string>& strs)
 
     return strs[0].substr(0, index - 1);
 }
+
+// 15. 3Sum
+vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum)
+{
+    const int size = nums.size();
+    vector<vector<int>> result(0);
+
+    if (size < k || k == 0)
+    {
+        return result;
+    }
+
+    if (k == 2)
+    {
+        for (int i = 0, j = size - 1; i < j;)
+        {
+            int s = nums[i] + nums[j];
+            if (s == sum)
+            {
+                result.push_back(vector<int>{ nums[i], nums[j] });
+
+                // skip duplicates.
+                for (++i; i < size && nums[i] == nums[i - 1]; ++i);
+                for (--j; j > 0 && nums[j] == nums[j + 1]; --j);
+            }
+            else if (s > sum)
+            {
+                for (--j; j > 0 && nums[j] == nums[j + 1]; --j);
+            }
+            else
+            {
+                for (++i; i < size && nums[i] == nums[i - 1]; ++i);
+            }
+        }
+
+        return result;
+    }
+
+    for (int i = 0; i < size; ++i)
+    {
+        // skip duplicates.
+        if (i > 0 && nums[i] == nums[i - 1])
+        {
+            continue;
+        }
+
+        // Because nums are sorted, so nums[i+1..i+k-1] are smallest in nums[i+1..size-1].
+        // if SUM(nums[i] + nums[i+1] + ... + nums[i+k-1]) > sum, we can give up, because 
+        // we cannot find answer, that sum is the smallest we can produce.
+        int s = nums[i];
+        for (int j = i + 1, p = k - 1; j < size && p > 0; s += nums[j++], --p);
+        if (s > sum)
+        {
+            break;
+        }
+
+        // Same reason, nums[size-k+1..size-1] are largest in nums[i+1..size-1].
+        // if SUM(nums[i] + nums[size-k+1] + ... + nums[size-1]) < sum, we can ignore current loop (jump over nums[i])
+        // because that sum is the largest we can produce in current loop.
+        s = nums[i];
+        for (int j = size - 1, p = k - 1; j > 0 && p > 0; s += nums[j--], --p);
+        if (s < sum)
+        {
+            continue;
+        }
+
+        vector<int> v(0);
+        for (int j = i + 1; j < size; v.push_back(nums[j++]));
+
+        vector<vector<int>> cures = kSum(v, k - 1, sum-nums[i]);
+        for (int j = 0; j < cures.size(); ++j)
+        {
+            cures[j].insert(cures[j].begin(), nums[i]);
+            result.insert(result.end(), cures[j]);
+        }
+    }
+
+    return result;
+}
+
+vector<vector<int>> threeSum(vector<int>& nums) 
+{
+    sort(nums.begin(), nums.end());
+    return kSum(nums, 3, 0);
+}
+
+//18. 4Sum
+vector<vector<int>> fourSum(vector<int>& nums, int target)
+{
+    sort(nums.begin(), nums.end());
+    return kSum(nums, 4, target);
+}
