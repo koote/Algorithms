@@ -434,6 +434,40 @@ vector<vector<int>> threeSum(vector<int>& nums)
     return kSum(nums, 3, 0);
 }
 
+//17. Letter Combinations of a Phone Number
+vector<string> letterCombinations(string digits)
+{
+    //                                0   1     2      3      4      5      6      7       8      9
+    const static vector<string> dict{ "", "", "abc", "def", "ghi", "jkl", "mon", "pqrs", "tuv", "xwyz" };
+    vector<string> result;
+
+    if (digits.length() == 0)
+    {
+        return result;
+    }
+
+    if (digits.length() == 1)
+    {
+        string val = dict[digits[0] - '0'];
+        for (int i = 0; i < val.length(); ++i)
+        {
+            result.push_back(val.substr(i, 1));
+        }
+        return result;
+    }
+
+    vector<string> cures = letterCombinations(digits.substr(1));
+    string val = dict[digits[0] - '0'];
+    for (int i = 0; i < val.length(); ++i)
+    {
+        for (int j = 0; j < cures.size(); ++j)
+        {
+            result.push_back(val.substr(i, 1).append(cures[j]));
+        }
+    }
+    return result;
+}
+
 //18. 4Sum
 vector<vector<int>> fourSum(vector<int>& nums, int target)
 {
