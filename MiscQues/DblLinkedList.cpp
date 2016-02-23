@@ -44,8 +44,3 @@ DLNODE* SwapPair(DLNODE* head)
 
     return (head->prev == nullptr) ? head : head->prev;
 }
-
-void TestDblLinkedList()
-{
-
-}

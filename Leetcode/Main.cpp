@@ -10,6 +10,9 @@ extern bool isMatch(string s, string p);
 extern string longestCommonPrefix(vector<string>& strs);
 extern vector<vector<int>> threeSum(vector<int>& nums);
 extern vector<vector<int>> fourSum(vector<int>& nums, int target);
+extern string intToRoman(int num);
+extern vector<vector<int>> threeSum(vector<int>& nums);
+extern int threeSumClosest(vector<int>& nums, int target);
 extern vector<string> letterCombinations(string digits);
 
 void main()

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <queue>
+#include <map>
 using namespace std;
 
 // 3# Longest Substring Without Repeating Characters
@@ -321,7 +322,58 @@ int maxArea(vector<int>& height)
 // 12# Integer to Roman
 string intToRoman(int num)
 {
-    return nullptr;
+    int n[] = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
+    string r[] = { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
+
+    string result;
+    for (int k = 1; num != 0; num /= 10, k *= 10)
+    {
+        int d = (num % 10) * k;
+
+        int i = 0;
+        int j = sizeof(n) / sizeof(n[0]) - 1;
+        while (j - i > 1)
+        {
+            int mid = (i + j) / 2;
+            if (n[mid] == d)
+            {
+                result = string(r[mid]).append(result);
+                break;
+            }
+            else if (n[mid] > d)
+            {
+                i = mid;
+            }
+            else
+            {
+                j = mid;
+            }
+        }
+
+        if (j - i == 1)
+        {
+            if (n[i] == d)
+            {
+                result = string(r[i]).append(result);
+            }
+            else if (n[j] == d)
+            {
+                result = string(r[i]).append(result);
+            }
+            else
+            {
+                int index = 0;
+                for (; n[index] != k; ++index);
+                result = string(r[j]).append(result);
+                for (int count = (d - n[j]) / k; count > 0; --count)
+                {
+                    result = string(r[index]).append(result);
+                }
+            }
+        }
+    }
+
+    return result;
 }
 
 // 14# Longest Common Prefix
@@ -338,7 +390,7 @@ string longestCommonPrefix(vector<string>& strs)
     {
         for (int i = 0, size = strs.size(); i < size; ++i)
         {
-            if (strs[i][index] != strs[0][index] || index >= strs[i].length())
+            if (index >= strs[i].length() || strs[i][index] != strs[0][index])
             {
                 flag = false;
                 break;
@@ -417,7 +469,7 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum)
         vector<int> v(0);
         for (int j = i + 1; j < size; v.push_back(nums[j++]));
 
-        vector<vector<int>> cures = kSum(v, k - 1, sum-nums[i]);
+        vector<vector<int>> cures = kSum(v, k - 1, sum - nums[i]);
         for (int j = 0; j < cures.size(); ++j)
         {
             cures[j].insert(cures[j].begin(), nums[i]);
@@ -432,6 +484,52 @@ vector<vector<int>> threeSum(vector<int>& nums)
 {
     sort(nums.begin(), nums.end());
     return kSum(nums, 3, 0);
+}
+
+//16. 3Sum Closest
+int threeSumClosest(vector<int>& nums, int target)
+{
+    const int size = nums.size();
+    int result = 0;
+    int diff = INT_MAX;
+
+    sort(nums.begin(), nums.end());
+    for (int i = 0; i <= size - 3; ++i)
+    {
+        if (i > 0 && nums[i] == nums[i - 1])
+        {
+            continue;
+        }
+
+        // 2sum in nums[i+1..size-1].
+        for (int l = i + 1, r = size - 1; l < r;)
+        {
+            // Cannot intialize result to INT_MAX then calc difference = abs(result - target) everytime, that could overflow.
+
+            int s = nums[l] + nums[r];
+            int d = abs(s - (target - nums[i]));
+            if (d < diff)
+            {
+                result = s + nums[i];
+                diff = d;
+            }
+
+            if (result == target)
+            {
+                return result;
+            }
+            else if (s > target - nums[i])
+            {
+                for (--r; r > 0 && nums[r] == nums[r + 1]; --r);
+            }
+            else
+            {
+                for (++l; l < size && nums[l] == nums[l - 1]; ++l);
+            }
+        }
+    }
+
+    return result;
 }
 
 //17. Letter Combinations of a Phone Number
@@ -473,4 +571,54 @@ vector<vector<int>> fourSum(vector<int>& nums, int target)
 {
     sort(nums.begin(), nums.end());
     return kSum(nums, 4, target);
+}
+
+//19. Remove Nth Node From End of List
+struct ListNode
+{
+    int val;
+    ListNode *next;
+    ListNode(int x) : val(x), next(NULL) {}
+};
+ListNode* removeNthFromEnd(ListNode* head, int n)
+{
+    ListNode* p;
+    for (p = head; n > 0 && p != nullptr; p = p->next, --n);
+
+    if (p == nullptr && n == 0)
+    {
+        ListNode* r = head->next;
+        delete head;
+        return r;
+    }
+    else
+    {
+        ListNode* q;
+        for (q = head; q != nullptr && p != nullptr && p->next != nullptr; q = q->next, p = p->next);
+
+        // q->next is what needs to be removed.
+        ListNode* r = q->next;
+        q->next = r->next;
+        delete r;
+
+        return head;
+    }
+}
+ListNode* removeNthFromEnd2(ListNode* head, int n)
+{
+    ListNode dummy(-1);
+    dummy.next = head;
+
+    ListNode* p;
+    for (p = &dummy; n > 0 && p != nullptr; p = p->next, --n);
+
+    ListNode* q;
+    for (q = &dummy; q != nullptr && p != nullptr && p->next != nullptr; q = q->next, p = p->next);
+
+    // q->next is what needs to be removed.
+    ListNode* r = q->next;
+    q->next = r->next;
+    delete r;
+
+    return dummy.next;
 }

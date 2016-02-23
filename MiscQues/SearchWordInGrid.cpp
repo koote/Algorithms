@@ -1,5 +1,4 @@
-﻿
-#include <stack>
+﻿#include <stack>
 
 struct STEP
 {
