@@ -1,6 +1,6 @@
 #include <string>
-#include <regex>
-#include <iostream>
+#include <vector>
+#include <ctime>
 using namespace std;
 
 extern string longestPalindrome(string s);

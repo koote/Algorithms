@@ -15,11 +15,11 @@ public:
 
 struct STEP
 {
-    COORDINATE coor;
+    COORDINATE coordinate;
     int directions[8];
-    
+
 public:
-    STEP(COORDINATE& c) : coor(c.x, c.y)
+    STEP(COORDINATE& c) : coordinate(c.x, c.y)
     {
         InitializeDirections();
     }
@@ -38,20 +38,20 @@ bool FindPath(int** maze, int m, int n, COORDINATE start, COORDINATE end)
         return false;
     }
 
-    std::stack<STEP> stkSteps;
+    std::stack<STEP> trail;
     STEP s(start);
-    stkSteps.push(s);
+    trail.push(s);
 
-    while(!stkSteps.empty())
+    while(!trail.empty())
     {
-        STEP cur = stkSteps.top();
+        STEP cur = trail.top();
         bool bMoveNext = false;
 
         // try directions that not visited.
         for (int d = 0; d < 8; ++d)
         {
-            int nexti = 0;
-            int nextj = 0;
+            int nextX = 0;
+            int nextY = 0;
             if (cur.directions[d] == 0) // 1 means visited, 0 means not visited
             {
                 cur.directions[d] = 1; //mark as visited.
@@ -59,54 +59,54 @@ bool FindPath(int** maze, int m, int n, COORDINATE start, COORDINATE end)
                 switch (d)
                 {
                 case 1:
-                    nexti = cur.coor.x - 1;
-                    nextj = cur.coor.y - 1;
+                    nextX = cur.coordinate.x - 1;
+                    nextY = cur.coordinate.y - 1;
                     break;
 
                 case 2:
-                    nexti = cur.coor.x - 1;
-                    nextj = cur.coor.y;
+                    nextX = cur.coordinate.x - 1;
+                    nextY = cur.coordinate.y;
                     break;
 
                 case 3:
-                    nexti = cur.coor.x - 1;
-                    nextj = cur.coor.y + 1;
+                    nextX = cur.coordinate.x - 1;
+                    nextY = cur.coordinate.y + 1;
                     break;
 
                 case 4:
-                    nexti = cur.coor.x;
-                    nextj = cur.coor.y + 1;
+                    nextX = cur.coordinate.x;
+                    nextY = cur.coordinate.y + 1;
                     break;
 
                 case 5:
-                    nexti = cur.coor.x + 1;
-                    nextj = cur.coor.y + 1;
+                    nextX = cur.coordinate.x + 1;
+                    nextY = cur.coordinate.y + 1;
                     break;
 
                 case 6 :
-                    nexti = cur.coor.x + 1;
-                    nextj = cur.coor.y;
+                    nextX = cur.coordinate.x + 1;
+                    nextY = cur.coordinate.y;
                     break;
 
                 case 7:
-                    nexti = cur.coor.x + 1;
-                    nextj = cur.coor.y - 1;
+                    nextX = cur.coordinate.x + 1;
+                    nextY = cur.coordinate.y - 1;
                     break;
 
                 case 8:
-                    nexti = cur.coor.x;
-                    nextj = cur.coor.y - 1;
+                    nextX = cur.coordinate.x;
+                    nextY = cur.coordinate.y - 1;
                     break;
                 }
 
-                // move on to next position
-                if (end.x == nexti && end.y == nextj) //got it!
+                // move to next position
+                if (end.x == nextX && end.y == nextY) //got it!
                 {
                     // print out the path and return;
                     return true;
                 }
                 
-                if (maze[nexti][nextj] == 0)
+                if (maze[nextX][nextY] == 0)
                 {
                     // For every position in maze, its value could be 1, -1 or 0.
                     // 0 means it is a safe position, can move on it.
@@ -114,10 +114,10 @@ bool FindPath(int** maze, int m, int n, COORDINATE start, COORDINATE end)
                     // 1 is temporary, it means this position is still in stack, it is a part of current path.
                     // in the further search, we don't want to cross the path.
 
-                    maze[nexti][nextj] = 1;
+                    maze[nextX][nextY] = 1;
                     bMoveNext = true;
-                    STEP next(COORDINATE(nexti, nextj));
-                    stkSteps.push(next);
+                    STEP next(COORDINATE(nextX, nextY));
+                    trail.push(next);
 
                     break;
                 }
@@ -129,8 +129,8 @@ bool FindPath(int** maze, int m, int n, COORDINATE start, COORDINATE end)
             // before we popup and roll back, we need to revert the value of this position in maze from 1 to 0.
             // it is safe to to that, because this direction is already marked as visited, so even its value is 0,
             // next time we will not move to this position again.
-            maze[cur.coor.x][cur.coor.y] = 0;
-            stkSteps.pop();
+            maze[cur.coordinate.x][cur.coordinate.y] = 0;
+            trail.pop();
         }
     }
 

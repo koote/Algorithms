@@ -3,6 +3,7 @@
 #include <vector>
 #include <queue>
 #include <map>
+#include <stack>
 using namespace std;
 
 // 3# Longest Substring Without Repeating Characters
@@ -621,4 +622,52 @@ ListNode* removeNthFromEnd2(ListNode* head, int n)
     delete r;
 
     return dummy.next;
+}
+
+// 20. Valid Parentheses
+bool isValid(string s)
+{
+    stack<char> stk;
+    for (int i = 0, length = s.length(); i < length; ++i)
+    {
+        if (s[i] == '{' || s[i] == '[' || s[i] == '(')
+        {
+            stk.push(s[i]);
+        }
+        else if ((s[i] == '}' && !stk.empty() && stk.top() == '{') || (s[i] == ']' && !stk.empty() && stk.top() == '[') || (s[i] == ')' && !stk.empty() && stk.top() == '('))
+        {
+            stk.pop();
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return stk.empty();
+}
+
+// 226. Invert Binary Tree
+struct TreeNode
+{
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+TreeNode* invertTree(TreeNode* root) 
+{
+    if (root == nullptr)
+    {
+        return root;
+    }
+
+    invertTree(root->left);
+    invertTree(root->right);
+
+    TreeNode* temp = root->left;
+    root->left = root->right;
+    root->right = temp;
+
+    return root;
 }
