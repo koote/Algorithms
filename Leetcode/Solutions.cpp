@@ -4,7 +4,20 @@
 #include <queue>
 #include <map>
 #include <stack>
+#include "DataStructure.h"
 using namespace std;
+
+// 1. Two Sum
+vector<int> twoSum(vector<int>& nums, int target)
+{
+    throw new exception();
+}
+
+// 2. Add Two Numbers
+ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
+{
+    throw new exception();
+}
 
 // 3# Longest Substring Without Repeating Characters
 int lengthOfLongestSubstring(string s)
@@ -71,7 +84,6 @@ double findKth(int a[], int m, int b[], int n, int k)
         return a[i - 1];
     }
 }
-
 double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2)
 {
     int m = nums1.size();
@@ -99,7 +111,6 @@ string trySearchPalindromic(string s, int l, int r)
 
     return s.substr(l + 1, r - l - 1);
 }
-
 string longestPalindrome(string s)
 {
     int slen = s.length();
@@ -377,6 +388,12 @@ string intToRoman(int num)
     return result;
 }
 
+//13. Roman to Integer
+int romanToInt(string s)
+{
+    throw new exception();
+}
+
 // 14# Longest Common Prefix
 string longestCommonPrefix(vector<string>& strs)
 {
@@ -481,7 +498,7 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum)
     return result;
 }
 
-vector<vector<int>> threeSum(vector<int>& nums) 
+vector<vector<int>> threeSum(vector<int>& nums)
 {
     sort(nums.begin(), nums.end());
     return kSum(nums, 3, 0);
@@ -575,12 +592,6 @@ vector<vector<int>> fourSum(vector<int>& nums, int target)
 }
 
 //19. Remove Nth Node From End of List
-struct ListNode
-{
-    int val;
-    ListNode *next;
-    ListNode(int x) : val(x), next(NULL) {}
-};
 ListNode* removeNthFromEnd(ListNode* head, int n)
 {
     ListNode* p;
@@ -647,15 +658,240 @@ bool isValid(string s)
     return stk.empty();
 }
 
-// 226. Invert Binary Tree
-struct TreeNode
+// 21. Merge Two Sorted Lists
+ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
 {
-    int val;
-    TreeNode *left;
-    TreeNode *right;
-    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
-};
-TreeNode* invertTree(TreeNode* root) 
+    ListNode head(-1);
+    ListNode* last = &head;
+    while (l1 != nullptr && l2 != nullptr)
+    {
+        ListNode* r;
+        if (l1->val < l2->val)
+        {
+            r = l1;
+            l1 = l1->next;
+        }
+        else
+        {
+            r = l2;
+            l2 = l2->next;
+        }
+
+        r->next = nullptr;
+        last->next = r;
+        last = r;
+    }
+
+    if (l1 != nullptr)
+    {
+        last->next = l1;
+    }
+    else if (l2 != nullptr)
+    {
+        last->next = l2;
+    }
+
+    return head.next;
+}
+
+// 22. Generate Parentheses
+vector<string> generateParenthesisInternal(string trail, int remainingLeftBrackets, int remainingRightBrackets)
+{
+    vector<string> results;
+
+    if (remainingLeftBrackets == 0 && remainingRightBrackets == 0)
+    {
+        results.push_back(trail);
+        return results;
+    }
+
+    // Solution space is a binary tree. But this problem is a little different from other similiar problems (e.g. letterCombinations),
+    // that is when searching in the solution tree, remaining left brackets must not be more than remaining right brackets.
+    if (remainingLeftBrackets <= remainingRightBrackets)
+    {
+        if (remainingLeftBrackets > 0)
+        {
+            // NOTE: When calling deeper, always use temp variable, DO NOT change the value of parameter in current level.
+            // E.g. DO NOT use trail.append or --remainingLeftBrackets here.
+            vector<string> cures1 = generateParenthesisInternal(trail + '(', remainingLeftBrackets - 1, remainingRightBrackets);
+            results.insert(results.end(), cures1.begin(), cures1.end());
+        }
+
+        if (remainingRightBrackets > 0)
+        {
+            vector<string> cures2 = generateParenthesisInternal(trail + ')', remainingLeftBrackets, remainingRightBrackets - 1);
+            results.insert(results.end(), cures2.begin(), cures2.end());
+        }
+    }
+
+    return results;
+}
+vector<string> generateParenthesis(int n)
+{
+    return generateParenthesisInternal("", n, n);
+}
+
+// 23. Merge k Sorted Lists
+void minHeapify(vector<ListNode*>& nodes, int i)
+{
+    int size = nodes.size();
+    int smallest = i;
+
+    if (2 * i + 1 < size && nodes[smallest]->val > nodes[2 * i + 1]->val) // left child
+    {
+        smallest = i * 2 + 1;
+    }
+
+    if (2 * i + 2 < size && nodes[smallest]->val > nodes[2 * i + 2]->val) // right child
+    {
+        smallest = 2 * i + 2;
+    }
+
+    if (smallest != i)
+    {
+        ListNode* temp = nodes[smallest];
+        nodes[smallest] = nodes[i];
+        nodes[i] = temp;
+
+        minHeapify(nodes, smallest);
+    }
+}
+void buildMinHeap(vector<ListNode*>& nodes)
+{
+    for (int i = (nodes.size() - 2) / 2; i >= 0; --i)
+    {
+        minHeapify(nodes, i);
+    }
+}
+ListNode* mergeKLists(vector<ListNode*>& lists)
+{
+    ListNode head(-1);
+    ListNode* last = &head;
+
+    vector<ListNode*> nodes;
+    for (ListNode* node : lists)
+    {
+        if (node != nullptr)
+        {
+            nodes.push_back(node);
+        }
+    }
+
+    // nodes[0] will be the smallest one.
+    buildMinHeap(nodes);
+
+    while (!nodes.empty())
+    {
+        last->next = nodes[0];
+        last = last->next;
+        nodes[0] = nodes[0]->next;
+        last->next = nullptr;
+
+        if (nodes[0] == nullptr) // this list has no remaining nodes.
+        {
+            // NOTE: After heap is built, never use erase to remove the root of heap, that will break the heap.
+            // We should always only exchange node[0] with last leaf node to get the root out of heap.
+            // WHY? Beucase after the heap is adjusted, for each element i, its left (2i+1) and right (2i+2) child
+            // are indexed by their position, if we erase the root, all elements' indexes shift left 1 position,
+            // so element i becomes i-1, and its new left child is 2i-1 (which was 2i) and new right child is 2i (which was 2i+1).
+            // The order of each nodes and its children could be broken.
+            // If a heap is broken, we cannot just use heapify to make it is a heap again, we need a full rebuild.
+
+            swap(nodes[0], nodes[nodes.size() - 1]);
+            nodes.pop_back();
+        }
+
+        minHeapify(nodes, 0);
+    }
+
+    return head.next;
+}
+
+// 24. Swap Nodes in Pairs
+ListNode* swapPairs(ListNode* head)
+{
+    if (head == nullptr || head->next == nullptr) // 0 or 1 node.
+    {
+        return head;
+    }
+
+    ListNode* p = head;
+    ListNode* q = head->next;
+
+    ListNode dummy(-1);
+    dummy.next = head;
+    ListNode* r = &dummy;
+
+    while (p != nullptr && q != nullptr)
+    {
+        r->next = q;
+        p->next = q->next;
+        q->next = p;
+
+        r = p;
+        p = p->next;
+        q = p != nullptr ? p->next : nullptr;
+    }
+
+    return dummy.next;
+}
+
+//25. Reverse Nodes in k-Group
+ListNode* reverseKGroup(ListNode* head, int k) 
+{
+    if (head == nullptr || k <= 1)
+    {
+        return head;
+    }
+
+    ListNode dummy(-1);
+    dummy.next = head;
+    ListNode* r = &dummy;
+
+    ListNode* p = head;
+    ListNode* q = head;
+
+    while (p != nullptr && q != nullptr)
+    {
+        int n = k - 1;
+        for (; n > 0 && q != nullptr; --n, q = q->next);
+
+        if (n == 0 && q != nullptr)
+        {
+            r->next = q;
+            ListNode* temp = q->next;
+
+            // reverse p..q
+            ListNode* s = p;
+            ListNode* t = p->next;
+            ListNode* u;
+            while (s != q)
+            {
+                u = t->next;
+                t->next = s;
+                s = t;
+                t = u;
+            }
+
+            p->next = temp;
+
+            r = p;
+            p = p->next;
+            q = p;
+        }
+    }
+
+    return dummy.next;
+}
+
+//26. Remove Duplicates from Sorted Array
+int removeDuplicates(vector<int>& nums)
+{
+
+}
+
+// 226. Invert Binary Tree
+TreeNode* invertTree(TreeNode* root)
 {
     if (root == nullptr)
     {
