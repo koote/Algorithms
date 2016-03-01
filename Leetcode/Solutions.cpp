@@ -498,7 +498,7 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum)
     return result;
 }
 
-vector<vector<int>> threeSum(vector<int>& nums)
+vector<vector<int>> threeSum(vector<int>& nums) 
 {
     sort(nums.begin(), nums.end());
     return kSum(nums, 3, 0);
@@ -797,7 +797,9 @@ ListNode* mergeKLists(vector<ListNode*>& lists)
             // The order of each nodes and its children could be broken.
             // If a heap is broken, we cannot just use heapify to make it is a heap again, we need a full rebuild.
 
-            swap(nodes[0], nodes[nodes.size() - 1]);
+            ListNode* temp = nodes[0];
+            nodes[0] = nodes[nodes.size() - 1];
+            nodes[nodes.size() - 1] = temp;
             nodes.pop_back();
         }
 
@@ -837,7 +839,7 @@ ListNode* swapPairs(ListNode* head)
 }
 
 //25. Reverse Nodes in k-Group
-ListNode* reverseKGroup(ListNode* head, int k) 
+ListNode* reverseKGroup(ListNode* head, int k)
 {
     if (head == nullptr || k <= 1)
     {
@@ -891,7 +893,7 @@ int removeDuplicates(vector<int>& nums)
 }
 
 // 226. Invert Binary Tree
-TreeNode* invertTree(TreeNode* root)
+TreeNode* invertTree(TreeNode* root) 
 {
     if (root == nullptr)
     {
@@ -906,4 +908,27 @@ TreeNode* invertTree(TreeNode* root)
     root->right = temp;
 
     return root;
+}
+
+//235. Lowest Common Ancestor of a Binary Search Tree
+TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
+{
+    TreeNode* r = root;
+    while (r != nullptr)
+    {
+        if (r->val > p->val && r->val > q->val)
+        {
+            r = r->left;
+        }
+        else if (r->val < p->val && r->val < q->val)
+        {
+            r = r->right;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    return r;
 }
