@@ -37,13 +37,15 @@ extern ListNode* mergeKLists(vector<ListNode*>& lists);
 extern ListNode* swapPairs(ListNode* head);
 extern ListNode* reverseKGroup(ListNode* head, int k);
 extern int removeDuplicates(vector<int>& nums);
+extern int removeElement(vector<int>& nums, int val);
+extern int strStr(string haystack, string needle);
 
 void main()
 {
     auto start = std::clock();
 
-    vector<int> list1{ 1, 2};
-    auto x = reverseKGroup(createList(list1), 2);
+    vector<int> list1{ 2 };
+    auto x = removeElement(list1, 3);
 
     auto duration1 = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 }

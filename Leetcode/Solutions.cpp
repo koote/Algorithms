@@ -498,7 +498,7 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum)
     return result;
 }
 
-vector<vector<int>> threeSum(vector<int>& nums) 
+vector<vector<int>> threeSum(vector<int>& nums)
 {
     sort(nums.begin(), nums.end());
     return kSum(nums, 3, 0);
@@ -886,14 +886,61 @@ ListNode* reverseKGroup(ListNode* head, int k)
     return dummy.next;
 }
 
-//26. Remove Duplicates from Sorted Array
+// 26. Remove Duplicates from Sorted Array
 int removeDuplicates(vector<int>& nums)
+{
+    // last points to the last element in packed part of array.
+    int last = -1;
+    for (int i = 0; i < nums.size() && last < (int)nums.size();)
+    {
+        for (; i + 1 < nums.size() && nums[i] == nums[i + 1]; ++i);
+        nums[++last] = nums[i++];
+    }
+
+    return last + 1;
+}
+int removeDuplicates2(vector<int>& nums)
+{
+    if (nums.size() == 0)
+    {
+        return 0;
+    }
+
+    int last = 0;
+    for (int i = 0; i < nums.size(); ++i)
+    {
+        if (nums[i] != nums[last])
+        {
+            nums[++last] = nums[i];
+        }
+    }
+
+    return last + 1;
+}
+
+// 27. Remove Element
+int removeElement(vector<int>& nums, int val)
+{
+    int last = 0;
+    for (int i = 0; i < nums.size(); ++i)
+    {
+        if (nums[i] != val)
+        {
+            nums[last++] = nums[i];
+        }
+    }
+
+    return last;
+}
+
+//28. Implement strStr()
+int strStr(string haystack, string needle)
 {
 
 }
 
 // 226. Invert Binary Tree
-TreeNode* invertTree(TreeNode* root) 
+TreeNode* invertTree(TreeNode* root)
 {
     if (root == nullptr)
     {
