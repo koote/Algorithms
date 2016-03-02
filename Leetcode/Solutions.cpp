@@ -313,7 +313,7 @@ bool isMatch(string s, string p)
 int maxArea(vector<int>& height)
 {
     int maxs = 0;
-    for (int len = height.size(), i = 0, j = len - 1; i < j; )
+    for (int len = height.size(), i = 0, j = len - 1; i < j;)
     {
         int s = min(height[i], height[j]) * (j - i);
         maxs = max(maxs, s);
@@ -936,7 +936,22 @@ int removeElement(vector<int>& nums, int val)
 //28. Implement strStr()
 int strStr(string haystack, string needle)
 {
+    if (needle.length() == 0)
+    {
+        return 0;
+    }
 
+    for (int i = 0, tlen = haystack.length(), plen = needle.length(); i <= tlen - plen; ++i)
+    {
+        int p = 0;
+        for (; p < plen && p + i < tlen && haystack[p + i] == needle[p]; ++p);
+        if (p == plen)
+        {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 // 226. Invert Binary Tree
