@@ -957,44 +957,29 @@ int strStr(string haystack, string needle)
 // 29. Divide Two Integers
 int divide(int dividend, int divisor)
 {
-    if ((dividend == INT_MIN && divisor == -1) || divisor == 0)
-    {
-        return INT_MAX;
-    }
-
-    // XOR the sign bit of dividend and divisor, check if they have same sign or not.
-    // Because in C/C++, >> is arithmatic shift, so only check the lowest bit after >>31 shift.
-    bool negative = ((dividend^divisor) >> 31) & 0x1 == 1;
-
-    // Use uint to avoid abs(INT_MIN) overflow.
+    bool negative = ((dividend ^ divisor) >> 31) & 0x1 == 1;
     unsigned int a = dividend < 0 ? -dividend : dividend;
     unsigned int b = divisor < 0 ? -divisor : divisor;
     unsigned int quotient = 0;
+
     while (a >= b)
     {
         unsigned int k = 0;
-        for (; a >= b << k; ++k)
-        {
-            // It is possible that, in current iteration, (b << k) <= a is true, but in next iteration, b << (k + 1) overflows, when
-            // overflow happens, b << (k + 1) == 0 <= a is always true, which makes the loop never ends. We need to handle that case.
-            // First of all, It is impossible that (b << k) < a is true but (b << (k + 1)) overflows. Why? If b << k + 1 will overflow,
-            // it means b << k must has 1 on its highest bit: (b << k) >= 0x80000000, and a > (b << k). Actually that 'a' doesn't 
-            // exists because we know a is abs of 32 bit signed integer, the maximum value of a is 0x8000000 = abs(INT_MIN), a could 
-            // not large than (b << k).
-            // So the only case that could cause overflow is: (b << k) == a is true, but b << (k + 1) overflows. If (b << k) == a, we
-            // should breaks the loop manually, because we know b << (k + 1) > a must be true, but loop will not ends because of overflow.
-            if (a == b << k)
-            {
-                k++; // make sure we always needs to decrease k.
-                break;
-            }
-        }
 
-        quotient |= 1 << --k;
+        // We are looking for a k that b << k <= a but b << (k + 1) > a. The loop looks complicated since
+        // we need to handle overflow. E.g. a == 1 << 31 and b == 1, k should be 31, because b << 31 == a
+        // and b << 32 > a, however b << 32 actually overflows so b << 32 == 0, this loop will never end.
+        // To prevent overflow, b << k must <= 0x80000000 / 2, otherwise, b << (k + 1) will overflow.
+        for (; a >= b << k && b << k <= (0x80000000 >> 1); ++k);
+
+        // When loop ends, if a < b << k, which means no overflow happens, and k increased one additional time,
+        // we need to decrease k; otherwise (a >= b << k), it means overflow happens, k is the maximum we can find.
+        quotient |= 1 << (a < b << k ? --k : k);
         a -= b << k;
     }
 
-    return negative ? -quotient : quotient;
+    // If negative is false, quotient must <= INT_MAX, otherwise overflow, should return INT_MAX.
+    return negative ? -quotient : quotient > INT_MAX ? INT_MAX : quotient;
 }
 
 // 226. Invert Binary Tree

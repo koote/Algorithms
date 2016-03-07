@@ -45,7 +45,7 @@ void main()
 {
     auto start = std::clock();
 
-    auto x = divide(-1, 1);
+    auto x = divide(-2147483648, -1);
 
     auto duration1 = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 }
