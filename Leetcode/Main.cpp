@@ -40,12 +40,14 @@ extern int removeDuplicates(vector<int>& nums);
 extern int removeElement(vector<int>& nums, int val);
 extern int strStr(string haystack, string needle);
 extern int divide(int dividend, int divisor);
+extern vector<int> findSubstring(string s, vector<string>& words);
+extern void nextPermutation(vector<int>& nums);
 
 void main()
 {
     auto start = std::clock();
 
-    auto x = divide(-2147483648, -1);
+    nextPermutation(vector<int>{1, 2});
 
     auto duration1 = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 }

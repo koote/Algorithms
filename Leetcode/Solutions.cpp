@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <queue>
-#include <map>
+#include <unordered_map>
 #include <stack>
 #include "DataStructure.h"
 using namespace std;
@@ -980,6 +980,80 @@ int divide(int dividend, int divisor)
 
     // If negative is false, quotient must <= INT_MAX, otherwise overflow, should return INT_MAX.
     return negative ? -quotient : quotient > INT_MAX ? INT_MAX : quotient;
+}
+
+// 30. Substring with Concatenation of All Words
+vector<int> findSubstring(string s, vector<string>& words)
+{
+    vector<int> result;
+
+    if (words.size() == 0)
+    {
+        return result;
+    }
+
+    int wordLen = words[0].length();
+    int patternLen = wordLen * words.size();
+
+    if (patternLen > s.length())
+    {
+        return result;
+    }
+
+    // Here we use a hash table to store for each word, how many times it occurs.
+    unordered_map<string, int> wordCount;
+    for (int i = 0; i < words.size(); ++i)
+    {
+        ++wordCount[words[i]];
+    }
+
+    for (int i = 0; i <= s.length() - patternLen; ++i)
+    {
+        unordered_map<string, int> unusedWords(wordCount);
+
+        // Check if all words present in current substring s[i..i+patternLen-1]
+        // Slice it to words.size() slices, for each slice, use the unusedWords
+        // hash table to quick check if it is a word, if yes, decrease value in
+        // hash table, means it has been used.
+        for (int j = i; j <= i + patternLen - wordLen; j += wordLen)
+        {
+            string word = s.substr(j, wordLen);
+            if (unusedWords.find(word) == unusedWords.end())
+            {
+                break;
+            }
+
+            if (--unusedWords[word] == 0)
+            {
+                unusedWords.erase(word);
+            }
+        }
+
+        if (unusedWords.empty())
+        {
+            result.push_back(i);
+        }
+    }
+
+    return result;
+}
+
+// 31. Next Permutation
+void nextPermutation(vector<int>& nums)
+{
+    if (nums.size() > 1)
+    {
+        int i; // i-1 will be the first element that nums[i-1] < nums[i].
+        int j; // j will be the first element in nums[i..size-1] that large than nums[i-1].
+        for (i = nums.size() - 1; i > 0 && nums[i] <= nums[i - 1]; --i); // search from end of array for the first element that smaller than its successor.
+        sort(nums.begin() + i, nums.end());
+        if (i > 0)
+        {
+            // Search for j that nums[j] is the first one large than nums[i-1], then swap nums[i-1] and nums[j].
+            for (j = i; j <= nums.size() - 1 && nums[j] <= nums[i - 1]; ++j);
+            swap(nums[i-1], nums[j]);
+        }
+    }
 }
 
 // 226. Invert Binary Tree
