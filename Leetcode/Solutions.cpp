@@ -176,19 +176,19 @@ string zigzagConvert(string s, int numRows)
 int reverseInteger(int x)
 {
     int sign = x < 0 ? -1 : 1;
-    x = x < 0 ? -x : x;
+    unsigned int num = x < 0 ? 0 - x : x; // if x = INT_MIN, -INT_MIN will overflow, so use uint here.
 
     queue<int> digits;
-    while (x > 0)
+    while (num > 0)
     {
-        digits.push(x % 10);
-        x = x / 10;
+        digits.push(num % 10);
+        num = num / 10;
     }
 
     // Key is considering overflow and nth power of 10.
     // nth power of 10 doesn't need special handling.
-    int result = 0;
-    while (!digits.empty() && result <= ((1 << 31) - 1 - digits.front()) / 10)
+    unsigned int result = 0;
+    while (!digits.empty() && result <= (unsigned int)(INT_MAX - digits.front()) / 10)
     {
         result *= 10;
         result += digits.front();
@@ -202,8 +202,6 @@ int reverseInteger(int x)
 // 8# String to Integer (atoi)
 int myAtoi(string str)
 {
-    int int32max = (1 << 31) - 1;
-    int int32min = -(1 << 31);
     int slen = str.length();
 
     // 1. Trim heading whitespaces.
@@ -223,18 +221,18 @@ int myAtoi(string str)
     }
 
     // 3. Process overflow or underflow. 
-    int r = 0;
+    unsigned int r = 0;
     while (i < slen && str[i] >= '0' && str[i] <= '9')
     {
         int digit = str[i] - '0';
 
-        if (sign == 1 && (r > int32max / 10 || (r == int32max / 10 && digit > int32max % 10))) // overflow
+        if (sign == 1 && (r > INT_MAX / 10 || (r == INT_MAX / 10 && digit > INT_MAX % 10))) // overflow
         {
-            return int32max;
+            return INT_MAX;
         }
-        else if (sign == -1 && (r > 0 - int32min / 10 || (r == 0 - int32min / 10 && digit > 0 - int32min % 10))) //underflow
+        else if (sign == -1 && (r > unsigned int(-INT_MIN) / 10 || (r == unsigned int(-INT_MIN) / 10 && digit > unsigned int(-INT_MIN) % 10))) //underflow
         {
-            return int32min;
+            return INT_MIN;
         }
         else
         {
@@ -394,7 +392,7 @@ int romanToInt(string s)
     throw new exception();
 }
 
-// 14# Longest Common Prefix
+// 14. Longest Common Prefix
 string longestCommonPrefix(vector<string>& strs)
 {
     if (strs.size() == 0)
@@ -1051,10 +1049,84 @@ void nextPermutation(vector<int>& nums)
         {
             // Search for j that nums[j] is the first one large than nums[i-1], then swap nums[i-1] and nums[j].
             for (j = i; j <= nums.size() - 1 && nums[j] <= nums[i - 1]; ++j);
-            swap(nums[i-1], nums[j]);
+            swap(nums[i - 1], nums[j]);
         }
     }
 }
+
+// 32. Longest Valid Parentheses
+int longestValidParentheses(string s)
+{
+    int slen = s.length();
+    int* dp = new int[slen];
+    memset(dp, 0, slen * sizeof(int));
+    int max = 0;
+
+    for (int i = slen - 2; i >= 0; --i)
+    {
+        dp[i] = s[i] == '(' ?
+            s[i + dp[i + 1] + 1] == ')' ?
+            dp[i + 1] + 2 +
+            (
+            i + dp[i + 1] + 2 < slen ? dp[i + dp[i + 1] + 2] : 0
+            ) : 0
+            : 0;
+
+        if (dp[i] > max)
+        {
+            max = dp[i];
+        }
+    }
+
+    delete[] dp;
+    return max;
+}
+int longestValidParentheses2(string s) // This solution is to demostrate how DP works.
+{
+    int max = 0;
+    int slen = s.length();
+
+    // dp[i] is the longest length of valid parentheses that starts from s[i].
+    // Please note that s[i] must be included. If s[i] is ')', then dp[i] = 0,
+    // because valid parentheses never start from ')', although there could be
+    // a valid parentheses starts from s[i+k] (0 <= k <= slen-i-1), but that is
+    // dp[i+k]'s business, not dp[i]'s.
+    int* dp = new int[slen];
+    dp[slen - 1] = 0;
+
+    for (int i = slen - 2; i >= 0; --i)
+    {
+        if (s[i] == '(')
+        {
+            if (i + dp[i + 1] + 1 < slen && s[i + dp[i + 1] + 1] == ')')
+            {
+                dp[i] = dp[i + 1] + 2;
+
+                if (i + dp[i + 1] + 2 < slen)
+                {
+                    dp[i] += dp[i + dp[i + 1] + 2];
+                }
+            }
+            else
+            {
+                dp[i] = 0;
+            }
+        }
+        else if (s[i] == ')')
+        {
+            dp[i] = 0;
+        }
+
+        if (dp[i] > max)
+        {
+            max = dp[i];
+        }
+    }
+
+    delete[] dp;
+    return max;
+}
+
 
 // 226. Invert Binary Tree
 TreeNode* invertTree(TreeNode* root)

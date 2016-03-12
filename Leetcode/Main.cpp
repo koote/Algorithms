@@ -42,12 +42,13 @@ extern int strStr(string haystack, string needle);
 extern int divide(int dividend, int divisor);
 extern vector<int> findSubstring(string s, vector<string>& words);
 extern void nextPermutation(vector<int>& nums);
+extern int longestValidParentheses(string s);
 
 void main()
 {
     auto start = std::clock();
 
-    nextPermutation(vector<int>{1, 2});
+    auto x = longestValidParentheses(")(");
 
     auto duration1 = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 }
