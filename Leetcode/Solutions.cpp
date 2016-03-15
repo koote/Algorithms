@@ -1127,6 +1127,59 @@ int longestValidParentheses2(string s) // This solution is to demostrate how DP 
     return max;
 }
 
+// 33. Search in Rotated Sorted Array
+int search(vector<int>& nums, int target)
+{
+    int left = 0;
+    int right = nums.size() - 1;
+    while (left <= right)
+    {
+        int mid = (left + right) / 2;
+        if (nums[mid] == target)
+        {
+            return mid;
+        }
+        else if (nums[left] <= nums[mid])   // mid is on left part.
+        {
+            if (target >= nums[left] && target <= nums[mid]) // nums[left] <= target <= nums[mid]
+            {
+                right = mid - 1;
+            }
+            else
+            {
+                left = mid + 1;
+            }
+        }
+        else if (nums[right] >= nums[mid]) // mid is on right part.
+        {
+            if (target >= nums[mid] && target <= nums[right]) // nums[mid] <= target <= nums[right]
+            {
+                left = mid + 1;
+            }
+            else
+            {
+                right = mid - 1;
+            }
+        }
+    }
+
+    return -1;
+}
+
+// 34. Search for a Range
+vector<int> searchRange(vector<int>& nums, int target)
+{
+    vector<int> result{ -1, -1 };
+    int left = 0;
+    int right = nums.size() - 1;
+    while (left <= right)
+    {
+        int mid = (left + right) / 2;
+        
+    }
+
+    return result;
+}
 
 // 226. Invert Binary Tree
 TreeNode* invertTree(TreeNode* root)

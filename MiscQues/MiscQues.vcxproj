@@ -14,7 +14,7 @@
     <ProjectGuid>{1BC2AA96-9087-4477-8FE2-292BA07CFE76}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>MiscQues</RootNamespace>
-    <ProjectName>MiscQues</ProjectName>
+    <ProjectName>MiscQuestions</ProjectName>
     <SccProjectName>SAK</SccProjectName>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>

@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <iostream>
 #include "DataStructure.h"
 
 using namespace std;
@@ -43,12 +44,15 @@ extern int divide(int dividend, int divisor);
 extern vector<int> findSubstring(string s, vector<string>& words);
 extern void nextPermutation(vector<int>& nums);
 extern int longestValidParentheses(string s);
+extern int search(vector<int>& nums, int target);
+extern vector<int> searchRange(vector<int>& nums, int target);
 
 void main()
 {
     auto start = std::clock();
 
-    auto x = longestValidParentheses(")(");
+    auto x = search(vector<int>{1, 3},3);
 
-    auto duration1 = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+    auto duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+    cout << duration<<endl;
 }
