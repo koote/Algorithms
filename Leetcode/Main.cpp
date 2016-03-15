@@ -46,6 +46,7 @@ extern void nextPermutation(vector<int>& nums);
 extern int longestValidParentheses(string s);
 extern int search(vector<int>& nums, int target);
 extern vector<int> searchRange(vector<int>& nums, int target);
+extern int searchInsert(vector<int>& nums, int target);
 
 void main()
 {
