@@ -265,14 +265,14 @@ bool isPalindrome(int x)
     while (k > 0)
     {
         int digit = x % 10;
-        ps += digit * pow(10, --k);
+        ps += digit * (int)pow(10, --k);
         x /= 10;
     }
 
     return n & 0x1 ? ps == x / 10 : ps == x;
 }
 
-// 10# Regular Expression Matching
+// 10. Regular Expression Matching
 bool isMatch(string s, string p)
 {
     // exit of recursion.
@@ -1098,6 +1098,8 @@ int longestValidParentheses2(string s) // This solution is to demostrate how DP 
     {
         if (s[i] == '(')
         {
+            //  (......................)          ....
+            // s[i]         s[i + dp[i + 1] + 1]
             if (i + dp[i + 1] + 1 < slen && s[i + dp[i + 1] + 1] == ')')
             {
                 dp[i] = dp[i + 1] + 2;
@@ -1112,7 +1114,7 @@ int longestValidParentheses2(string s) // This solution is to demostrate how DP 
                 dp[i] = 0;
             }
         }
-        else if (s[i] == ')')
+        else if (s[i] == ')') // If a string starts with ')', it could not be a valid parentheses.
         {
             dp[i] = 0;
         }
@@ -1169,16 +1171,51 @@ int search(vector<int>& nums, int target)
 // 34. Search for a Range
 vector<int> searchRange(vector<int>& nums, int target)
 {
-    vector<int> result{ -1, -1 };
+    vector<int> result;
     int left = 0;
     int right = nums.size() - 1;
     while (left <= right)
     {
         int mid = (left + right) / 2;
-        
+        if (nums[mid] == target)
+        {
+            // If we haven't find the first appearance of target (because result is empty), and current is not the 
+            // first appearance of target (because nums[mid - 1] == target), keep going left to find the first target
+            if (result.empty() && (mid > 0 && nums[mid - 1] == target))
+            {
+                right = mid - 1;
+            }
+            else if (!result.empty() && (mid < nums.size() -1 && nums[mid + 1] == target)) // If we have found the first apperance of target, go right to find the last appearance of target
+            {
+                left = mid + 1;
+            }
+            else
+            {
+                result.push_back(mid);
+                if (result.size() == 1)
+                {
+                    // So nums[mid] is the first appearance of target, now we need to find the last appearance of target.
+                    // reset left = mid and right = nums.size()-1.
+                    left = mid;
+                    right = nums.size() - 1;
+                }
+                else
+                {
+                    return result;
+                }
+            }
+        }
+        else if (nums[mid] > target) // go left
+        {
+            right = mid - 1;
+        }
+        else if (nums[mid] < target) // go right
+        {
+            left = mid + 1;
+        }
     }
 
-    return result;
+    return vector<int>{ -1,-1 };
 }
 
 // 226. Invert Binary Tree

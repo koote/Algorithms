@@ -51,7 +51,7 @@ void main()
 {
     auto start = std::clock();
 
-    auto x = search(vector<int>{1, 3},3);
+    auto x = searchRange(vector<int>{1, 2,3,4,4,4,4,5,6,7},4);
 
     auto duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
     cout << duration<<endl;
