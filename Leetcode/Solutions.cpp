@@ -955,8 +955,8 @@ int strStr(string haystack, string needle)
 // 29. Divide Two Integers
 int divide(int dividend, int divisor)
 {
-    bool negative = ((dividend ^ divisor) >> 31) & 0x1 == 1;
-    unsigned int a = dividend < 0 ? -dividend : dividend;
+    bool negative = (((dividend ^ divisor) >> 31) & 0x1) == 1;
+    unsigned int a = dividend < 0 ? -dividend : dividend; // Use uint, so abs(a) will not overflow even a = INT_MIN.
     unsigned int b = divisor < 0 ? -divisor : divisor;
     unsigned int quotient = 0;
 
@@ -970,14 +970,14 @@ int divide(int dividend, int divisor)
         // To prevent overflow, b << k must <= 0x80000000 / 2, otherwise, b << (k + 1) will overflow.
         for (; a >= b << k && b << k <= (0x80000000 >> 1); ++k);
 
-        // When loop ends, if a < b << k, which means no overflow happens, and k increased one additional time,
-        // we need to decrease k; otherwise (a >= b << k), it means overflow happens, k is the maximum we can find.
+        // When loop ends, if a < b << k, it means no overflow happens, and k increased one additional time, we
+        // need to decrease k; otherwise (a >= b << k), it means overflow happens, k is the maximum we can find.
         quotient |= 1 << (a < b << k ? --k : k);
         a -= b << k;
     }
 
     // If negative is false, quotient must <= INT_MAX, otherwise overflow, should return INT_MAX.
-    return negative ? -quotient : quotient > INT_MAX ? INT_MAX : quotient;
+    return negative ? 0 - quotient : quotient > INT_MAX ? INT_MAX : quotient;
 }
 
 // 30. Substring with Concatenation of All Words
@@ -1068,8 +1068,8 @@ int longestValidParentheses(string s)
             s[i + dp[i + 1] + 1] == ')' ?
             dp[i + 1] + 2 +
             (
-            i + dp[i + 1] + 2 < slen ? dp[i + dp[i + 1] + 2] : 0
-            ) : 0
+                i + dp[i + 1] + 2 < slen ? dp[i + dp[i + 1] + 2] : 0
+                ) : 0
             : 0;
 
         if (dp[i] > max)
@@ -1185,7 +1185,7 @@ vector<int> searchRange(vector<int>& nums, int target)
             {
                 right = mid - 1;
             }
-            else if (!result.empty() && (mid < nums.size() -1 && nums[mid + 1] == target)) // If we have found the first apperance of target, go right to find the last appearance of target
+            else if (!result.empty() && (mid < nums.size() - 1 && nums[mid + 1] == target)) // If we have found the first apperance of target, go right to find the last appearance of target
             {
                 left = mid + 1;
             }
@@ -1215,7 +1215,7 @@ vector<int> searchRange(vector<int>& nums, int target)
         }
     }
 
-    return vector<int>{ -1,-1 };
+    return vector<int>{ -1, -1 };
 }
 
 // 35. Search Insert Position
@@ -1243,6 +1243,125 @@ int searchInsert(vector<int>& nums, int target)
     // when loop ends, left > right, left is the first number that larger than target,
     // which is also the insert location.
     return left;
+}
+
+// 36. Valid Sudoku
+bool isValidSudoku(vector<vector<char>>& board)
+{
+    // check 9 rows & 9 columns
+    for (int i = 0; i < 9; ++i)
+    {
+        int rowNumbers[10] = { 0 };
+        int colNumbers[10] = { 0 };
+
+        for (int j = 0; j < 9; ++j)
+        {
+            // row
+            if (board[i][j] != '.')
+            {
+                int val = board[i][j] - '0';
+                if (val < 1 || val > 9 || rowNumbers[val] != 0)
+                {
+                    return false;
+                }
+
+                rowNumbers[val] = 1;
+            }
+
+            // column
+            if (board[j][i] != '.')
+            {
+                int val = board[j][i] - '0';
+                if (val < 1 || val > 9 || colNumbers[val] != 0)
+                {
+                    return false;
+                }
+
+                colNumbers[val] = 1;
+            }
+        }
+    }
+
+    // check 9 3x3 tiles
+    for (int i = 0; i <= 6; i += 3)
+    {
+        for (int j = 0; j <= 6; j += 3)
+        {
+            int numbers[10] = { 0 };
+            for (int k = 0; k < 3; ++k)
+            {
+                for (int p = 0; p < 3; ++p)
+                {
+                    if (board[i + k][j + p] != '.')
+                    {
+                        int val = board[i + k][j + p] - '0';
+                        if (val < 1 || val > 9 || numbers[val] != 0)
+                        {
+                            return false;
+                        }
+
+                        numbers[val] = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+// 37. Sudoku Solver
+bool solveSudoku(vector<vector<char>>& board)
+{
+    for (int i = 0; i < 9; ++i)
+    {
+        for (int j = 0; j < 9; ++j)
+        {
+            if (board[i][j] == '.')
+            {
+                for (int val = 1; val <= 9; ++val)
+                {
+                    board[i][j] = val + '0';
+                    if (isValidSudoku(board) && solveSudoku(board))
+                    {
+                        return true;
+                    }
+
+                    board[i][j] = '.';
+                }
+
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+// 38. Count and Say
+string countAndSay(int n)
+{
+    string seq = "1";
+    for (; n > 1; --n)
+    {
+        string newSeq;
+        for (size_t i = 0; seq[i] != '\0';)
+        {
+            size_t j = i + 1;
+            for (; seq[j] != '\0' && seq[j] == seq[j - 1]; ++j);
+            newSeq.append(1, j - i + '0');
+            newSeq.append(1, seq[i]);
+            i = j;
+        }
+        seq = newSeq;
+    }
+    return seq;
+}
+
+// 39. Combination Sum
+vector<vector<int>> combinationSum(vector<int>& candidates, int target)
+{
+
 }
 
 // 226. Invert Binary Tree

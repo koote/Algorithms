@@ -1,7 +1,7 @@
 ﻿//////////////////////////////////////////////////////////////////////////
 // Chapter2 Linked Lists
 
-#include "..\MiscQues\CommonDataStruct.h"
+#include "..\MiscQuestions\CommonDataStruct.h"
 
 // 2.1 从一个链表中删除重复节点,不适用额外存储空间。
 void RemoveDup(SLNODE* head)
@@ -20,7 +20,7 @@ void RemoveDup(SLNODE* head)
         SLNODE* r = head;
         while (r != q)
         {
-            if (r->val = q->val) // find a dup
+            if (r->val == q->val) // find a dup
             {
                 // Remove q from list.
                 p->next = q->next;

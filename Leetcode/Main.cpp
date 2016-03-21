@@ -47,13 +47,17 @@ extern int longestValidParentheses(string s);
 extern int search(vector<int>& nums, int target);
 extern vector<int> searchRange(vector<int>& nums, int target);
 extern int searchInsert(vector<int>& nums, int target);
+extern bool isValidSudoku(vector<vector<char>>& board);
+extern void solveSudoku(vector<vector<char>>& board);
+extern string countAndSay(int n);
+extern vector<vector<int>> combinationSum(vector<int>& candidates, int target);
 
 void main()
 {
     auto start = std::clock();
 
-    auto x = searchRange(vector<int>{1, 2,3,4,4,4,4,5,6,7},4);
+    auto x = countAndSay(100);
 
     auto duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
-    cout << duration<<endl;
+    cout << duration << endl;
 }

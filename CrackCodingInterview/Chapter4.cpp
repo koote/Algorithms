@@ -1,5 +1,5 @@
 ﻿#include <math.h>
-#include "..\MiscQues\CommonDataStruct.h"
+#include "..\MiscQuestions\CommonDataStruct.h"
 
 //4.1 检查一个二叉树是不是平衡二叉树
 int CalcBSTHeight(BTNODE* root)
