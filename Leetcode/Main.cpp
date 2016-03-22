@@ -51,6 +51,8 @@ extern bool isValidSudoku(vector<vector<char>>& board);
 extern void solveSudoku(vector<vector<char>>& board);
 extern string countAndSay(int n);
 extern vector<vector<int>> combinationSum(vector<int>& candidates, int target);
+extern vector<vector<int>> combinationSum2(vector<int>& candidates, int target);
+extern int firstMissingPositive(vector<int>& nums);
 
 void main()
 {

@@ -1359,26 +1359,34 @@ string countAndSay(int n)
 }
 
 // 39. Combination Sum
-void depthSearchCombinationSum(vector<vector<int>>& results, vector<int>& path, vector<int>& candidates, int pos, int target)
+void depthSearchCombinationSum(vector<vector<int>>& results, vector<int>& path, vector<int>& candidates, int startPos, int target)
 {
     // Found a path, save it to results. Do not clear the path, because it is still needed 
     // for upper level caller. Let's say now the path is ?...??X, after we push this path
-    // into results, it will return to upper caller, in upper caller, the path is ?...??, it
-    // may still need to try another number Y: ?...???Y
+    // to results, and return to upper caller, in upper caller, the path is ?...??, it may
+    // still need to try another number Y: ?...???Y
     if (target == 0) 
     {
         results.push_back(path);
         return;
     }
 
-    // because the candidates is sorted, so to prevent duplicate paths, we only look forward, because each number can be
-    // used mulitpal times, so if we choose candidates[i], next step is we try numbers from candidates[i] to end of array.
-    // If every number can be used only once, then next step we start from candidates[i+1].
-    for (size_t i = pos; i < candidates.size() && candidates[i] <= target; ++i) // candidates[i] <= target is pruning
+    // Since the candidates is sorted, to prevent duplicate paths, we only look forward. Because each number can be used
+    // mulitpal times, so if we choose candidates[i], next step is we try numbers from candidates[i] to end of array. If
+    // every number can be used only once, then next step we start from candidates[i+1].
+    for (size_t i = startPos; i < candidates.size() && candidates[i] <= target; ++i) // candidates[i] <= target is pruning
     {
-        path.push_back(candidates[i]);
+        // Skip duplicates. e.g. candidates = [1,1,2,3], target = 6, let's mark it as (1,1,2,3|6), we can notice that actually
+        // (1,2,3|5) is already included in (1,1,2,3|5) :
+        // (1,1,2,3|5) = (1,1,2,3|4), (1,2,3|4), (2,3|3), (3|2).
+        // (1,2,3|5) =                (1,2,3|4), (2,3|3), (3|2).
+        if (i > startPos && candidates[i] == candidates[i - 1])
+        {
+            continue;
+        }
+        path.push_back(candidates[i]); // Try to select candidate[i] in current step.
         depthSearchCombinationSum(results, path, candidates, i, target - candidates[i]);
-        path.pop_back();
+        path.pop_back(); // Must revert path back.
     }
 }
 vector<vector<int>> combinationSum(vector<int>& candidates, int target)
@@ -1388,6 +1396,40 @@ vector<vector<int>> combinationSum(vector<int>& candidates, int target)
     vector<int> path;
     depthSearchCombinationSum(results, path, candidates, 0, target);
     return results;
+}
+
+// 40. Combination Sum II
+void depthSearchCombinationSum2(vector<vector<int>>& results, vector<int>& path, vector<int>& candidates, int startPos, int target)
+{
+    if (target == 0)
+    {
+        results.push_back(path);
+        return;
+    }
+
+    for (size_t i = startPos; i < candidates.size() && candidates[i] <= target; ++i) // candidates[i] <= target is pruning
+    {
+        if (i > startPos && candidates[i] == candidates[i - 1])
+        {
+            continue;
+        }
+        path.push_back(candidates[i]); // Try to select candidate[i] in current step.
+        depthSearchCombinationSum2(results, path, candidates, i + 1, target - candidates[i]);
+        path.pop_back(); // Must revert path back.
+    }
+}
+vector<vector<int>> combinationSum2(vector<int>& candidates, int target)
+{
+    sort(candidates.begin(), candidates.end());
+    vector<vector<int>> results;
+    vector<int> path;
+    depthSearchCombinationSum2(results, path, candidates, 0, target);
+    return results;
+}
+
+// 41. First Missing Positive
+int firstMissingPositive(vector<int>& nums)
+{
 }
 
 // 226. Invert Binary Tree
