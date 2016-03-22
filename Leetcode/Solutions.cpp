@@ -1349,7 +1349,7 @@ string countAndSay(int n)
         {
             size_t j = i + 1;
             for (; seq[j] != '\0' && seq[j] == seq[j - 1]; ++j);
-            newSeq.append(1, j - i + '0');
+            newSeq.append(1, (char)(j - i + '0'));
             newSeq.append(1, seq[i]);
             i = j;
         }
@@ -1359,9 +1359,35 @@ string countAndSay(int n)
 }
 
 // 39. Combination Sum
+void depthSearchCombinationSum(vector<vector<int>>& results, vector<int>& path, vector<int>& candidates, int pos, int target)
+{
+    // Found a path, save it to results. Do not clear the path, because it is still needed 
+    // for upper level caller. Let's say now the path is ?...??X, after we push this path
+    // into results, it will return to upper caller, in upper caller, the path is ?...??, it
+    // may still need to try another number Y: ?...???Y
+    if (target == 0) 
+    {
+        results.push_back(path);
+        return;
+    }
+
+    // because the candidates is sorted, so to prevent duplicate paths, we only look forward, because each number can be
+    // used mulitpal times, so if we choose candidates[i], next step is we try numbers from candidates[i] to end of array.
+    // If every number can be used only once, then next step we start from candidates[i+1].
+    for (size_t i = pos; i < candidates.size() && candidates[i] <= target; ++i) // candidates[i] <= target is pruning
+    {
+        path.push_back(candidates[i]);
+        depthSearchCombinationSum(results, path, candidates, i, target - candidates[i]);
+        path.pop_back();
+    }
+}
 vector<vector<int>> combinationSum(vector<int>& candidates, int target)
 {
-
+    sort(candidates.begin(), candidates.end());
+    vector<vector<int>> results;
+    vector<int> path;
+    depthSearchCombinationSum(results, path, candidates, 0, target);
+    return results;
 }
 
 // 226. Invert Binary Tree

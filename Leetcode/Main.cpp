@@ -55,8 +55,8 @@ extern vector<vector<int>> combinationSum(vector<int>& candidates, int target);
 void main()
 {
     auto start = std::clock();
-
-    auto x = countAndSay(100);
+   
+    auto x = combinationSum(vector<int> { 2, 3, 6, 7}, 7);
 
     auto duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
     cout << duration << endl;
