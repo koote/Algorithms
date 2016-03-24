@@ -1365,7 +1365,7 @@ void depthSearchCombinationSum(vector<vector<int>>& results, vector<int>& path, 
     // for upper level caller. Let's say now the path is ?...??X, after we push this path
     // to results, and return to upper caller, in upper caller, the path is ?...??, it may
     // still need to try another number Y: ?...???Y
-    if (target == 0) 
+    if (target == 0)
     {
         results.push_back(path);
         return;
@@ -1430,6 +1430,31 @@ vector<vector<int>> combinationSum2(vector<int>& candidates, int target)
 // 41. First Missing Positive
 int firstMissingPositive(vector<int>& nums)
 {
+    // For each positive number, try to put it on correct index.
+    for (size_t i = 0; i < nums.size();)
+    {
+        // Put 1 in nums[0], put 2 in num[1], etc.
+        if (nums[i] > 0 && nums[i] < nums.size() && nums[i] != nums[nums[i] - 1])
+        {
+            int temp = nums[nums[i] - 1];
+            nums[nums[i] - 1] = nums[i];
+            nums[i] = temp;
+        }
+        else
+        {
+            ++i;
+        }
+    }
+
+    for (size_t i = 0; i < nums.size(); ++i)
+    {
+        if (nums[i] != i + 1)
+        {
+            return i + 1;
+        }
+    }
+
+    return nums.size() + 1;
 }
 
 // 226. Invert Binary Tree

@@ -58,7 +58,7 @@ void main()
 {
     auto start = std::clock();
    
-    auto x = combinationSum(vector<int> { 2, 3, 6, 7}, 7);
+    auto x = firstMissingPositive(vector<int> {2,2,2,2});
 
     auto duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
     cout << duration << endl;
