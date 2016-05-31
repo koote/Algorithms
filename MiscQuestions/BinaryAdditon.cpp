@@ -64,7 +64,7 @@ int BinAdd(const char* s1, const char* s2, char* res, size_t sizeInChars)
         carry = (v >> 1) & 0x1;
     }
 
-    res[nLen - 1] = carry + '0';
+    res[nLen - 1] = (char)(carry + '0');
 
     return 0;
 }

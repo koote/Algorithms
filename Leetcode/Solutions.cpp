@@ -290,7 +290,7 @@ bool isMatch(string s, string p)
         // .... 
         // if p[0] repeate k times (k < length of s), check if s.substr(k+1) could match p.substr(2);
         // this process is just to try all possible repeate times of p[0].
-        for (int i = 0; i < s.length() && (s[i] == p[0] || p[0] == '.'); ++i)
+        for (size_t i = 0; i < s.length() && (s[i] == p[0] || p[0] == '.'); ++i)
         {
             if (isMatch(s.substr(i + 1), p.substr(2)))
             {
@@ -400,11 +400,11 @@ string longestCommonPrefix(vector<string>& strs)
         return "";
     }
 
-    int index = 0;
+    size_t index = 0;
     bool flag = true;
     for (index = 0; flag; ++index)
     {
-        for (int i = 0, size = strs.size(); i < size; ++i)
+        for (size_t i = 0, size = strs.size(); i < size; ++i)
         {
             if (index >= strs[i].length() || strs[i][index] != strs[0][index])
             {
@@ -420,7 +420,7 @@ string longestCommonPrefix(vector<string>& strs)
 // 15. 3Sum
 vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum)
 {
-    const int size = nums.size();
+    const size_t size = nums.size();
     vector<vector<int>> result(0);
 
     if (size < k || k == 0)
@@ -430,7 +430,7 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum)
 
     if (k == 2)
     {
-        for (int i = 0, j = size - 1; i < j;)
+        for (size_t i = 0, j = size - 1; i < j;)
         {
             int s = nums[i] + nums[j];
             if (s == sum)
@@ -454,7 +454,7 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum)
         return result;
     }
 
-    for (int i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         // skip duplicates.
         if (i > 0 && nums[i] == nums[i - 1])
@@ -466,7 +466,7 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum)
         // if SUM(nums[i] + nums[i+1] + ... + nums[i+k-1]) > sum, we can give up, because 
         // we cannot find answer, that sum is the smallest we can produce.
         int s = nums[i];
-        for (int j = i + 1, p = k - 1; j < size && p > 0; s += nums[j++], --p);
+        for (size_t j = i + 1, p = k - 1; j < size && p > 0; s += nums[j++], --p);
         if (s > sum)
         {
             break;
@@ -476,17 +476,17 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum)
         // if SUM(nums[i] + nums[size-k+1] + ... + nums[size-1]) < sum, we can ignore current loop (jump over nums[i])
         // because that sum is the largest we can produce in current loop.
         s = nums[i];
-        for (int j = size - 1, p = k - 1; j > 0 && p > 0; s += nums[j--], --p);
+        for (size_t j = size - 1, p = k - 1; j > 0 && p > 0; s += nums[j--], --p);
         if (s < sum)
         {
             continue;
         }
 
         vector<int> v(0);
-        for (int j = i + 1; j < size; v.push_back(nums[j++]));
+        for (size_t j = i + 1; j < size; v.push_back(nums[j++]));
 
         vector<vector<int>> cures = kSum(v, k - 1, sum - nums[i]);
-        for (int j = 0; j < cures.size(); ++j)
+        for (size_t j = 0; j < cures.size(); ++j)
         {
             cures[j].insert(cures[j].begin(), nums[i]);
             result.insert(result.end(), cures[j]);
@@ -548,7 +548,7 @@ int threeSumClosest(vector<int>& nums, int target)
     return result;
 }
 
-//17. Letter Combinations of a Phone Number
+// 17. Letter Combinations of a Phone Number
 vector<string> letterCombinations(string digits)
 {
     //                                0   1     2      3      4      5      6      7       8      9
@@ -563,22 +563,24 @@ vector<string> letterCombinations(string digits)
     if (digits.length() == 1)
     {
         string val = dict[digits[0] - '0'];
-        for (int i = 0; i < val.length(); ++i)
+        for (size_t i = 0; i < val.length(); ++i)
         {
             result.push_back(val.substr(i, 1));
         }
+
         return result;
     }
 
     vector<string> cures = letterCombinations(digits.substr(1));
     string val = dict[digits[0] - '0'];
-    for (int i = 0; i < val.length(); ++i)
+    for (size_t i = 0; i < val.length(); ++i)
     {
-        for (int j = 0; j < cures.size(); ++j)
+        for (size_t j = 0; j < cures.size(); ++j)
         {
             result.push_back(val.substr(i, 1).append(cures[j]));
         }
     }
+
     return result;
 }
 
@@ -889,7 +891,7 @@ int removeDuplicates(vector<int>& nums)
 {
     // last points to the last element in packed part of array.
     int last = -1;
-    for (int i = 0; i < nums.size() && last < (int)nums.size();)
+    for (size_t i = 0; i < nums.size() && last < (int)nums.size();)
     {
         for (; i + 1 < nums.size() && nums[i] == nums[i + 1]; ++i);
         nums[++last] = nums[i++];
@@ -905,7 +907,7 @@ int removeDuplicates2(vector<int>& nums)
     }
 
     int last = 0;
-    for (int i = 0; i < nums.size(); ++i)
+    for (size_t i = 0; i < nums.size(); ++i)
     {
         if (nums[i] != nums[last])
         {
@@ -920,7 +922,7 @@ int removeDuplicates2(vector<int>& nums)
 int removeElement(vector<int>& nums, int val)
 {
     int last = 0;
-    for (int i = 0; i < nums.size(); ++i)
+    for (size_t i = 0; i < nums.size(); ++i)
     {
         if (nums[i] != val)
         {
@@ -990,8 +992,8 @@ vector<int> findSubstring(string s, vector<string>& words)
         return result;
     }
 
-    int wordLen = words[0].length();
-    int patternLen = wordLen * words.size();
+    size_t wordLen = words[0].length();
+    size_t patternLen = wordLen * words.size();
 
     if (patternLen > s.length())
     {
@@ -1000,12 +1002,12 @@ vector<int> findSubstring(string s, vector<string>& words)
 
     // Here we use a hash table to store for each word, how many times it occurs.
     unordered_map<string, int> wordCount;
-    for (int i = 0; i < words.size(); ++i)
+    for (size_t i = 0; i < words.size(); ++i)
     {
         ++wordCount[words[i]];
     }
 
-    for (int i = 0; i <= s.length() - patternLen; ++i)
+    for (size_t i = 0; i <= s.length() - patternLen; ++i)
     {
         unordered_map<string, int> unusedWords(wordCount);
 
@@ -1013,7 +1015,7 @@ vector<int> findSubstring(string s, vector<string>& words)
         // Slice it to words.size() slices, for each slice, use the unusedWords
         // hash table to quick check if it is a word, if yes, decrease value in
         // hash table, means it has been used.
-        for (int j = i; j <= i + patternLen - wordLen; j += wordLen)
+        for (size_t j = i; j <= i + patternLen - wordLen; j += wordLen)
         {
             string word = s.substr(j, wordLen);
             if (unusedWords.find(word) == unusedWords.end())
@@ -1041,8 +1043,8 @@ void nextPermutation(vector<int>& nums)
 {
     if (nums.size() > 1)
     {
-        int i; // i-1 will be the first element that nums[i-1] < nums[i].
-        int j; // j will be the first element in nums[i..size-1] that large than nums[i-1].
+        size_t i; // i-1 will be the first element that nums[i-1] < nums[i].
+        size_t j; // j will be the first element in nums[i..size-1] that large than nums[i-1].
         for (i = nums.size() - 1; i > 0 && nums[i] <= nums[i - 1]; --i); // search from end of array for the first element that smaller than its successor.
         sort(nums.begin() + i, nums.end());
         if (i > 0)
@@ -1176,7 +1178,7 @@ vector<int> searchRange(vector<int>& nums, int target)
     int right = nums.size() - 1;
     while (left <= right)
     {
-        int mid = (left + right) / 2;
+        size_t mid = (left + right) / 2;
         if (nums[mid] == target)
         {
             // If we haven't find the first appearance of target (because result is empty), and current is not the 
@@ -1321,7 +1323,7 @@ bool solveSudoku(vector<vector<char>>& board)
             {
                 for (int val = 1; val <= 9; ++val)
                 {
-                    board[i][j] = val + '0';
+                    board[i][j] = (char)(val + '0');
                     if (isValidSudoku(board) && solveSudoku(board))
                     {
                         return true;
@@ -1359,7 +1361,7 @@ string countAndSay(int n)
 }
 
 // 39. Combination Sum
-void depthSearchCombinationSum(vector<vector<int>>& results, vector<int>& path, vector<int>& candidates, int startPos, int target)
+void depthSearchCombinationSum(vector<vector<int>>& results, vector<int>& path, vector<int>& candidates, size_t startPos, int target)
 {
     // Found a path, save it to results. Do not clear the path, because it is still needed 
     // for upper level caller. Let's say now the path is ?...??X, after we push this path
@@ -1399,7 +1401,7 @@ vector<vector<int>> combinationSum(vector<int>& candidates, int target)
 }
 
 // 40. Combination Sum II
-void depthSearchCombinationSum2(vector<vector<int>>& results, vector<int>& path, vector<int>& candidates, int startPos, int target)
+void depthSearchCombinationSum2(vector<vector<int>>& results, vector<int>& path, vector<int>& candidates, size_t startPos, int target)
 {
     if (target == 0)
     {
@@ -1434,7 +1436,7 @@ int firstMissingPositive(vector<int>& nums)
     for (size_t i = 0; i < nums.size();)
     {
         // Put 1 in nums[0], put 2 in num[1], etc.
-        if (nums[i] > 0 && nums[i] < nums.size() && nums[i] != nums[nums[i] - 1])
+        if (nums[i] > 0 && nums[i] < (int)nums.size() && nums[i] != nums[nums[i] - 1])
         {
             int temp = nums[nums[i] - 1];
             nums[nums[i] - 1] = nums[i];
@@ -1448,13 +1450,45 @@ int firstMissingPositive(vector<int>& nums)
 
     for (size_t i = 0; i < nums.size(); ++i)
     {
-        if (nums[i] != i + 1)
+        if (nums[i] != (int)(i + 1))
         {
             return i + 1;
         }
     }
 
     return nums.size() + 1;
+}
+
+// 42. Trapping Rain Water
+int trap(vector<int>& height)
+{
+    if (height.size() <= 1) return 0;
+    unsigned int result = 0;
+    for (size_t i = 0; i < height.size();)
+    {
+        if (height[i] == 0)
+        {
+            ++i;
+            continue;
+        };
+
+        size_t j = i + 1;
+        unsigned int vol = 0;
+        while (j < height.size() && height[j] < height[i])
+        {
+            vol += height[j];
+            ++j;
+        }
+
+        if (j < height.size())
+        {
+            result += height[i] * (j - i) - vol;
+        }
+
+        i = j;
+    }
+
+    return result;
 }
 
 // 226. Invert Binary Tree

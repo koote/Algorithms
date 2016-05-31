@@ -53,12 +53,13 @@ extern string countAndSay(int n);
 extern vector<vector<int>> combinationSum(vector<int>& candidates, int target);
 extern vector<vector<int>> combinationSum2(vector<int>& candidates, int target);
 extern int firstMissingPositive(vector<int>& nums);
+extern int trap(vector<int>& height);
 
 void main()
 {
     auto start = std::clock();
    
-    auto x = firstMissingPositive(vector<int> {2,2,2,2});
+    auto x = trap(vector<int> {0,2,0});
 
     auto duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
     cout << duration << endl;
