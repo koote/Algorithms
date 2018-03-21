@@ -16,7 +16,34 @@ vector<int> twoSum(vector<int>& nums, int target)
 // 2. Add Two Numbers
 ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
 {
-    throw new exception();
+    ListNode* a = l1;
+    ListNode* b = l2;
+    ListNode* dummy = new ListNode(-1);
+    ListNode* c = dummy;
+    int carry = 0;
+
+    while (a != nullptr || b != nullptr)
+    {
+        int val = (a == nullptr ? 0 : a->val) + (b == nullptr ? 0 : b->val) + carry;
+        carry = val / 10;
+        val %= 10;
+
+        c->next = new ListNode(val);
+        c = c->next;
+        a = a == nullptr ? a : a->next;
+        b = b == nullptr ? b : b->next;
+    }
+
+    if (carry > 0)
+    {
+        c->next = new ListNode(carry);
+        c = c->next;
+    }
+
+    c->next = nullptr; //close the result list
+    ListNode* result = dummy->next;
+    delete dummy;
+    return result;
 }
 
 // 3# Longest Substring Without Repeating Characters
@@ -245,7 +272,7 @@ int myAtoi(string str)
     return r * sign;
 }
 
-// 9# Palindrome Number 
+// 9# Palindrome Number
 bool isPalindrome(int x)
 {
     // Leetcode OJ thinks negative integer never could be a palindrome.
@@ -418,7 +445,7 @@ string longestCommonPrefix(vector<string>& strs)
 }
 
 // 15. 3Sum
-vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum)
+vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum) // nums must be sorted.
 {
     const size_t size = nums.size();
     vector<vector<int>> result(0);
@@ -495,14 +522,13 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum)
 
     return result;
 }
-
 vector<vector<int>> threeSum(vector<int>& nums)
 {
     sort(nums.begin(), nums.end());
     return kSum(nums, 3, 0);
 }
 
-//16. 3Sum Closest
+// 16. 3Sum Closest
 int threeSumClosest(vector<int>& nums, int target)
 {
     const int size = nums.size();
@@ -841,7 +867,7 @@ ListNode* swapPairs(ListNode* head)
 //25. Reverse Nodes in k-Group
 ListNode* reverseKGroup(ListNode* head, int k)
 {
-    if (head == nullptr || k <= 1)
+    if (head == nullptr || head->next == nullptr || k <= 1)
     {
         return head;
     }
@@ -1367,7 +1393,7 @@ void depthSearchCombinationSum(vector<vector<int>>& results, vector<int>& path, 
     // for upper level caller. Let's say now the path is ?...??X, after we push this path
     // to results, and return to upper caller, in upper caller, the path is ?...??, it may
     // still need to try another number Y: ?...???Y
-    if (target == 0)
+    if (target == 0) 
     {
         results.push_back(path);
         return;
