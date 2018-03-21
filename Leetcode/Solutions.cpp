@@ -10,7 +10,26 @@ using namespace std;
 // 1. Two Sum
 vector<int> twoSum(vector<int>& nums, int target)
 {
-    throw new exception();
+	int length = nums.size();
+	vector<int> result;
+	unordered_map<int, int> map; // <value, original_index>
+	unordered_map<int, int>::iterator iterator;
+
+	for (int i = 0; i < length; ++i)
+	{
+		int new_target = target - nums[i];
+		if ((iterator = map.find(new_target)) != map.end()) 
+		{
+			result.push_back(i);
+			result.push_back(iterator->second);
+
+			return result;
+		}
+
+		map.insert(std::make_pair(nums[i], i)); // unordered_map search first element of pair, so have to make pair in this way.
+	}
+
+	return result;
 }
 
 // 2. Add Two Numbers
