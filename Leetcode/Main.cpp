@@ -12,7 +12,7 @@ extern ListNode* createList(vector<int>& nums);
 // Solutions
 extern vector<int> twoSum(vector<int>& nums, int target);
 extern ListNode* addTwoNumbers(ListNode* l1, ListNode* l2);
-extern string longestPalindrome(string s);
+extern int lengthOfLongestSubstring(string s);
 extern double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2);
 extern string trySearchPalindromic(string s, int l, int r);
 extern string longestPalindrome(string s);

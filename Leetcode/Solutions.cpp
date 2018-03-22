@@ -68,42 +68,28 @@ ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
 // 3# Longest Substring Without Repeating Characters
 int lengthOfLongestSubstring(string s)
 {
-    int i = 0, maxlen = 0, n = s.length();
-    int loc[256];
+	int maxlen = 0;
+	int existence[256];
+	fill_n(existence, 256, -1);
+	for (int i = 0; i < s.length();)
+	{
+		for (int j = i; j < s.length(); ++j)
+		{
+			if (existence[s[j]] < i)
+			{
+				existence[s[j]] = j;
+				maxlen = max(j - i + 1, maxlen);
+			}
+			else
+			{
+				i = existence[s[j]] + 1;
+				fill_n(existence, 256, -1);
+				break;
+			}
+		}
+	}
 
-    while (i < n)
-    {
-        // no element's position is n, use this to initialize loc array.
-        std::fill_n(loc, 256, n);
-
-        int j = i;
-        while (j < n)
-        {
-            if (loc[s[j]] == n)
-            {
-                loc[s[j]] = j;
-                ++j;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        // now j either points to first repeat or null terminator.
-        int current_subtring_len = j - i;
-        if (current_subtring_len > maxlen)
-        {
-            maxlen = current_subtring_len;
-        }
-
-        // we don't need to check if inner loop ends because j reach the end of string or
-        // found a repeat character, if j reach end, loc[s[j]] + 1 > n, outer loop will also
-        // end, if found a repeat, loc[s[j]] + 1 is the new substring start position.
-        i = loc[s[j]] + 1;
-    }
-
-    return maxlen;
+	return maxlen;
 }
 
 // 4# Median of Two Sorted Arrays
