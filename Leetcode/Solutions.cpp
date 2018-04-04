@@ -10,26 +10,26 @@ using namespace std;
 // 1. Two Sum
 vector<int> twoSum(vector<int>& nums, int target)
 {
-	int length = nums.size();
-	vector<int> result;
-	unordered_map<int, int> map; // <value, original_index>
-	unordered_map<int, int>::iterator iterator;
+    int length = nums.size();
+    vector<int> result;
+    unordered_map<int, int> map; // <value, original_index>
+    unordered_map<int, int>::iterator iterator;
 
-	for (int i = 0; i < length; ++i)
-	{
-		int new_target = target - nums[i];
-		if ((iterator = map.find(new_target)) != map.end()) 
-		{
-			result.push_back(i);
-			result.push_back(iterator->second);
+    for (int i = 0; i < length; ++i)
+    {
+        int new_target = target - nums[i];
+        if ((iterator = map.find(new_target)) != map.end())
+        {
+            result.push_back(i);
+            result.push_back(iterator->second);
 
-			return result;
-		}
+            return result;
+        }
 
-		map.insert(std::make_pair(nums[i], i)); // unordered_map search first element of pair, so have to make pair in this way.
-	}
+        map.insert(std::make_pair(nums[i], i)); // unordered_map search first element of pair, so have to make pair in this way.
+    }
 
-	return result;
+    return result;
 }
 
 // 2. Add Two Numbers
@@ -53,7 +53,7 @@ ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
         b = b == nullptr ? b : b->next;
     }
 
-    if (carry > 0)
+    if (carry > 0) // don't forget the carry
     {
         c->next = new ListNode(carry);
         c = c->next;
@@ -65,7 +65,7 @@ ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
     return result;
 }
 
-// 3# Longest Substring Without Repeating Characters
+// 3. Longest Substring Without Repeating Characters
 int lengthOfLongestSubstring(string s)
 {
 	int maxlen = 0;
@@ -92,7 +92,7 @@ int lengthOfLongestSubstring(string s)
 	return maxlen;
 }
 
-// 4# Median of Two Sorted Arrays
+// 4. Median of Two Sorted Arrays
 double findKth(int a[], int m, int b[], int n, int k)
 {
     if (m < n) { return findKth(b, n, a, m, k); }
@@ -131,7 +131,7 @@ double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2)
     }
 }
 
-// 5# Longest Palindromic Substring
+// 5. Longest Palindromic Substring
 string trySearchPalindromic(string s, int l, int r)
 {
     int slen = s.length();
@@ -171,7 +171,7 @@ string longestPalindrome(string s)
     return longest;
 }
 
-// 6# ZigZag Conversion
+// 6. ZigZag Conversion
 string zigzagConvert(string s, int numRows)
 {
     int len = s.length();
@@ -204,7 +204,7 @@ string zigzagConvert(string s, int numRows)
     return res;
 }
 
-// 7# Reverse Integer
+// 7. Reverse Integer
 int reverseInteger(int x)
 {
     int sign = x < 0 ? -1 : 1;
@@ -231,7 +231,7 @@ int reverseInteger(int x)
     return digits.empty() ? result * sign : 0;
 }
 
-// 8# String to Integer (atoi)
+// 8. String to Integer (atoi)
 int myAtoi(string str)
 {
     int slen = str.length();
@@ -277,7 +277,7 @@ int myAtoi(string str)
     return r * sign;
 }
 
-// 9# Palindrome Number
+// 9. Palindrome Number
 bool isPalindrome(int x)
 {
     // Leetcode OJ thinks negative integer never could be a palindrome.
@@ -339,7 +339,7 @@ bool isMatch(string s, string p)
     }
 }
 
-// 11# Container With Most Water
+// 11. Container With Most Water
 int maxArea(vector<int>& height)
 {
     int maxs = 0;
@@ -361,7 +361,7 @@ int maxArea(vector<int>& height)
     return maxs;
 }
 
-// 12# Integer to Roman
+// 12. Integer to Roman
 string intToRoman(int num)
 {
     int n[] = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
@@ -615,14 +615,14 @@ vector<string> letterCombinations(string digits)
     return result;
 }
 
-//18. 4Sum
+// 18. 4Sum
 vector<vector<int>> fourSum(vector<int>& nums, int target)
 {
     sort(nums.begin(), nums.end());
     return kSum(nums, 4, target);
 }
 
-//19. Remove Nth Node From End of List
+// 19. Remove Nth Node From End of List
 ListNode* removeNthFromEnd(ListNode* head, int n)
 {
     ListNode* p;
@@ -1398,7 +1398,7 @@ void depthSearchCombinationSum(vector<vector<int>>& results, vector<int>& path, 
     // for upper level caller. Let's say now the path is ?...??X, after we push this path
     // to results, and return to upper caller, in upper caller, the path is ?...??, it may
     // still need to try another number Y: ?...???Y
-    if (target == 0) 
+    if (target == 0)
     {
         results.push_back(path);
         return;
