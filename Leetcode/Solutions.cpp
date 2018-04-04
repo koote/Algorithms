@@ -132,43 +132,35 @@ double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2)
 }
 
 // 5. Longest Palindromic Substring
-string trySearchPalindromic(string s, int l, int r)
+string searchPalindrome(string s, int left, int right)
 {
-    int slen = s.length();
-    while (l >= 0 && r <= slen - 1 && s[l] == s[r])
-    {
-        --l;
-        ++r;
-    }
+	for (; left >= 0 && right < s.length() && s[left] == s[right]; left--, right++);
 
-    return s.substr(l + 1, r - l - 1);
+	// when loop ends, no matter it is because of out of bounds or s[left] and s[rigth] no longer equal, current valid palindrome is always s[left+1 .. right-1].
+	return s.substr(left + 1, right - 1 - left);
 }
 string longestPalindrome(string s)
 {
-    int slen = s.length();
-    if (slen == 0)
-    {
-        return "";
-    }
+	string result("");
+	for (int position = 0; position < s.length(); ++position)
+	{
+		string palindrome1 = searchPalindrome(s, position, position);
 
-    string longest = s.substr(0, 1);
+		// don't worry that position+1 could out of right bound, since searchPalindrome will check j < s.length()
+		string palindrome2 = searchPalindrome(s, position, position + 1);
 
-    for (int i = 0; i <= slen - 1; ++i)
-    {
-        string p1 = trySearchPalindromic(s, i, i);
-        if (p1.length() > longest.length())
-        {
-            longest = p1;
-        }
+		if (palindrome1.length() > result.length())
+		{
+			result = palindrome1;
+		}
 
-        string p2 = trySearchPalindromic(s, i, i + 1);
-        if (p2.length() > longest.length())
-        {
-            longest = p2;
-        }
-    }
+		if (palindrome2.length() > result.length())
+		{
+			result = palindrome2;
+		}
+	}
 
-    return longest;
+	return result;
 }
 
 // 6. ZigZag Conversion
