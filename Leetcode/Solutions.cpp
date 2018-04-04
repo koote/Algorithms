@@ -195,27 +195,22 @@ string zigzagConvert(string s, int numRows)
 int reverseInteger(int x)
 {
 	int sign = x < 0 ? -1 : 1;
-	unsigned int num = x < 0 ? 0 - x : x; // if x = INT_MIN, -INT_MIN will overflow, so use uint here.
-
-	queue<int> digits;
-	while (num > 0)
+	x = abs(x);
+	int result = 0;
+	for (; x > 0; x /= 10)
 	{
-		digits.push(num % 10);
-		num = num / 10;
+		int digit = x % 10;
+		if ((INT_MAX - digit) / 10 >= result || (sign < 0 && (INT_MAX - digit + 1) / 10 >= result))
+		{
+			result = result * 10 + digit;
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
-	// Key is considering overflow and nth power of 10.
-	// nth power of 10 doesn't need special handling.
-	unsigned int result = 0;
-	while (!digits.empty() && result <= (unsigned int)(INT_MAX - digits.front()) / 10)
-	{
-		result *= 10;
-		result += digits.front();
-
-		digits.pop();
-	}
-
-	return digits.empty() ? result * sign : 0;
+	return result * sign;
 }
 
 // 8. String to Integer (atoi)
