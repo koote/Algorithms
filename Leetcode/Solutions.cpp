@@ -71,6 +71,7 @@ int lengthOfLongestSubstring(string s)
 	int maxlen = 0;
 	int existence[256];
 	fill_n(existence, 256, -1);
+
 	for (int i = 0; i < s.length();)
 	{
 		for (int j = i; j < s.length(); ++j)
@@ -100,6 +101,7 @@ double findKth(int a[], int m, int b[], int n, int k)
 	if (k == 1) { return min(a[0], b[0]); }
 	if (k == m + n) { return max(a[m - 1], b[n - 1]); }
 
+	// let k = i+j. Please note that we are sure n <= m here
 	int j = min(n, k / 2);
 	int i = k - j;
 
@@ -113,6 +115,7 @@ double findKth(int a[], int m, int b[], int n, int k)
 	}
 	else
 	{
+		// When a[i-1] == b[j-1], they have k-2 elements left and m+n-k elements right, so either is the kth.
 		return a[i - 1];
 	}
 }
@@ -163,34 +166,29 @@ string longestPalindrome(string s)
 // 6. ZigZag Conversion
 string zigzagConvert(string s, int numRows)
 {
-	int len = s.length();
-
-	if (numRows <= 1 || numRows >= len)
+	// We can also add condition if numRows>=s.length(), return s directly, but this condition has been handled below.
+	// For condition numRows == 1, just make sure distance = 1, then it could also be handled correctly.
+	if (numRows == 1)
 	{
 		return s;
 	}
 
-	string res;
-	int delta = 2 * numRows - 2;
-	for (int r = 0; r <= numRows - 1; ++r)
+	string result("");
+	int distance = 2 * numRows - 2;
+	for (int r = 0; r < numRows; ++r)
 	{
-		res += s[r];
-
-		for (int k = r + delta; k - 2 * r < len; k += delta)
+		int curDistance1 = distance - r * 2;
+		for (int j = r; j < s.length(); j += distance)
 		{
-			if (r >= 1 && r <= numRows - 2)
+			result += s[j];
+			if (curDistance1 < distance && curDistance1 > 0 && j + curDistance1 < s.length())
 			{
-				res += s[k - 2 * r];
-			}
-
-			if (k < len)
-			{
-				res += s[k];
+				result += s[j + curDistance1];
 			}
 		}
 	}
 
-	return res;
+	return result;
 }
 
 // 7. Reverse Integer
