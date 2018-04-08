@@ -252,28 +252,25 @@ int myAtoi(string str)
 // 9. Palindrome Number
 bool isPalindrome(int x)
 {
-    // Leetcode OJ thinks negative integer never could be a palindrome.
-    // But I don't agree, sign should not be reversed like digits.
-    // This line makes this solution can be accepted by Leetcode OJ.
-    // If remove this line, whole function can handle negative integer, it will 
-    // think -12321 is a palindrome.
-
-    if (x < 0) return false;
-
-    // get number of digits
-    int n = 0;
-    for (int y = x; y != 0; y /= 10, ++n);
-
-    int ps = 0;
-    int k = n / 2; //compare half of x because reverse X could overflow or underflow.
-    while (k > 0)
+    if (x < 0)
     {
-        int digit = x % 10;
-        ps += digit * (int)pow(10, --k);
-        x /= 10;
+        return false;
     }
 
-    return n & 0x1 ? ps == x / 10 : ps == x;
+    // First calculate how many digits the number x has.
+    int numOfDigits = 0;
+    for (int temp = x; temp > 0; temp /= 10, ++numOfDigits);
+
+    // calculate low half value of x. Lets say x = 12321, lower half is 21.
+    int lowhalf = 0;
+    for (int i = 1, k = numOfDigits / 2, temp = x; i <= k; lowhalf = lowhalf * 10 + temp % 10, temp /= 10, ++i);
+
+    // high half value of x is x / 10^(numOfDigits-k), no need to worry about whether numOfDigits is odd or even. 
+    // if x = 12321, numOfDigits = 5, k = numOfDigits / 2 = 2, low half is 12, high half is x / 1000 = 12.
+    // if x = 123321, numOfDigits = 6, k = numOfDigits / 2 = 3, low half is 123, high half is x / 10^3 = 123
+    int highhalf = x / (int)pow(10, numOfDigits - numOfDigits / 2);
+
+    return highhalf == lowhalf;
 }
 
 // 10. Regular Expression Matching
