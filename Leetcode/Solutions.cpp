@@ -270,7 +270,7 @@ bool isPalindrome(int x)
 }
 
 // 10. Regular Expression Matching
-bool isMatch(string text, string pattern) 
+bool isMatch(string text, string pattern)
 {
     // Exit condition of recursion should be: when pattern is processed, text must also be processed, 
     // but not vice versa. Why? because when text is empty, pattern is a* or .*, they still match.
@@ -279,8 +279,9 @@ bool isMatch(string text, string pattern)
         return text.length() == 0;
     }
 
-    // If there is a * followed, 2 conditions: (1) the preceding character of * appears zero times, next match would be isMatch(text, pattern.substr(2)).
-    // (2) the preceding character of * appears >= 1 times, next match would be isMatch(text.substr(1), pattern.substr(1))
+    // If there is a * followed, there are 2 cases:
+    // (1) the preceding character of * appears zero times, next match would be isMatch(text, pattern.substr(2)).
+    // (2) the preceding character of * appears >= 1 times, next match would be isMatch(text.substr(1), pattern.substr(1)) if current character matches pattern.
     return (pattern.length() > 1 && pattern[1] == '*') ?
         isMatch(text, pattern.substr(2)) || (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isMatch(text.substr(1), pattern) :
         (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isMatch(text.substr(1), pattern.substr(1));
@@ -289,23 +290,28 @@ bool isMatch(string text, string pattern)
 // 11. Container With Most Water
 int maxArea(vector<int>& height)
 {
-    int maxs = 0;
-    for (int len = height.size(), i = 0, j = len - 1; i < j;)
+    int max = 0;
+    for (int i = 0, j = height.size() - 1; i < j;)
     {
-        int s = min(height[i], height[j]) * (j - i);
-        maxs = max(maxs, s);
-
+        int current = 0;
         if (height[i] < height[j])
         {
+            current = (j - i) * height[i];
             ++i;
         }
         else
         {
+            current = (j - i)* height[j];
             --j;
+        }
+
+        if (current > max)
+        {
+            max = current;
         }
     }
 
-    return maxs;
+    return max;
 }
 
 // 12. Integer to Roman
