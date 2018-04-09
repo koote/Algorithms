@@ -263,49 +263,27 @@ bool isPalindrome(int x)
 
     // calculate low half value of x. Lets say x = 12321, lower half is 21.
     int lowhalf = 0;
-    for (int i = 1, k = numOfDigits / 2, temp = x; i <= k; lowhalf = lowhalf * 10 + temp % 10, temp /= 10, ++i);
+    for (int i = 1, k = numOfDigits / 2; i <= k; lowhalf = lowhalf * 10 + x % 10, x /= 10, ++i);
 
-    // high half value of x is x / 10^(numOfDigits-k), no need to worry about whether numOfDigits is odd or even. 
-    // if x = 12321, numOfDigits = 5, k = numOfDigits / 2 = 2, low half is 12, high half is x / 1000 = 12.
-    // if x = 123321, numOfDigits = 6, k = numOfDigits / 2 = 3, low half is 123, high half is x / 10^3 = 123
-    int highhalf = x / (int)pow(10, numOfDigits - numOfDigits / 2);
-
-    return highhalf == lowhalf;
+    // after above loop, we got low half value, then we need to get high half value and compare.
+    return (numOfDigits & 0x1 ? x / 10 : x) == lowhalf;;
 }
 
 // 10. Regular Expression Matching
-bool isMatch(string s, string p)
+bool isMatch(string text, string pattern) 
 {
-    // exit of recursion.
-    if (p.length() == 0)
+    // Exit condition of recursion should be: when pattern is processed, text must also be processed, 
+    // but not vice versa. Why? because when text is empty, pattern is a* or .*, they still match.
+    if (pattern.length() == 0)
     {
-        return s.length() == 0;
+        return text.length() == 0;
     }
 
-    if (p.length() > 1 && p[1] == '*') // p[1] is * means p[0] could repeat 0 or any times.
-    {
-        // try : 
-        // if p[0] repeate 1 time, check if s.substr(1) could match p.substr(2);
-        // if p[0] repeate 2 times, check if s.substr(2) could match p.substr(2);
-        // if p[0] repeate 3 times, check if s.substr(3) could match p.substr(2); 
-        // .... 
-        // if p[0] repeate k times (k < length of s), check if s.substr(k+1) could match p.substr(2);
-        // this process is just to try all possible repeate times of p[0].
-        for (size_t i = 0; i < s.length() && (s[i] == p[0] || p[0] == '.'); ++i)
-        {
-            if (isMatch(s.substr(i + 1), p.substr(2)))
-            {
-                return true;
-            }
-        }
-
-        // if p[0] repeate 0 time, check if s could match p.substr(2);
-        return isMatch(s, p.substr(2));
-    }
-    else // p[1] is either not exists or not a *, just try to match current character and remainings.
-    {
-        return (p.length() > 0 && s.length() > 0) && (p[0] == '.' || p[0] == s[0]) && isMatch(s.substr(1), p.substr(1));
-    }
+    // If there is a * followed, 2 conditions: (1) the preceding character of * appears zero times, next match would be isMatch(text, pattern.substr(2)).
+    // (2) the preceding character of * appears >= 1 times, next match would be isMatch(text.substr(1), pattern.substr(1))
+    return (pattern.length() > 1 && pattern[1] == '*') ?
+        isMatch(text, pattern.substr(2)) || (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isMatch(text.substr(1), pattern) :
+        (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isMatch(text.substr(1), pattern.substr(1));
 }
 
 // 11. Container With Most Water
