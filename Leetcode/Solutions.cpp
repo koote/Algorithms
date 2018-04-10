@@ -385,21 +385,17 @@ string longestCommonPrefix(vector<string>& strs)
         return "";
     }
 
-    size_t index = 0;
+    int i;
     bool flag = true;
-    for (index = 0; flag; ++index)
+    for (i = 0; flag; ++i)
     {
-        for (size_t i = 0, size = strs.size(); i < size; ++i)
+        for (int j = 0; j < strs.size() && flag; ++j)
         {
-            if (index >= strs[i].length() || strs[i][index] != strs[0][index])
-            {
-                flag = false;
-                break;
-            }
+            flag = i < strs[j].length() && strs[j][i] == strs[0][i];
         }
     }
 
-    return strs[0].substr(0, index - 1);
+    return strs[0].substr(0, i - 1);
 }
 
 // 15. 3Sum
