@@ -166,8 +166,8 @@ string longestPalindrome(string s)
 // 6. ZigZag Conversion
 string zigzagConvert(string s, int numRows)
 {
-    // We can also add condition if numRows>=s.length(), return s directly, but this condition has been handled below.
-    // For condition numRows == 1, just make sure distance = 1, then it could also be handled correctly.
+    // We can also handle condition here when numRows>=s.length(), return s directly, but it has been covered in following loop.
+    // For condition numRows == 1, because 2*numRows-2=0, if we let distance = 1 when, then it could also be handled by following loop.
     if (numRows == 1)
     {
         return s;
@@ -1466,6 +1466,36 @@ int trap(vector<int>& height)
         }
 
         i = j;
+    }
+
+    return result;
+}
+
+// 144. Binary Tree Preorder Traversal
+vector<int> preorderTraversal(TreeNode* root)
+{
+    vector<int> result;
+    stack<TreeNode*> stk;
+    stk.push(root);
+    while (stk.empty() == false)
+    {
+        root = stk.top(); // reuse root
+        stk.pop();
+
+        if (root != nullptr)
+        {
+            result.push_back(root->val);
+
+            if (root->right != nullptr)
+            {
+                stk.push(root->right);
+            }
+
+            if (root->left != nullptr)
+            {
+                stk.push(root->left);
+            }
+        }
     }
 
     return result;
