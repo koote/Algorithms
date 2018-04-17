@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <stack>
 #include "DataStructure.h"
+
 using namespace std;
 
 // 1. Two Sum
@@ -401,55 +402,49 @@ string longestCommonPrefix(vector<string>& strs)
 // 15. 3Sum
 vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum) // nums must be sorted.
 {
-    const size_t size = nums.size();
     vector<vector<int>> result(0);
 
-    if (size < k || k == 0)
+    if (nums.size() < k || k == 0)
     {
         return result;
     }
 
     if (k == 2)
     {
-        for (size_t i = 0, j = size - 1; i < j;)
+        for (size_t i = 0, j = nums.size() - 1; i < j;)
         {
-            int s = nums[i] + nums[j];
-            if (s == sum)
+            if (nums[i] + nums[j] > sum)
+            {
+                --j;
+            }
+            else if (nums[i] + nums[j] < sum)
+            {
+                ++i;
+            }
+            else
             {
                 result.push_back(vector<int>{ nums[i], nums[j] });
 
                 // skip duplicates.
-                for (++i; i < size && nums[i] == nums[i - 1]; ++i);
+                for (++i; i < nums.size() && nums[i] == nums[i - 1]; ++i);
                 for (--j; j > 0 && nums[j] == nums[j + 1]; --j);
-            }
-            else if (s > sum)
-            {
-                for (--j; j > 0 && nums[j] == nums[j + 1]; --j);
-            }
-            else
-            {
-                for (++i; i < size && nums[i] == nums[i - 1]; ++i);
             }
         }
 
         return result;
     }
 
-    for (size_t i = 0; i < size; ++i)
+    for (int i = 0; i < (int)nums.size() - k + 1;)
     {
-        // skip duplicates.
-        if (i > 0 && nums[i] == nums[i - 1])
-        {
-            continue;
-        }
-
+        /*
         // Because nums are sorted, so nums[i+1..i+k-1] are smallest in nums[i+1..size-1].
         // if SUM(nums[i] + nums[i+1] + ... + nums[i+k-1]) > sum, we can give up, because 
         // we cannot find answer, that sum is the smallest we can produce.
         int s = nums[i];
-        for (size_t j = i + 1, p = k - 1; j < size && p > 0; s += nums[j++], --p);
+        for (size_t j = i + 1, p = k - 1; j < nums.size() && p > 0; s += nums[j++], --p);
         if (s > sum)
         {
+            for (++i; i < nums.size() && nums[i - 1] == nums[i]; ++i);
             break;
         }
 
@@ -457,21 +452,24 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum) // nums mus
         // if SUM(nums[i] + nums[size-k+1] + ... + nums[size-1]) < sum, we can ignore current loop (jump over nums[i])
         // because that sum is the largest we can produce in current loop.
         s = nums[i];
-        for (size_t j = size - 1, p = k - 1; j > 0 && p > 0; s += nums[j--], --p);
+        for (size_t j = nums.size() - 1, p = k - 1; j > 0 && p > 0; s += nums[j--], --p);
         if (s < sum)
         {
-            continue;
+            for (++i; i < nums.size() && nums[i - 1] == nums[i]; ++i);
+            break;
         }
+        */
 
-        vector<int> v(0);
-        for (size_t j = i + 1; j < size; v.push_back(nums[j++]));
-
+        // downgrade current k sum problem to k-1 sum problem
+        vector<int> v(nums.begin() + i + 1, nums.end());
         vector<vector<int>> cures = kSum(v, k - 1, sum - nums[i]);
         for (size_t j = 0; j < cures.size(); ++j)
         {
             cures[j].insert(cures[j].begin(), nums[i]);
             result.insert(result.end(), cures[j]);
         }
+
+        for (++i; i < nums.size() && nums[i - 1] == nums[i]; ++i);
     }
 
     return result;
