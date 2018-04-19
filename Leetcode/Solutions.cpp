@@ -153,7 +153,7 @@ string longestPalindrome(string s)
             result = palindrome1;
         }
 
-        // don't worry that position+1 could out of right bound, since searchPalindrome will check j < s.length()
+        // don't worry that position+1 could exceed right bound, since searchPalindrome will check j < s.length()
         string palindrome2 = searchPalindrome(s, position, position + 1);
         if (palindrome2.length() > result.length())
         {
@@ -483,47 +483,46 @@ vector<vector<int>> threeSum(vector<int>& nums)
 // 16. 3Sum Closest
 int threeSumClosest(vector<int>& nums, int target)
 {
-    const int size = nums.size();
-    int result = 0;
-    int diff = INT_MAX;
-
+    int sum = 0;
+    int diff = INT_MAX; // Don't intialize sum to INT_MAX then calc difference = abs(sum - target), that could overflow.
     sort(nums.begin(), nums.end());
-    for (int i = 0; i <= size - 3; ++i)
+
+    for (int i = 0; i < nums.size() - 2;)
     {
-        if (i > 0 && nums[i] == nums[i - 1])
+        for (int j = i + 1, k = nums.size() - 1; j < k && j < nums.size() && k >= 0;)
         {
-            continue;
-        }
+            int cursum = nums[j] + nums[k] + nums[i];
 
-        // 2sum in nums[i+1..size-1].
-        for (int l = i + 1, r = size - 1; l < r;)
-        {
-            // Cannot intialize result to INT_MAX then calc difference = abs(result - target) everytime, that could overflow.
-
-            int s = nums[l] + nums[r];
-            int d = abs(s - (target - nums[i]));
-            if (d < diff)
+            if (cursum > target)
             {
-                result = s + nums[i];
-                diff = d;
+                if (cursum - target < diff)
+                {
+                    diff = cursum - target;
+                    sum = cursum;
+                }
+
+                for (--k; k >= 0 && nums[k] == nums[k + 1]; --k);
             }
+            else if (cursum < target)
+            {
+                if (target - cursum < diff)
+                {
+                    diff = target - cursum;
+                    sum = cursum;
+                }
 
-            if (result == target)
-            {
-                return result;
-            }
-            else if (s > target - nums[i])
-            {
-                for (--r; r > 0 && nums[r] == nums[r + 1]; --r);
+                for (++j; j < nums.size() && nums[j] == nums[j - 1]; ++j);
             }
             else
             {
-                for (++l; l < size && nums[l] == nums[l - 1]; ++l);
+                return target;
             }
         }
+
+        for (++i; i < nums.size() && nums[i] == nums[i - 1]; ++i);
     }
 
-    return result;
+    return sum;
 }
 
 // 17. Letter Combinations of a Phone Number
