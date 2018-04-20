@@ -438,7 +438,7 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum) // nums mus
     {
         /*
         // Because nums are sorted, so nums[i+1..i+k-1] are smallest in nums[i+1..size-1].
-        // if SUM(nums[i] + nums[i+1] + ... + nums[i+k-1]) > sum, we can give up, because 
+        // if SUM(nums[i] + nums[i+1] + ... + nums[i+k-1]) > sum, we can give up, because
         // we cannot find answer, that sum is the smallest we can produce.
         int s = nums[i];
         for (size_t j = i + 1, p = k - 1; j < nums.size() && p > 0; s += nums[j++], --p);
@@ -526,39 +526,67 @@ int threeSumClosest(vector<int>& nums, int target)
 }
 
 // 17. Letter Combinations of a Phone Number
-vector<string> letterCombinations(string digits)
+vector<string> letterCombinationsTopDown(string digits)
 {
-    //                                0   1     2      3      4      5      6      7       8      9
-    const static vector<string> dict{ "", "", "abc", "def", "ghi", "jkl", "mon", "pqrs", "tuv", "xwyz" };
+    const string mapping[9] = { "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz" };
     vector<string> result;
-
-    if (digits.length() == 0)
+    if (digits.length() >= 1)
     {
-        return result;
-    }
-
-    if (digits.length() == 1)
-    {
-        string val = dict[digits[0] - '0'];
-        for (size_t i = 0; i < val.length(); ++i)
+        vector<string> rest = letterCombinationsTopDown(digits.substr(1));
+        string first = mapping[digits[0] - '0' - 1];
+        for (int i = 0; i < first.length(); ++i)
         {
-            result.push_back(val.substr(i, 1));
-        }
-
-        return result;
-    }
-
-    vector<string> cures = letterCombinations(digits.substr(1));
-    string val = dict[digits[0] - '0'];
-    for (size_t i = 0; i < val.length(); ++i)
-    {
-        for (size_t j = 0; j < cures.size(); ++j)
-        {
-            result.push_back(val.substr(i, 1).append(cures[j]));
+            string s = first.substr(i, 1);
+            if (rest.size() > 0)
+            {
+                for (int j = 0; j < rest.size(); ++j)
+                {
+                    result.push_back(s + rest[i]);
+                }
+            }
+            else
+            {
+                result.push_back(s);
+            }
         }
     }
 
     return result;
+}
+vector<string> letterCombinationsBottomUp(string digits)
+{
+    const string mapping[9] = { "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz" };
+    vector<vector<string>> dp(digits.length() + 1);
+    for (int i = digits.length() - 1; i >= 0; --i)
+    {
+        string current = mapping[digits[i] - '0' - 1];
+        if (dp[i + 1].empty())
+        {
+            for (int j = 0; j < current.length(); ++j)
+            {
+                dp[i].push_back(current.substr(j, 1));
+            }
+        }
+        else
+        {
+            for (int j = 0; j < current.length(); ++j)
+            {
+                string s = current.substr(j, 1);
+                for (int k = 0; k < dp[i + 1].size(); ++k)
+                {
+                    dp[i].push_back(s + dp[i + 1][k]);
+                }
+            }
+        }
+    }
+
+    return dp[0];
+}
+vector<string> letterCombinations(string digits)
+{
+    vector<string> r1 = letterCombinationsTopDown(digits);
+    vector<string> r2 = letterCombinationsBottomUp(digits);
+    return r1;
 }
 
 // 18. 4Sum
