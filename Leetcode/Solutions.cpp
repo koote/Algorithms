@@ -625,18 +625,24 @@ ListNode* removeNthFromEnd(ListNode* head, int n)
 bool isValid(string s)
 {
     stack<char> stk;
-    for (int i = 0, length = s.length(); i < length; ++i)
+    for (size_t i = 0; i < s.length(); ++i)
     {
         if (s[i] == '{' || s[i] == '[' || s[i] == '(')
         {
             stk.push(s[i]);
         }
-        else if ((s[i] == '}' && !stk.empty() && stk.top() == '{') || (s[i] == ']' && !stk.empty() && stk.top() == '[') || (s[i] == ')' && !stk.empty() && stk.top() == '('))
-        {
-            stk.pop();
-        }
         else
         {
+            if (!stk.empty())
+            {
+                char top = stk.top();
+                if ((s[i] == ')' && top == '(') || (s[i] == ']'&&top == '[') || (s[i] == '}' && top == '{'))
+                {
+                    stk.pop();
+                    continue;
+                }
+            }
+
             return false;
         }
     }
@@ -647,37 +653,38 @@ bool isValid(string s)
 // 21. Merge Two Sorted Lists
 ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
 {
-    ListNode head(-1);
-    ListNode* last = &head;
-    while (l1 != nullptr && l2 != nullptr)
+    ListNode dummy(-1);
+    ListNode* last = &dummy;
+    while (l1 != nullptr || l2 != nullptr)
     {
-        ListNode* r;
-        if (l1->val < l2->val)
+        if (l1 != nullptr && l2 != nullptr)
         {
-            r = l1;
-            l1 = l1->next;
+            if (l1->val < l2->val)
+            {
+                last->next = l1;
+                l1 = l1->next;
+            }
+            else
+            {
+                last->next = l2;
+                l2 = l2->next;
+            }
+
+            last = last->next;
         }
-        else
+        else if (l1 != nullptr)
         {
-            r = l2;
-            l2 = l2->next;
+            last->next = l1;
+            break;
         }
-
-        r->next = nullptr;
-        last->next = r;
-        last = r;
+        else if (l2 != nullptr)
+        {
+            last->next = l2;
+            break;
+        }
     }
 
-    if (l1 != nullptr)
-    {
-        last->next = l1;
-    }
-    else if (l2 != nullptr)
-    {
-        last->next = l2;
-    }
-
-    return head.next;
+    return dummy.next;
 }
 
 // 22. Generate Parentheses
