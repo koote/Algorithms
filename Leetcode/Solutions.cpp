@@ -599,43 +599,24 @@ vector<vector<int>> fourSum(vector<int>& nums, int target)
 // 19. Remove Nth Node From End of List
 ListNode* removeNthFromEnd(ListNode* head, int n)
 {
-    ListNode* p;
-    for (p = head; n > 0 && p != nullptr; p = p->next, --n);
-
-    if (p == nullptr && n == 0)
-    {
-        ListNode* r = head->next;
-        delete head;
-        return r;
-    }
-    else
-    {
-        ListNode* q;
-        for (q = head; q != nullptr && p != nullptr && p->next != nullptr; q = q->next, p = p->next);
-
-        // q->next is what needs to be removed.
-        ListNode* r = q->next;
-        q->next = r->next;
-        delete r;
-
-        return head;
-    }
-}
-ListNode* removeNthFromEnd2(ListNode* head, int n)
-{
     ListNode dummy(-1);
     dummy.next = head;
 
-    ListNode* p;
-    for (p = &dummy; n > 0 && p != nullptr; p = p->next, --n);
+    // The algorithms is to use two pointers and let distance between first and last is n+1, when first reaches 
+    // end of list, last->next is the one needs to be deleted.
+    // We start counting from dummy other than real head, this can solve the condition that list length is 1 and
+    // n == 1, pointer first stops at real head, pointer last points to dummy head, no special handling is needed.
+    // If we start counting from real head, then when first loop ends, first is null.
+    ListNode* first;
+    for (first = &dummy; n > 0 && first != nullptr; first = first->next, --n);
 
-    ListNode* q;
-    for (q = &dummy; q != nullptr && p != nullptr && p->next != nullptr; q = q->next, p = p->next);
+    ListNode* last;
+    for (last = &dummy; first->next != nullptr; first = first->next, last = last->next);
 
-    // q->next is what needs to be removed.
-    ListNode* r = q->next;
-    q->next = r->next;
-    delete r;
+    // last->next is what needs to be removed.
+    ListNode* target = last->next;
+    last->next = target->next;
+    delete target;
 
     return dummy.next;
 }
