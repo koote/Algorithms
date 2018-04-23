@@ -537,7 +537,7 @@ vector<string> letterCombinationsTopDown(string digits)
         for (int i = 0; i < first.length(); ++i)
         {
             string s = first.substr(i, 1);
-            if (rest.size() > 0)
+            if (!rest.empty())
             {
                 for (int j = 0; j < rest.size(); ++j)
                 {
@@ -688,7 +688,28 @@ ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
 }
 
 // 22. Generate Parentheses
-vector<string> generateParenthesisInternal(string trail, int remainingLeftBrackets, int remainingRightBrackets)
+vector<string> generateParenthesisBottomUp(int n)
+{
+    vector<vector<string>> dp(n + 1);
+    dp[0].push_back("");
+    for (int i = 1; i <= n; ++i)
+    {
+        for (int j = 0; j < i; ++j)
+        {
+            // For every string in dp[j] and dp[i-j-1], concat a new string (dp[j])+dp[i-j-1]
+            for (const auto& x : dp[j])
+            {
+                for (const auto& y : dp[i - j - 1])
+                {
+                    dp[i].push_back(('(' + x + ')').append(y));
+                }
+            }
+        }
+    }
+
+    return dp[n];
+}
+vector<string> generateParenthesisBacktracking(const string trail, int remainingLeftBrackets, int remainingRightBrackets)
 {
     vector<string> results;
 
@@ -706,13 +727,13 @@ vector<string> generateParenthesisInternal(string trail, int remainingLeftBracke
         {
             // NOTE: When calling deeper, always use temp variable, DO NOT change the value of parameter in current level.
             // E.g. DO NOT use trail.append or --remainingLeftBrackets here.
-            vector<string> cures1 = generateParenthesisInternal(trail + '(', remainingLeftBrackets - 1, remainingRightBrackets);
+            vector<string> cures1 = generateParenthesisBacktracking(trail + '(', remainingLeftBrackets - 1, remainingRightBrackets);
             results.insert(results.end(), cures1.begin(), cures1.end());
         }
 
         if (remainingRightBrackets > 0)
         {
-            vector<string> cures2 = generateParenthesisInternal(trail + ')', remainingLeftBrackets, remainingRightBrackets - 1);
+            vector<string> cures2 = generateParenthesisBacktracking(trail + ')', remainingLeftBrackets, remainingRightBrackets - 1);
             results.insert(results.end(), cures2.begin(), cures2.end());
         }
     }
@@ -721,7 +742,7 @@ vector<string> generateParenthesisInternal(string trail, int remainingLeftBracke
 }
 vector<string> generateParenthesis(int n)
 {
-    return generateParenthesisInternal("", n, n);
+    return generateParenthesisBacktracking("", n, n);
 }
 
 // 23. Merge k Sorted Lists
