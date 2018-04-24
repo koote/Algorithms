@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <stack>
 #include "DataStructure.h"
+#include <cassert>
 
 using namespace std;
 
@@ -742,7 +743,10 @@ vector<string> generateParenthesisBacktracking(const string trail, int remaining
 }
 vector<string> generateParenthesis(int n)
 {
-    return generateParenthesisBacktracking("", n, n);
+    vector<string> r1 = generateParenthesisBacktracking("", n, n);
+    vector<string> r2 = generateParenthesisBottomUp(n);
+    assert(r1 == r2);
+    return r2;
 }
 
 // 23. Merge k Sorted Lists

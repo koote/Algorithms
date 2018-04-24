@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CrackCodingInterview", "CrackCodingInterview\CrackCodingInterview.vcxproj", "{5B4310C8-C7B0-446D-AC18-BC127457D61B}"
 EndProject
@@ -9,32 +9,50 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Leetcode", "Leetcode\Leetco
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiscQuestions", "MiscQuestions\MiscQuestions.vcxproj", "{1BC2AA96-9087-4477-8FE2-292BA07CFE76}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZOJ", "ZOJ\ZOJ.vcxproj", "{22D8C4A8-CC44-42C8-93B7-77151D2936F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
 		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{5B4310C8-C7B0-446D-AC18-BC127457D61B}.Debug|Win32.ActiveCfg = Debug|Win32
 		{5B4310C8-C7B0-446D-AC18-BC127457D61B}.Debug|Win32.Build.0 = Debug|Win32
+		{5B4310C8-C7B0-446D-AC18-BC127457D61B}.Debug|x64.ActiveCfg = Debug|Win32
 		{5B4310C8-C7B0-446D-AC18-BC127457D61B}.Release|Win32.ActiveCfg = Release|Win32
 		{5B4310C8-C7B0-446D-AC18-BC127457D61B}.Release|Win32.Build.0 = Release|Win32
+		{5B4310C8-C7B0-446D-AC18-BC127457D61B}.Release|x64.ActiveCfg = Release|Win32
 		{54578149-6594-4D1E-9B01-45ECBA9F50D4}.Debug|Win32.ActiveCfg = Debug|Win32
 		{54578149-6594-4D1E-9B01-45ECBA9F50D4}.Debug|Win32.Build.0 = Debug|Win32
+		{54578149-6594-4D1E-9B01-45ECBA9F50D4}.Debug|x64.ActiveCfg = Debug|Win32
 		{54578149-6594-4D1E-9B01-45ECBA9F50D4}.Release|Win32.ActiveCfg = Release|Win32
 		{54578149-6594-4D1E-9B01-45ECBA9F50D4}.Release|Win32.Build.0 = Release|Win32
+		{54578149-6594-4D1E-9B01-45ECBA9F50D4}.Release|x64.ActiveCfg = Release|Win32
 		{1BC2AA96-9087-4477-8FE2-292BA07CFE76}.Debug|Win32.ActiveCfg = Debug|Win32
 		{1BC2AA96-9087-4477-8FE2-292BA07CFE76}.Debug|Win32.Build.0 = Debug|Win32
+		{1BC2AA96-9087-4477-8FE2-292BA07CFE76}.Debug|x64.ActiveCfg = Debug|Win32
 		{1BC2AA96-9087-4477-8FE2-292BA07CFE76}.Release|Win32.ActiveCfg = Release|Win32
 		{1BC2AA96-9087-4477-8FE2-292BA07CFE76}.Release|Win32.Build.0 = Release|Win32
+		{1BC2AA96-9087-4477-8FE2-292BA07CFE76}.Release|x64.ActiveCfg = Release|Win32
+		{22D8C4A8-CC44-42C8-93B7-77151D2936F5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{22D8C4A8-CC44-42C8-93B7-77151D2936F5}.Debug|Win32.Build.0 = Debug|Win32
+		{22D8C4A8-CC44-42C8-93B7-77151D2936F5}.Debug|x64.ActiveCfg = Debug|x64
+		{22D8C4A8-CC44-42C8-93B7-77151D2936F5}.Debug|x64.Build.0 = Debug|x64
+		{22D8C4A8-CC44-42C8-93B7-77151D2936F5}.Release|Win32.ActiveCfg = Release|Win32
+		{22D8C4A8-CC44-42C8-93B7-77151D2936F5}.Release|Win32.Build.0 = Release|Win32
+		{22D8C4A8-CC44-42C8-93B7-77151D2936F5}.Release|x64.ActiveCfg = Release|x64
+		{22D8C4A8-CC44-42C8-93B7-77151D2936F5}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
+		SccNumberOfProjects = 5
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://pseudocode.visualstudio.com/defaultcollection
+		SccTeamFoundationServer = https://pseudocode.visualstudio.com/
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = CrackCodingInterview\\CrackCodingInterview.vcxproj
 		SccProjectName1 = CrackCodingInterview
@@ -45,5 +63,8 @@ Global
 		SccProjectUniqueName3 = MiscQuestions\\MiscQuestions.vcxproj
 		SccProjectName3 = MiscQuestions
 		SccLocalPath3 = MiscQuestions
+		SccProjectUniqueName4 = ZOJ\\ZOJ.vcxproj
+		SccProjectName4 = ZOJ
+		SccLocalPath4 = ZOJ
 	EndGlobalSection
 EndGlobal
