@@ -750,81 +750,78 @@ vector<string> generateParenthesis(int n)
 }
 
 // 23. Merge k Sorted Lists
-void minHeapify(vector<ListNode*>& nodes, int i)
+void minHeapify(vector<ListNode*>& nodes, int root)
 {
-    int size = nodes.size();
-    int smallest = i;
+    const int leftChild = root * 2 + 1;
+    const int rightChild = root * 2 + 2;
+    int smallest = root;
 
-    if (2 * i + 1 < size && nodes[smallest]->val > nodes[2 * i + 1]->val) // left child
+    if (leftChild < nodes.size() && nodes[leftChild]->val < nodes[smallest]->val)
     {
-        smallest = i * 2 + 1;
+        smallest = leftChild;
     }
 
-    if (2 * i + 2 < size && nodes[smallest]->val > nodes[2 * i + 2]->val) // right child
+    if (rightChild < nodes.size() && nodes[rightChild]->val < nodes[smallest]->val)
     {
-        smallest = 2 * i + 2;
+        smallest = rightChild;
     }
 
-    if (smallest != i)
+    if (smallest != root)
     {
-        ListNode* temp = nodes[smallest];
-        nodes[smallest] = nodes[i];
-        nodes[i] = temp;
+        ListNode* temp = nodes[root];
+        nodes[root] = nodes[smallest];
+        nodes[smallest] = temp;
 
         minHeapify(nodes, smallest);
     }
 }
 void buildMinHeap(vector<ListNode*>& nodes)
 {
-    for (int i = (nodes.size() - 2) / 2; i >= 0; --i)
+    for (int i = nodes.size() / 2 - 1; i >= 0; --i)
     {
         minHeapify(nodes, i);
     }
 }
 ListNode* mergeKLists(vector<ListNode*>& lists)
 {
-    ListNode head(-1);
-    ListNode* last = &head;
+    ListNode dummy(0);
+    ListNode* last = &dummy;
+    vector<ListNode*> minHeap;
 
-    vector<ListNode*> nodes;
-    for (ListNode* node : lists)
+    // Build a min heap by pushing first element of every list into heap. Because each element
+    // is still chained in its list, so we can also think every whole list is pushed into heap.
+    for (ListNode* list : lists)
     {
-        if (node != nullptr)
+        if (list != nullptr)
         {
-            nodes.push_back(node);
+            minHeap.push_back(list);
         }
     }
 
-    // nodes[0] will be the smallest one.
-    buildMinHeap(nodes);
+    buildMinHeap(minHeap);
 
-    while (!nodes.empty())
+    while (!minHeap.empty())
     {
-        last->next = nodes[0];
+        last->next = minHeap[0];
         last = last->next;
-        nodes[0] = nodes[0]->next;
-        last->next = nullptr;
 
-        if (nodes[0] == nullptr) // this list has no remaining nodes.
+        // Keep taking elements from current list.
+        minHeap[0] = minHeap[0]->next;
+
+        // When one list's elements are all processed, move it to the end of vector and pop out.
+        if (minHeap[0] == nullptr)
         {
-            // NOTE: After heap is built, never use erase to remove the root of heap, that will break the heap.
-            // We should always only exchange node[0] with last leaf node to get the root out of heap.
-            // WHY? Beucase after the heap is adjusted, for each element i, its left (2i+1) and right (2i+2) child
-            // are indexed by their position, if we erase the root, all elements' indexes shift left 1 position,
-            // so element i becomes i-1, and its new left child is 2i-1 (which was 2i) and new right child is 2i (which was 2i+1).
-            // The order of each nodes and its children could be broken.
-            // If a heap is broken, we cannot just use heapify to make it is a heap again, we need a full rebuild.
-
-            ListNode* temp = nodes[0];
-            nodes[0] = nodes[nodes.size() - 1];
-            nodes[nodes.size() - 1] = temp;
-            nodes.pop_back();
+            minHeap[0] = minHeap[minHeap.size() - 1];
+            minHeap.pop_back();
         }
 
-        minHeapify(nodes, 0);
+        // No matter if current list is empty or not, we only change the first element, so
+        // always adjust heap from root.
+        minHeapify(minHeap, 0);
     }
 
-    return head.next;
+    last->next = nullptr;
+    return dummy.next;
 }
 
 // 24. Swap Nodes in Pairs
