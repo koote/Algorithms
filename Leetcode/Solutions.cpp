@@ -827,27 +827,23 @@ ListNode* mergeKLists(vector<ListNode*>& lists)
 // 24. Swap Nodes in Pairs
 ListNode* swapPairs(ListNode* head)
 {
-    if (head == nullptr || head->next == nullptr) // 0 or 1 node.
-    {
-        return head;
-    }
-
-    ListNode* p = head;
-    ListNode* q = head->next;
-
-    ListNode dummy(-1);
+    ListNode dummy(0);
     dummy.next = head;
-    ListNode* r = &dummy;
 
-    while (p != nullptr && q != nullptr)
+    // What will be swaped are p->next and q->next.
+    ListNode* p = &dummy;
+    ListNode* q = head; // p->next
+
+    // check q is null is only for empty list. check q->next is null is really needed for non empty list.
+    while (q != nullptr && q->next != nullptr)
     {
-        r->next = q;
         p->next = q->next;
-        q->next = p;
+        p = p->next; // Moving p forward makes code looks a little bit clean, otherwise it would be q->next = p->next->next;p->next->next=q;
+        q->next = p->next;
+        p->next = q;
 
-        r = p;
-        p = p->next;
-        q = p != nullptr ? p->next : nullptr;
+        p = q;
+        q = p->next;
     }
 
     return dummy.next;
