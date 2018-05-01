@@ -809,6 +809,7 @@ ListNode* mergeKLists(vector<ListNode*>& lists)
         minHeap[0] = minHeap[0]->next;
 
         // When one list's elements are all processed, move it to the end of vector and pop out.
+        // Do not erase from vector's head, that shifts all elements left by 1, heap needs rebuild.
         if (minHeap[0] == nullptr)
         {
             minHeap[0] = minHeap[minHeap.size() - 1];
@@ -831,11 +832,8 @@ ListNode* swapPairs(ListNode* head)
     dummy.next = head;
 
     // What will be swaped are p->next and q->next.
-    ListNode* p = &dummy;
-    ListNode* q = head; // p->next
-
     // check q is null is only for empty list. check q->next is null is really needed for non empty list.
-    while (q != nullptr && q->next != nullptr)
+    for (ListNode* p = &dummy, *q = head; q != nullptr && q->next != nullptr;)
     {
         p->next = q->next;
         p = p->next; // Moving p forward makes code looks a little bit clean, otherwise it would be q->next = p->next->next;p->next->next=q;
@@ -852,45 +850,35 @@ ListNode* swapPairs(ListNode* head)
 //25. Reverse Nodes in k-Group
 ListNode* reverseKGroup(ListNode* head, int k)
 {
-    if (head == nullptr || head->next == nullptr || k <= 1)
-    {
-        return head;
-    }
-
-    ListNode dummy(-1);
+    ListNode dummy(0);
     dummy.next = head;
-    ListNode* r = &dummy;
 
-    ListNode* p = head;
-    ListNode* q = head;
-
-    while (p != nullptr && q != nullptr)
+    for (ListNode* p = &dummy, *q = head; q != nullptr;)
     {
+        // Moving q forward by k-1 elements.
         int n = k - 1;
         for (; n > 0 && q != nullptr; --n, q = q->next);
 
-        if (n == 0 && q != nullptr)
+        if (q != nullptr)
         {
-            r->next = q;
-            ListNode* temp = q->next;
+            // now reverse segment (p .. q]
+            ListNode* r = p->next;
+            p->next = q;
+            p = r->next;
+            r->next = q->next;
 
-            // reverse p..q
-            ListNode* s = p;
-            ListNode* t = p->next;
-            ListNode* u;
-            while (s != q)
+            // reuse q and p for linked list reversing. p is q's succeedor
+            for (n = k - 1, q = r; n > 0; --n)
             {
-                u = t->next;
-                t->next = s;
-                s = t;
-                t = u;
+                ListNode* temp = p->next;
+                p->next = q;
+
+                q = p;
+                p = temp;
             }
 
-            p->next = temp;
-
-            r = p;
-            p = p->next;
-            q = p;
+            p = r;
+            q = p->next;
         }
     }
 
