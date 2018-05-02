@@ -856,8 +856,8 @@ ListNode* reverseKGroup(ListNode* head, int k)
     for (ListNode* p = &dummy, *q = head; q != nullptr;)
     {
         // Moving q forward by k-1 elements.
-        int n = k - 1;
-        for (; n > 0 && q != nullptr; --n, q = q->next);
+        int n;
+        for (n = k - 1; n > 0 && q != nullptr; --n, q = q->next);
 
         if (q != nullptr)
         {
@@ -886,32 +886,12 @@ ListNode* reverseKGroup(ListNode* head, int k)
 }
 
 // 26. Remove Duplicates from Sorted Array
-int removeDuplicates(vector<int>& nums)
-{
-    // last points to the last element in packed part of array.
-    int last = -1;
-    for (size_t i = 0; i < nums.size() && last < (int)nums.size();)
-    {
-        for (; i + 1 < nums.size() && nums[i] == nums[i + 1]; ++i);
-        nums[++last] = nums[i++];
-    }
-
-    return last + 1;
-}
 int removeDuplicates2(vector<int>& nums)
 {
-    if (nums.size() == 0)
+    size_t last = -1;
+    for (size_t probe = 0; probe < nums.size(); nums.at(++last) = nums.at(probe++))
     {
-        return 0;
-    }
-
-    int last = 0;
-    for (size_t i = 0; i < nums.size(); ++i)
-    {
-        if (nums[i] != nums[last])
-        {
-            nums[++last] = nums[i];
-        }
+        for (; probe + 1 < nums.size() && nums.at(probe + 1) == nums.at(probe); ++probe);
     }
 
     return last + 1;
@@ -956,12 +936,10 @@ int strStr(string haystack, string needle)
 // 29. Divide Two Integers
 int divide(int dividend, int divisor)
 {
-    bool negative = (((dividend ^ divisor) >> 31) & 0x1) == 1;
-    unsigned int a = dividend < 0 ? -dividend : dividend; // Use uint, so abs(a) will not overflow even a = INT_MIN.
-    unsigned int b = divisor < 0 ? -divisor : divisor;
+    const bool negative = (((dividend ^ divisor) >> 31) & 0x1) == 1;
     unsigned int quotient = 0;
 
-    while (a >= b)
+    for (unsigned int a = dividend < 0 ? -dividend : dividend, b = divisor < 0 ? -divisor : divisor; a >= b;)
     {
         unsigned int k = 0;
 
