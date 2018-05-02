@@ -886,7 +886,7 @@ ListNode* reverseKGroup(ListNode* head, int k)
 }
 
 // 26. Remove Duplicates from Sorted Array
-int removeDuplicates2(vector<int>& nums)
+int removeDuplicates(vector<int>& nums)
 {
     size_t last = -1;
     for (size_t probe = 0; probe < nums.size(); nums.at(++last) = nums.at(probe++))
@@ -900,12 +900,12 @@ int removeDuplicates2(vector<int>& nums)
 // 27. Remove Element
 int removeElement(vector<int>& nums, int val)
 {
-    int last = 0;
-    for (size_t i = 0; i < nums.size(); ++i)
+    size_t last = 0;
+    for (size_t probe = 0; probe < nums.size(); ++probe)
     {
-        if (nums[i] != val)
+        if (nums[probe] != val)
         {
-            nums[last++] = nums[i];
+            nums[last++] = nums[probe];
         }
     }
 
