@@ -912,19 +912,13 @@ int removeElement(vector<int>& nums, int val)
     return last;
 }
 
-//28. Implement strStr()
-int strStr(string haystack, string needle)
+// 28. Implement strStr()
+int strStr(string text, string pattern)
 {
-    if (needle.length() == 0)
+    for (int i = 0, j; text.length() >= pattern.length() && i <= text.length() - pattern.length(); ++i)
     {
-        return 0;
-    }
-
-    for (int i = 0, tlen = haystack.length(), plen = needle.length(); i <= tlen - plen; ++i)
-    {
-        int p = 0;
-        for (; p < plen && p + i < tlen && haystack[p + i] == needle[p]; ++p);
-        if (p == plen)
+        for (j = 0; j < pattern.length() && text[j + i] == pattern[j]; ++j);
+        if (j == pattern.length())
         {
             return i;
         }
