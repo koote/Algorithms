@@ -961,17 +961,16 @@ int divide(int dividend, int divisor)
 }
 
 // 30. Substring with Concatenation of All Words
-vector<int> findSubstring(string s, vector<string>& words)
+vector<int> findSubstring(const string& s, vector<string>& words)
 {
     vector<int> result;
 
-    if (words.size() == 0)
+    if (words.empty())
     {
         return result;
     }
 
-    size_t wordLen = words[0].length();
-    size_t patternLen = wordLen * words.size();
+    const size_t patternLen = words[0].length() * words.size();
 
     if (patternLen > s.length())
     {
@@ -980,22 +979,22 @@ vector<int> findSubstring(string s, vector<string>& words)
 
     // Here we use a hash table to store for each word, how many times it occurs.
     unordered_map<string, int> wordCount;
-    for (size_t i = 0; i < words.size(); ++i)
+    for (const string& word : words)
     {
-        ++wordCount[words[i]];
+        ++wordCount[word];
     }
 
     for (size_t i = 0; i <= s.length() - patternLen; ++i)
     {
         unordered_map<string, int> unusedWords(wordCount);
 
-        // Check if all words present in current substring s[i..i+patternLen-1]
+        // Check if all words present in current substring s[i + j..i + j + patternLen - 1]
         // Slice it to words.size() slices, for each slice, use the unusedWords
         // hash table to quick check if it is a word, if yes, decrease value in
         // hash table, means it has been used.
-        for (size_t j = i; j <= i + patternLen - wordLen; j += wordLen)
+        for (size_t j = 0; j < patternLen; j += words[0].length())
         {
-            string word = s.substr(j, wordLen);
+            const string word = s.substr(i + j, words[0].length());
             if (unusedWords.find(word) == unusedWords.end())
             {
                 break;
