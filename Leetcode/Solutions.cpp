@@ -1018,18 +1018,29 @@ vector<int> findSubstring(const string& s, vector<string>& words)
 // 31. Next Permutation
 void nextPermutation(vector<int>& nums)
 {
-    if (nums.size() > 1)
+    // As we know that the greatest permutation is all numbers are in descending order.
+    // So search from end to begin check if all elements are in descending order.
+    size_t i;
+    for (i = nums.size() - 1; i >= 1 && nums[i] <= nums[i - 1]; --i);
+
+    // When previous loop ends, it could be (1) i == 0, or (2) i > 0, it doesn't matter, sort this segment first.
+    // Please note that starts from i, all elements are in descending order, so sorting is straightforward, just reverse them.
+    for (size_t j = i, k = nums.size() - 1; j < k; ++j, --k)
     {
-        size_t i; // i-1 will be the first element that nums[i-1] < nums[i].
-        size_t j; // j will be the first element in nums[i..size-1] that large than nums[i-1].
-        for (i = nums.size() - 1; i > 0 && nums[i] <= nums[i - 1]; --i); // search from end of array for the first element that smaller than its successor.
-        sort(nums.begin() + i, nums.end());
-        if (i > 0)
-        {
-            // Search for j that nums[j] is the first one large than nums[i-1], then swap nums[i-1] and nums[j].
-            for (j = i; j <= nums.size() - 1 && nums[j] <= nums[i - 1]; ++j);
-            swap(nums[i - 1], nums[j]);
-        }
+        int temp = nums[j];
+        nums[j] = nums[k];
+        nums[k] = temp;
+    }
+
+    // Now lets handle if we really find an i > 0, if yes, swap nums[i-1] with the smallest element that greater than nums[i-1].
+    if (i > 0)
+    {
+        size_t l;
+        for (l = i; l < nums.size() && nums[l] < nums[i - 1]; ++l);
+
+        int temp = nums[l];
+        nums[i - 1] = nums[l];
+        nums[l] = temp;
     }
 }
 
