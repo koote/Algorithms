@@ -1047,75 +1047,45 @@ void nextPermutation(vector<int>& nums)
 // 32. Longest Valid Parentheses
 int longestValidParentheses(string s)
 {
-    int slen = s.length();
-    int* dp = new int[slen];
-    memset(dp, 0, slen * sizeof(int));
-    int max = 0;
-
-    for (int i = slen - 2; i >= 0; --i)
+    if (s.length() == 0)
     {
-        dp[i] = s[i] == '(' ?
-            s[i + dp[i + 1] + 1] == ')' ?
-            dp[i + 1] + 2 +
-            (
-                i + dp[i + 1] + 2 < slen ? dp[i + dp[i + 1] + 2] : 0
-                ) : 0
-            : 0;
-
-        if (dp[i] > max)
-        {
-            max = dp[i];
-        }
+        return 0;
     }
 
-    delete[] dp;
-    return max;
-}
-int longestValidParentheses2(string s) // This solution is to demostrate how DP works.
-{
     int max = 0;
-    int slen = s.length();
+    vector<int> dp(s.length());
 
-    // dp[i] is the longest length of valid parentheses that starts from s[i].
-    // Please note that s[i] must be included. If s[i] is ')', then dp[i] = 0,
-    // because valid parentheses never start from ')', although there could be
-    // a valid parentheses starts from s[i+k] (0 <= k <= slen-i-1), but that is
-    // dp[i+k]'s business, not dp[i]'s.
-    int* dp = new int[slen];
-    dp[slen - 1] = 0;
-
-    for (int i = slen - 2; i >= 0; --i)
+    // lets say dp[i] is the length of longest valid parentheses ends at position i. 
+    // If s[0..i] has valid parentheses however it doesn't end at position i, then dp[i] = 0.
+    dp[0] = 0;
+    for (size_t i = 1; i < s.length(); ++i)
     {
-        if (s[i] == '(')
+        // It is obviously that, a valid parentheses string must end with a ')'. We scan s from left to right, if see a ')',
+        // what should we do?
+        // Because dp[i-1] is the length of valid parentheses string ends at position i-1, and for a valid parentheses
+        // string, if embrace it with brackets, the new string is still a valid parentheses string:
+        //          ''(' + valid parentheses string = ')' = a new valid parentheses string.
+        // So just check s[i-dp[i-1]-1], if it is a '(', then we know s[i-dp[i-1]-1 .. i] is also valid, thus:
+        //          dp[i] = dp[i-1] + 2. 
+        // But that is not done yet, what if there is another valid parentheses string before s[i-dp[i-1]-1 .. i]?
+        // Since concatenation of two valid parentheses strings is still a valid parentheses string, so just add 
+        // dp[i-dp[i-1]-1-1] = dp[i-dp[i]] to dp[i].
+        if (s[i] == ')' && s[i - dp[i - 1] - 1] == '(')
         {
-            //  (......................)          ....
-            // s[i]         s[i + dp[i + 1] + 1]
-            if (i + dp[i + 1] + 1 < slen && s[i + dp[i + 1] + 1] == ')')
-            {
-                dp[i] = dp[i + 1] + 2;
-
-                if (i + dp[i + 1] + 2 < slen)
-                {
-                    dp[i] += dp[i + dp[i + 1] + 2];
-                }
-            }
-            else
-            {
-                dp[i] = 0;
-            }
+            dp[i] = dp[i - 1] + 2;
+            dp[i] += dp[i - dp[i]];
         }
-        else if (s[i] == ')') // If a string starts with ')', it could not be a valid parentheses.
+        else
         {
             dp[i] = 0;
         }
 
-        if (dp[i] > max)
+        if (max < dp[i])
         {
             max = dp[i];
         }
     }
 
-    delete[] dp;
     return max;
 }
 
