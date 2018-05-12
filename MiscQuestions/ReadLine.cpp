@@ -2,7 +2,7 @@
 // Facebook in-person 面试题
 // 给定一个函数 int recv(char* buf, size_t sizeInChars)
 // 写一个函数read_line，作用是返回一行内容，\n作为一行的结束。
-// 注意第一，没有问一行最长有多长，所以这是一个潜在的问题；
+// 注意第一，没有说一行最长有多长，所以这是一个潜在的问题；
 // 第二，当找到结尾也没有找到换行符时，说明要继续调用recv读入接下来的数据，在其中找换行。
 // 第三，可以在函数中用malloc然后要求调用者用free去释放内存。
 // 第四，可以用全局变量等任何违反好设计的东西，Facebook只考察算法主题。
@@ -23,7 +23,7 @@ int recv(char* buf, size_t len)
 // return a line to caller, and the length of that line.
 char* read_line(int& nLineLen)
 {
-    while (1)
+    while (true)
     {
         size_t i = g_uNextStart;
         while (g_chBuffer[i] != '\n' && i < g_uBufferUsed)
@@ -38,7 +38,7 @@ char* read_line(int& nLineLen)
             // Let's check if we have enough free space to read more data in.
             // if the buffer is full, we cannot call recv and return error to caller.
             // Note that before g_uNextStart is available space.
-            size_t uBufferRemain = sizeof(g_chBuffer) -  (g_uBufferUsed - g_uNextStart);
+            const size_t uBufferRemain = sizeof(g_chBuffer) -  (g_uBufferUsed - g_uNextStart);
             if (uBufferRemain == 0)
             {
                 nLineLen = -1; //indicates an error, buffer full.

@@ -1060,16 +1060,17 @@ int longestValidParentheses(string s)
     dp[0] = 0;
     for (size_t i = 1; i < s.length(); ++i)
     {
-        // It is obviously that, a valid parentheses string must end with a ')'. We scan s from left to right, if see a ')',
-        // what should we do?
-        // Because dp[i-1] is the length of valid parentheses string ends at position i-1, and for a valid parentheses
-        // string, if embrace it with brackets, the new string is still a valid parentheses string:
-        //          ''(' + valid parentheses string = ')' = a new valid parentheses string.
-        // So just check s[i-dp[i-1]-1], if it is a '(', then we know s[i-dp[i-1]-1 .. i] is also valid, thus:
-        //          dp[i] = dp[i-1] + 2. 
-        // But that is not done yet, what if there is another valid parentheses string before s[i-dp[i-1]-1 .. i]?
-        // Since concatenation of two valid parentheses strings is still a valid parentheses string, so just add 
-        // dp[i-dp[i-1]-1-1] = dp[i-dp[i]] to dp[i].
+        // Two key thought: 
+        // (1) If a substring s is a valid parentheses string, then "(" + s + ")" is also valid parentheses string.
+        // (2) Two valid parentheses string's concatenation is also a valid parentheses string.
+        // 
+        // It is obviously that a valid parentheses string must end with a ')', We scan s from left to right, if see
+        // a ')', because dp[i-1] is the length of valid parentheses string ends at position i-1, So according to (1),
+        // we should check s[i-dp[i-1]-1], if it is a '(', then we know s[i-dp[i-1]-1 .. i] is also valid, thus we got:
+        //          dp[i] = dp[i-1] + 2
+        // According to (2), if there is another valid parentheses string before s[i-dp[i-1]-1 .. i], we also need to add 
+        // dp[i-dp[i-1]-1-1] = dp[i-dp[i]] to dp[i], so we have another equation:
+        //          dp[i] = dp[i] + dp[i-dp[i]]
         if (s[i] == ')' && s[i - dp[i - 1] - 1] == '(')
         {
             dp[i] = dp[i - 1] + 2;
@@ -1447,6 +1448,53 @@ int trap(vector<int>& height)
     }
 
     return result;
+}
+
+// 53. Maximum Subarray
+// Some throughts:
+// This is a DP problem, at first I want to define dp[i] as: the maximum sum of subarray in range nums[0..i], 
+// so when i increases from 0 to n-1 (n is the length of nums array), we got the final answer at dp[n-1]. However
+// I soon realize this doesn't work. The reason is given an i, we only konw the max subarray's sum in the range 
+// nums[0..i-1], but we don't know where the previous max subarray ends, it could end at nums[i-1], or before 
+// nums[i-1], this information is very important because we need to decide whether nums[i] is possible to join 
+// previous max subarray, or must become a start of new subarray. It is very like to the question 32 (longest
+// valid parentheses), which inspires me to change the definition of dp[i] to: given range nums[0..i], for all 
+// subarraies end at num[i], the maximum sum of those subarraies. With this new definition, given a dp[i], we 
+// know that the max subarray ends at nums[i], and the final answer is the maximum number in dp[0..n-1]. Why? 
+// Back to the original question, given an array nums[0..n-1], its max subarray must ends at a certain element
+// in nums, given that dp[0..n-1] stores the max subarray's sum ends at nums[0], nums[1], ... nums[n-1], so the 
+// max subarray's sum is the maximum element in dp[0..n-1].
+// Then next step is how to get the transition function. Let's starts from array has 3 element : 1, -2, 3
+// i = 0, max sum is 1, no doubt, dp[0] = 1.
+// i = 1, we are facing two choices, whether -2 should join previous max subarry or start a new subarray. If 
+//        joining previous max subarray, then the max subarray is [1, -2] and sum is 1-2 = -1; if we decide to 
+//        start a new subarray, the new subarray's sum is -2, -1 > -2, so -2 should join, and dp[1] = -1.
+// i = 2, because dp[1] = -1, if 3 join previous subarray, new sum is 3-1=2, if we start a new subarray from 3,
+//        the sum of new subarray is 3, 3>2 so we should start a new subarray.
+// From this we can see, actually it doesn't matter nums[i] is positive or negative, as long as dp[i-1] is positive,
+// nums[i] should always join previous subarry.
+// Why? If nums[i] is positive, obviously joining the previous subarray can make its sum greater;
+// if nums[i] is negative, joining previous subarray is better than starting a new subarray from it if dp[i-1] is
+// positive. But if dp[i-1] is negative, we should choose to start a new subarray.
+// So we get the state transition function: 
+//          dp[i] = dp[i-1] > 0 ? dp[i-1] + nums[i] : nums[i]
+// And since every dp[i] only depends on dp[i-1], so we can actually use 1 additional variable to store dp[i-1], 
+// reducing space complexity from O(n) to O(1).
+int maxSubArray(vector<int>& nums)
+{
+    int dp = nums[0];
+    int max = dp;
+    for (size_t i = 1; i < nums.size(); ++i)
+    {
+        dp = dp > 0 ? dp + nums[i] : nums[i];
+
+        if (dp > max)
+        {
+            max = dp;
+        }
+    }
+
+    return max;
 }
 
 // 144. Binary Tree Preorder Traversal
