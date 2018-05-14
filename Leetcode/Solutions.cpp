@@ -1480,21 +1480,44 @@ int trap(vector<int>& height)
 //          dp[i] = dp[i-1] > 0 ? dp[i-1] + nums[i] : nums[i]
 // And since every dp[i] only depends on dp[i-1], so we can actually use 1 additional variable to store dp[i-1], 
 // reducing space complexity from O(n) to O(1).
-int maxSubArray(vector<int>& nums)
+int maxSubArrayDP(vector<int>& nums)
 {
     int dp = nums[0];
-    int max = dp;
+    int maxSum = dp;
     for (size_t i = 1; i < nums.size(); ++i)
     {
         dp = dp > 0 ? dp + nums[i] : nums[i];
 
-        if (dp > max)
+        if (dp > maxSum)
         {
-            max = dp;
+            maxSum = dp;
         }
     }
 
-    return max;
+    return maxSum;
+}
+// This is another way of thinking this problem. Let's start from nums[0], so for each num[i], we have two choices,
+// adding it to current subarray (sum = sum + nums[i]), or starting a new subarray (sum = nums[i]), we go the way 
+// can make sum greater by comparing this two sums.
+int maxSubArrayStraightforward(vector<int>& nums)
+{
+    int sum = 0;
+    int maxSum = INT_MIN;
+    for (int num : nums)
+    {
+        sum = sum + num > num ? sum + num : num;
+
+        if (sum > maxSum)
+        {
+            maxSum = sum;
+        }
+    }
+
+    return maxSum;
+}
+int maxSubArray(vector<int>& nums)
+{
+    return maxSubArrayStraightforward(nums);
 }
 
 // 144. Binary Tree Preorder Traversal
