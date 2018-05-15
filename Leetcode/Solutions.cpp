@@ -1097,14 +1097,15 @@ int search(vector<int>& nums, int target)
     int right = nums.size() - 1;
     while (left <= right)
     {
-        int mid = (left + right) / 2;
+        size_t mid = (left + right) / 2;
         if (nums[mid] == target)
         {
             return mid;
         }
-        else if (nums[left] <= nums[mid])   // mid is on left part.
+
+        if (nums[left] <= nums[mid])   // mid is on left part.
         {
-            if (target >= nums[left] && target <= nums[mid]) // nums[left] <= target <= nums[mid]
+            if (target >= nums[left] && target < nums[mid]) // nums[left] <= target < nums[mid]
             {
                 right = mid - 1;
             }
@@ -1115,13 +1116,53 @@ int search(vector<int>& nums, int target)
         }
         else if (nums[right] >= nums[mid]) // mid is on right part.
         {
-            if (target >= nums[mid] && target <= nums[right]) // nums[mid] <= target <= nums[right]
+            if (target > nums[mid] && target <= nums[right]) // nums[mid] < target <= nums[right]
             {
                 left = mid + 1;
             }
             else
             {
                 right = mid - 1;
+            }
+        }
+    }
+
+    return -1;
+}
+int search2(vector<int>& nums, const int target)
+{
+    int left = 0;
+    int right = nums.size() - 1;
+    while (left <= right)
+    {
+        const int middle = (left + right) / 2;
+        if (nums[middle] == target)
+        {
+            return middle;
+        }
+
+        if (target > nums[middle]) // Have 2 cases
+        {
+            // When middle is on right part and target is not in range nums[middle .. right]
+            if (nums[right] >= nums[middle] && target > nums[right])
+            {
+                right = middle - 1;
+            }
+            else // for other 2 cases (1) middle is on left part, (2) middle is on right part and target is in range nums[middle ... right]
+            {
+                left = middle + 1;
+            }
+        }
+        else // nums[middle] > target
+        {
+            // When middle is on left part and target is not in range nums[left .. middle]
+            if (nums[left] <= nums[middle] && target < nums[left])
+            {
+                left = middle + 1;
+            }
+            else // for other 2 cases (1) middle is on the right part, (2) middle is on left part and target is in range nums[left .. middle]
+            {
+                right = middle - 1;
             }
         }
     }
