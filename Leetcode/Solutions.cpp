@@ -268,7 +268,7 @@ bool isPalindrome(int x)
     for (int i = 1, k = numOfDigits / 2; i <= k; lowhalf = lowhalf * 10 + x % 10, x /= 10, ++i);
 
     // after above loop, we got low half value, then we need to get high half value and compare.
-    return (numOfDigits & 0x1 ? x / 10 : x) == lowhalf;;
+    return (numOfDigits & 0x1 ? x / 10 : x) == lowhalf;
 }
 
 // 10. Regular Expression Matching
@@ -462,8 +462,7 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum) // nums mus
         */
 
         // downgrade current k sum problem to k-1 sum problem
-        vector<int> v(nums.begin() + i + 1, nums.end());
-        vector<vector<int>> cures = kSum(v, k - 1, sum - nums[i]);
+        vector<vector<int>> cures = kSum(vector<int>(nums.begin() + i + 1, nums.end()), k - 1, sum - nums[i]);
         for (size_t j = 0; j < cures.size(); ++j)
         {
             cures[j].insert(cures[j].begin(), nums[i]);
@@ -698,9 +697,9 @@ vector<string> generateParenthesisBottomUp(int n)
         for (int j = 0; j < i; ++j)
         {
             // For every string in dp[j] and dp[i-j-1], concat a new string (dp[j])+dp[i-j-1]
-            for (const auto& x : dp[j])
+            for (const string& x : dp[j])
             {
-                for (const auto& y : dp[i - j - 1])
+                for (const string& y : dp[i - j - 1])
                 {
                     dp[i].push_back(('(' + x + ')').append(y));
                 }
