@@ -1172,77 +1172,83 @@ int search2(vector<int>& nums, const int target)
 // 34. Search for a Range
 vector<int> searchRange(vector<int>& nums, int target)
 {
-    vector<int> result;
-    int left = 0;
-    int right = nums.size() - 1;
-    while (left <= right)
+    vector<int> result(2, -1);
+    for (int left = 0, right = nums.size() - 1; left <= right;)
     {
-        size_t mid = (left + right) / 2;
-        if (nums[mid] == target)
+        const int middle = (left + right) / 2;
+        if (target == nums[middle])
         {
-            // If we haven't find the first appearance of target (because result is empty), and current is not the 
-            // first appearance of target (because nums[mid - 1] == target), keep going left to find the first target
-            if (result.empty() && (mid > 0 && nums[mid - 1] == target))
+            // search for the first appearance of target
+            for (left = 0, right = middle; left <= right;)
             {
-                right = mid - 1;
-            }
-            else if (!result.empty() && (mid < nums.size() - 1 && nums[mid + 1] == target)) // If we have found the first apperance of target, go right to find the last appearance of target
-            {
-                left = mid + 1;
-            }
-            else
-            {
-                result.push_back(mid);
-                if (result.size() == 1)
+                const int middle2 = (left + right) / 2;
+                if (target == nums[middle2])
                 {
-                    // So nums[mid] is the first appearance of target, now we need to find the last appearance of target.
-                    // reset left = mid and right = nums.size()-1.
-                    left = mid;
-                    right = nums.size() - 1;
+                    right = middle2 - 1;
                 }
                 else
                 {
-                    return result;
+                    left = middle2 + 1;
                 }
             }
+
+            result[0] = left;
+
+            // search for the last appearance of target
+            for (left = middle, right = nums.size() - 1; left <= right;)
+            {
+                const int middle2 = (left + right) / 2;
+                if (target == nums[middle2])
+                {
+                    left = middle2 + 1;
+                }
+                else
+                {
+                    right = middle2 - 1;
+                }
+            }
+
+            result[1] = right;
+
+            break;
         }
-        else if (nums[mid] > target) // go left
+
+        if (target < nums[middle])
         {
-            right = mid - 1;
+            right = middle - 1;
         }
-        else if (nums[mid] < target) // go right
+        else
         {
-            left = mid + 1;
+            left = middle + 1;
         }
     }
 
-    return vector<int>{ -1, -1 };
+    return result;
 }
 
 // 35. Search Insert Position
 int searchInsert(vector<int>& nums, int target)
 {
-    int left = 0;
-    int right = nums.size() - 1;
-    while (left <= right)
+    int left, right;
+    for (left = 0, right = nums.size() - 1; left <= right;)
     {
-        int mid = (left + right) / 2;
-        if (nums[mid] == target)
+        const int middle = (left + right) / 2;
+        if (nums[middle] == target)
         {
-            return mid;
+            return middle;
         }
-        else if (nums[mid] > target)
+        
+        if (nums[middle] > target)
         {
-            right = mid - 1;
+            right = middle - 1;
         }
-        else if (nums[mid] < target)
+        else 
         {
-            left = mid + 1;
+            left = middle + 1;
         }
     }
 
-    // when loop ends, left > right, left is the first number that larger than target,
-    // which is also the insert location.
+    // when loop ends, left > right, left is the first number that larger than target, which is also the insert location.
     return left;
 }
 
