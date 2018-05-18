@@ -14,7 +14,7 @@ extern vector<int> twoSum(vector<int>& nums, int target);
 extern ListNode* addTwoNumbers(ListNode* l1, ListNode* l2);
 extern int lengthOfLongestSubstring(string s);
 extern double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2);
-extern string trySearchPalindromic(string s, int l, int r);
+extern string searchPalindrome(string s, int l, int r);
 extern string longestPalindrome(string s);
 extern string zigzagConvert(string s, int numRows);
 extern int reverseInteger(int x);
@@ -30,7 +30,6 @@ extern int threeSumClosest(vector<int>& nums, int target);
 extern vector<string> letterCombinations(string digits);
 extern vector<vector<int>> fourSum(vector<int>& nums, int target);
 extern ListNode* removeNthFromEnd(ListNode* head, int n);
-extern ListNode* removeNthFromEnd2(ListNode* head, int n);
 extern bool isValid(string s);
 extern ListNode* mergeTwoLists(ListNode* l1, ListNode* l2);
 extern vector<string> generateParenthesis(int n);
@@ -41,7 +40,7 @@ extern int removeDuplicates(vector<int>& nums);
 extern int removeElement(vector<int>& nums, int val);
 extern int strStr(string haystack, string needle);
 extern int divide(int dividend, int divisor);
-extern vector<int> findSubstring(string s, vector<string>& words);
+extern vector<int> findSubstring(const string& s, vector<string>& words);
 extern void nextPermutation(vector<int>& nums);
 extern int longestValidParentheses(string s);
 extern int search(vector<int>& nums, int target);
@@ -59,6 +58,20 @@ void main()
 {
     auto start = std::clock();
    
+    vector<vector<char>> sudoku({
+        { '5', '3', '.', '.', '7', '.', '.', '.', '.' },
+        { '6', '.', '.', '1', '9', '5', '.', '.', '.' },
+        { '.', '9', '8', '.', '.', '.', '.', '6', '.' },
+        { '8', '.', '.', '.', '6', '.', '.', '.', '3' },
+        { '4', '.', '.', '8', '.', '3', '.', '.', '1' },
+        { '7', '.', '.', '.', '2', '.', '.', '.', '6' },
+        { '.', '6', '.', '.', '.', '.', '2', '8', '.' },
+        { '.', '.', '.', '4', '1', '9', '.', '.', '5' },
+        { '.', '.', '.', '.', '8', '.', '.', '7', '9' }
+    });
+
+    isValidSudoku(sudoku);
+
     auto x = trap(vector<int> {0,2,0});
 
     auto duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;

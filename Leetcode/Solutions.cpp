@@ -1,11 +1,12 @@
-#include <string>
-#include <algorithm>
-#include <vector>
-#include <queue>
-#include <unordered_map>
 #include <stack>
-#include "DataStructure.h"
+#include <queue>
+#include <string>
+#include <vector>
 #include <cassert>
+#include <algorithm>
+#include <unordered_map>
+#include <unordered_set>
+#include "DataStructure.h"
 
 using namespace std;
 
@@ -1178,7 +1179,7 @@ vector<int> searchRange(vector<int>& nums, int target)
         const int middle = (left + right) / 2;
         if (target == nums[middle])
         {
-            // search for the first appearance of target
+            // searching for the first appearance of target
             for (left = 0, right = middle; left <= right;)
             {
                 const int middle2 = (left + right) / 2;
@@ -1194,7 +1195,7 @@ vector<int> searchRange(vector<int>& nums, int target)
 
             result[0] = left;
 
-            // search for the last appearance of target
+            // searching for the last appearance of target
             for (left = middle, right = nums.size() - 1; left <= right;)
             {
                 const int middle2 = (left + right) / 2;
@@ -1237,12 +1238,12 @@ int searchInsert(vector<int>& nums, int target)
         {
             return middle;
         }
-        
+
         if (nums[middle] > target)
         {
             right = middle - 1;
         }
-        else 
+        else
         {
             left = middle + 1;
         }
@@ -1255,60 +1256,24 @@ int searchInsert(vector<int>& nums, int target)
 // 36. Valid Sudoku
 bool isValidSudoku(vector<vector<char>>& board)
 {
-    // check 9 rows & 9 columns
-    for (int i = 0; i < 9; ++i)
+    unordered_set<string> occurrence;
+    for (int i = 0; i < board.size(); ++i)
     {
-        int rowNumbers[10] = { 0 };
-        int colNumbers[10] = { 0 };
-
-        for (int j = 0; j < 9; ++j)
+        for (int j = 0; j < board[0].size(); ++j)
         {
-            // row
             if (board[i][j] != '.')
             {
-                int val = board[i][j] - '0';
-                if (val < 1 || val > 9 || rowNumbers[val] != 0)
+                // Instead of checking every row, every column and every block iteratively, do it in one pass scan.
+                // For every element board[i][j], we generate 3 strings:
+                // "r{i}{board[i][j]}" to check row i,
+                // "c{j}{board[i][j]}" to check row j,
+                // "{i/3}{board[i][j]}{j/3}" to check tile belonged, each tile is marked using it top left element's indice.
+                if (board[i][j] < '1' || board[i][j] > '9' ||
+                    !occurrence.insert(string("r") + (char)(i + '0') + board[i][j]).second ||           // Row
+                    !occurrence.insert(string("c") + (char)(j + '0') + board[i][j]).second ||           //column
+                    !occurrence.insert(string("") + (char)(i / 3 + '0') + board[i][j] + (char)(j / 3 + '0')).second)      // sub
                 {
                     return false;
-                }
-
-                rowNumbers[val] = 1;
-            }
-
-            // column
-            if (board[j][i] != '.')
-            {
-                int val = board[j][i] - '0';
-                if (val < 1 || val > 9 || colNumbers[val] != 0)
-                {
-                    return false;
-                }
-
-                colNumbers[val] = 1;
-            }
-        }
-    }
-
-    // check 9 3x3 tiles
-    for (int i = 0; i <= 6; i += 3)
-    {
-        for (int j = 0; j <= 6; j += 3)
-        {
-            int numbers[10] = { 0 };
-            for (int k = 0; k < 3; ++k)
-            {
-                for (int p = 0; p < 3; ++p)
-                {
-                    if (board[i + k][j + p] != '.')
-                    {
-                        int val = board[i + k][j + p] - '0';
-                        if (val < 1 || val > 9 || numbers[val] != 0)
-                        {
-                            return false;
-                        }
-
-                        numbers[val] = 1;
-                    }
                 }
             }
         }
