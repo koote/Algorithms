@@ -1257,9 +1257,9 @@ int searchInsert(vector<int>& nums, int target)
 bool isValidSudoku(vector<vector<char>>& board)
 {
     unordered_set<string> occurrence;
-    for (int i = 0; i < board.size(); ++i)
+    for (size_t i = 0; i < board.size(); ++i)
     {
-        for (int j = 0; j < board[0].size(); ++j)
+        for (size_t j = 0; j < board[0].size(); ++j)
         {
             if (board[i][j] != '.')
             {
@@ -1269,9 +1269,9 @@ bool isValidSudoku(vector<vector<char>>& board)
                 // "c{j}{board[i][j]}" to check row j,
                 // "{i/3}{board[i][j]}{j/3}" to check tile belonged, each tile is marked using it top left element's indice.
                 if (board[i][j] < '1' || board[i][j] > '9' ||
-                    !occurrence.insert(string("r") + (char)(i + '0') + board[i][j]).second ||           // Row
-                    !occurrence.insert(string("c") + (char)(j + '0') + board[i][j]).second ||           //column
-                    !occurrence.insert(string("") + (char)(i / 3 + '0') + board[i][j] + (char)(j / 3 + '0')).second)      // sub
+                    !occurrence.insert(string("r") + static_cast<char>(i + '0') + board[i][j]).second ||           // row
+                    !occurrence.insert(string("c") + static_cast<char>(j + '0') + board[i][j]).second ||           // column
+                    !occurrence.insert(string("") + static_cast<char>(i / 3 + '0') + board[i][j] + static_cast<char>(j / 3 + '0')).second)      // tile
                 {
                     return false;
                 }
@@ -1283,18 +1283,18 @@ bool isValidSudoku(vector<vector<char>>& board)
 }
 
 // 37. Sudoku Solver
-bool solveSudoku(vector<vector<char>>& board)
+bool solveSudokuUse36(vector<vector<char>>& board)
 {
-    for (int i = 0; i < 9; ++i)
+    for (size_t i = 0; i < board.size(); ++i)
     {
-        for (int j = 0; j < 9; ++j)
+        for (size_t j = 0; j < board[0].size(); ++j)
         {
             if (board[i][j] == '.')
             {
-                for (int val = 1; val <= 9; ++val)
+                for (char ch = '1'; ch <= '9'; ++ch)
                 {
-                    board[i][j] = (char)(val + '0');
-                    if (isValidSudoku(board) && solveSudoku(board))
+                    board[i][j] = ch;
+                    if (isValidSudoku(board) && solveSudokuUse36(board))
                     {
                         return true;
                     }
@@ -1309,6 +1309,68 @@ bool solveSudoku(vector<vector<char>>& board)
 
     return true;
 }
+
+bool isValidCandidate(const vector<vector<char>>& board, size_t row, size_t col)
+{
+    for (size_t r = 0; r < board.size(); ++r)
+    {
+        if (r != row && board[r][col] == board[row][col])
+        {
+            return false;
+        }
+    }
+
+    for (size_t c = 0; c < board[0].size(); ++c)
+    {
+        if (c != col && board[row][c] == board[row][col])
+        {
+            return false;
+        }
+    }
+
+    for (size_t r = 3 * (row / 3); r < 3 * (row / 3 + 1); ++r)
+    {
+        for (size_t c = 3 * (col / 3); c < 3 * (col / 3 + 1); ++c)
+        {
+            if (r != row && c != col && board[r][c] == board[row][col])
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+bool dfsSearchSudoku(vector<vector<char>>& board, size_t row, size_t col)
+{
+    for (; row < board.size(); ++row, col = 0)
+    {
+        for (; col < board[0].size(); ++col)
+        {
+            if (board[row][col] == '.')
+            {
+                for (char ch = '1'; ch <= '9'; ++ch)
+                {
+                    board[row][col] = ch;
+                    if (isValidCandidate(board, row, col) && dfsSearchSudoku(board, row, col + 1)) // valid
+                    {
+                        return true;
+                    }
+                }
+
+                board[row][col] = '.';
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+void solveSudoku(vector<vector<char>>& board)
+{
+    dfsSearchSudoku(board, 0, 0);
+}
+
 
 // 38. Count and Say
 string countAndSay(int n)

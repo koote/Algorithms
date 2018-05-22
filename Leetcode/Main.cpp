@@ -70,7 +70,7 @@ void main()
         { '.', '.', '.', '.', '8', '.', '.', '7', '9' }
     });
 
-    isValidSudoku(sudoku);
+    solveSudoku(sudoku);
 
     auto x = trap(vector<int> {0,2,0});
 
