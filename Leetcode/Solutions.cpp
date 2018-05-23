@@ -1291,10 +1291,10 @@ bool solveSudokuUse36(vector<vector<char>>& board)
         {
             if (board[i][j] == '.')
             {
-                for (char ch = '1'; ch <= '9'; ++ch)
+                for (char candidate = '1'; candidate <= '9'; ++candidate)
                 {
-                    board[i][j] = ch;
-                    if (isValidSudoku(board) && solveSudokuUse36(board))
+                    board[i][j] = candidate;
+                    if (isValidSudoku(board) && solveSudokuUse36(board)) // No need to check whole board every time, just check the latest location see if it's valid.
                     {
                         return true;
                     }
@@ -1349,9 +1349,9 @@ bool dfsSearchSudoku(vector<vector<char>>& board, size_t row, size_t col)
         {
             if (board[row][col] == '.')
             {
-                for (char ch = '1'; ch <= '9'; ++ch)
+                for (char candidate = '1'; candidate <= '9'; ++candidate)
                 {
-                    board[row][col] = ch;
+                    board[row][col] = candidate;
                     if (isValidCandidate(board, row, col) && dfsSearchSudoku(board, row, col + 1)) // valid
                     {
                         return true;
@@ -1371,25 +1371,23 @@ void solveSudoku(vector<vector<char>>& board)
     dfsSearchSudoku(board, 0, 0);
 }
 
-
 // 38. Count and Say
 string countAndSay(int n)
 {
-    string seq = "1";
+    string result = "1";
     for (; n > 1; --n)
     {
-        string newSeq;
-        for (size_t i = 0; seq[i] != '\0';)
+        string temp;
+        for (size_t i = 0, j; i < result.length(); i = j)
         {
-            size_t j = i + 1;
-            for (; seq[j] != '\0' && seq[j] == seq[j - 1]; ++j);
-            newSeq.append(1, (char)(j - i + '0'));
-            newSeq.append(1, seq[i]);
-            i = j;
+            for (j = i; j < result.length() && result[j] == result[i]; ++j);
+            temp += string("") + static_cast<char>(j - i + '0') + result[i];
         }
-        seq = newSeq;
+
+        result = temp;
     }
-    return seq;
+
+    return result;
 }
 
 // 39. Combination Sum
