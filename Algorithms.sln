@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiscQuestions", "MiscQuesti
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZOJ", "ZOJ\ZOJ.vcxproj", "{22D8C4A8-CC44-42C8-93B7-77151D2936F5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NowCoder", "NowCoder\NowCoder.vcxproj", "{59A7E566-B1A9-47EC-9174-EB4B2A7B07EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -45,12 +47,20 @@ Global
 		{22D8C4A8-CC44-42C8-93B7-77151D2936F5}.Release|Win32.Build.0 = Release|Win32
 		{22D8C4A8-CC44-42C8-93B7-77151D2936F5}.Release|x64.ActiveCfg = Release|x64
 		{22D8C4A8-CC44-42C8-93B7-77151D2936F5}.Release|x64.Build.0 = Release|x64
+		{59A7E566-B1A9-47EC-9174-EB4B2A7B07EE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{59A7E566-B1A9-47EC-9174-EB4B2A7B07EE}.Debug|Win32.Build.0 = Debug|Win32
+		{59A7E566-B1A9-47EC-9174-EB4B2A7B07EE}.Debug|x64.ActiveCfg = Debug|x64
+		{59A7E566-B1A9-47EC-9174-EB4B2A7B07EE}.Debug|x64.Build.0 = Debug|x64
+		{59A7E566-B1A9-47EC-9174-EB4B2A7B07EE}.Release|Win32.ActiveCfg = Release|Win32
+		{59A7E566-B1A9-47EC-9174-EB4B2A7B07EE}.Release|Win32.Build.0 = Release|Win32
+		{59A7E566-B1A9-47EC-9174-EB4B2A7B07EE}.Release|x64.ActiveCfg = Release|x64
+		{59A7E566-B1A9-47EC-9174-EB4B2A7B07EE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 6
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://pseudocode.visualstudio.com/
 		SccLocalPath0 = .
@@ -66,5 +76,8 @@ Global
 		SccProjectUniqueName4 = ZOJ\\ZOJ.vcxproj
 		SccProjectName4 = ZOJ
 		SccLocalPath4 = ZOJ
+		SccProjectUniqueName5 = NowCoder\\NowCoder.vcxproj
+		SccProjectName5 = NowCoder
+		SccLocalPath5 = NowCoder
 	EndGlobalSection
 EndGlobal

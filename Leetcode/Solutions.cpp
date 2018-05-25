@@ -1391,43 +1391,33 @@ string countAndSay(int n)
 }
 
 // 39. Combination Sum
-void depthSearchCombinationSum(vector<vector<int>>& results, vector<int>& path, vector<int>& candidates, size_t startPos, int target)
+void dfsSearchCombinationSumSolution(vector<int>& candidates, size_t currentIndex, int target, vector<int>& path, vector<vector<int>>& solutions)
 {
-    // Found a path, save it to results. Do not clear the path, because it is still needed 
-    // for upper level caller. Let's say now the path is ?...??X, after we push this path
-    // to results, and return to upper caller, in upper caller, the path is ?...??, it may
-    // still need to try another number Y: ?...???Y
-    if (target == 0)
+    if (target < 0 || currentIndex >= candidates.size())
     {
-        results.push_back(path);
         return;
     }
 
-    // Since the candidates is sorted, to prevent duplicate paths, we only look forward. Because each number can be used
-    // mulitpal times, so if we choose candidates[i], next step is we try numbers from candidates[i] to end of array. If
-    // every number can be used only once, then next step we start from candidates[i+1].
-    for (size_t i = startPos; i < candidates.size() && candidates[i] <= target; ++i) // candidates[i] <= target is pruning
+    if (target == 0)
     {
-        // Skip duplicates. e.g. candidates = [1,1,2,3], target = 6, let's mark it as (1,1,2,3|6), we can notice that actually
-        // (1,2,3|5) is already included in (1,1,2,3|5) :
-        // (1,1,2,3|5) = (1,1,2,3|4), (1,2,3|4), (2,3|3), (3|2).
-        // (1,2,3|5) =                (1,2,3|4), (2,3|3), (3|2).
-        if (i > startPos && candidates[i] == candidates[i - 1])
-        {
-            continue;
-        }
-        path.push_back(candidates[i]); // Try to select candidate[i] in current step.
-        depthSearchCombinationSum(results, path, candidates, i, target - candidates[i]);
-        path.pop_back(); // Must revert path back.
+        solutions.push_back(path);
+        return;
     }
+
+    // At each position we have 2 choices: choose the number on current position and keep going; or skip it.
+    // Because it is allowed to choose an element multiple times so don't update the currentIndex.
+    path.push_back(candidates[currentIndex]);
+    dfsSearchCombinationSumSolution(candidates, currentIndex, target - candidates[currentIndex], path, solutions);
+    path.pop_back();
+    dfsSearchCombinationSumSolution(candidates, currentIndex + 1, target, path, solutions);
 }
+
 vector<vector<int>> combinationSum(vector<int>& candidates, int target)
 {
-    sort(candidates.begin(), candidates.end());
-    vector<vector<int>> results;
+    vector<vector<int>> solutions;
     vector<int> path;
-    depthSearchCombinationSum(results, path, candidates, 0, target);
-    return results;
+    dfsSearchCombinationSumSolution(candidates, 0, target, path, solutions);
+    return solutions;
 }
 
 // 40. Combination Sum II
