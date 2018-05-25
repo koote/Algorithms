@@ -1393,14 +1393,22 @@ string countAndSay(int n)
 // 39. Combination Sum
 void dfsSearchCombinationSumSolution(vector<int>& candidates, size_t currentIndex, int target, vector<int>& path, vector<vector<int>>& solutions)
 {
-    if (target < 0 || currentIndex >= candidates.size())
-    {
-        return;
-    }
-
+    // In this problem, because allow choosing element multiple times, so whether checking target == 0 
+    // first or checking currentIndex out of boundary first doesn't matter. But in next problem it matters.
+    // Thinking about this test case: [10,1,2,7,6,5] and target == 8. There is a valid combination [1,2,5],
+    // when currentIndex == 5, next recursion function call, we can still have currentIndex == 5 then we 
+    // know we find a valid combination. But in next problem, one element can only be chosen one time, so
+    // currentIndex is updated in every recursion function call, then currentIndex == 6, which is out of
+    // boundary and return immediately, we don't have a chance to examine target == 0 so [1,2,5] will be 
+    // missed.
     if (target == 0)
     {
         solutions.push_back(path);
+        return;
+    }
+
+    if (target < 0 || currentIndex >= candidates.size())
+    {
         return;
     }
 
@@ -1411,7 +1419,6 @@ void dfsSearchCombinationSumSolution(vector<int>& candidates, size_t currentInde
     path.pop_back();
     dfsSearchCombinationSumSolution(candidates, currentIndex + 1, target, path, solutions);
 }
-
 vector<vector<int>> combinationSum(vector<int>& candidates, int target)
 {
     vector<vector<int>> solutions;
@@ -1421,32 +1428,32 @@ vector<vector<int>> combinationSum(vector<int>& candidates, int target)
 }
 
 // 40. Combination Sum II
-void depthSearchCombinationSum2(vector<vector<int>>& results, vector<int>& path, vector<int>& candidates, size_t startPos, int target)
+void dfsSearchCombinationSum2Solution(vector<int>& candidates, size_t currentIndex, int target, vector<int>& path, vector<vector<int>>& solutions)
 {
     if (target == 0)
     {
-        results.push_back(path);
+        solutions.push_back(path);
         return;
     }
 
-    for (size_t i = startPos; i < candidates.size() && candidates[i] <= target; ++i) // candidates[i] <= target is pruning
+    if (target < 0 || currentIndex >= candidates.size())
     {
-        if (i > startPos && candidates[i] == candidates[i - 1])
-        {
-            continue;
-        }
-        path.push_back(candidates[i]); // Try to select candidate[i] in current step.
-        depthSearchCombinationSum2(results, path, candidates, i + 1, target - candidates[i]);
-        path.pop_back(); // Must revert path back.
+        return;
     }
+
+    path.push_back(candidates[currentIndex]);
+    dfsSearchCombinationSum2Solution(candidates, currentIndex + 1, target - candidates[currentIndex], path, solutions);
+    path.pop_back();
+    for (; currentIndex < candidates.size() - 1 && candidates[currentIndex + 1] == candidates[currentIndex]; ++currentIndex);
+    dfsSearchCombinationSum2Solution(candidates, currentIndex + 1, target, path, solutions);
 }
 vector<vector<int>> combinationSum2(vector<int>& candidates, int target)
 {
     sort(candidates.begin(), candidates.end());
-    vector<vector<int>> results;
+    vector<vector<int>> solutions;
     vector<int> path;
-    depthSearchCombinationSum2(results, path, candidates, 0, target);
-    return results;
+    dfsSearchCombinationSum2Solution(candidates, 0, target, path, solutions);
+    return solutions;
 }
 
 // 41. First Missing Positive
