@@ -53,11 +53,22 @@ extern vector<vector<int>> combinationSum(vector<int>& candidates, int target);
 extern vector<vector<int>> combinationSum2(vector<int>& candidates, int target);
 extern int firstMissingPositive(vector<int>& nums);
 extern int trap(vector<int>& height);
+extern string multiply(string num1, string num2);
+
+extern int maxSubArray(vector<int>& nums);
+
+extern vector<int> preorderTraversal(TreeNode* root);
+
+extern TreeNode* invertTree(TreeNode* root);
+
+extern TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q);
+
+extern string addStrings(string num1, string num2);
 
 void main()
 {
     auto start = std::clock();
-   
+
     vector<vector<char>> sudoku({
         { '5', '3', '.', '.', '7', '.', '.', '.', '.' },
         { '6', '.', '.', '1', '9', '5', '.', '.', '.' },

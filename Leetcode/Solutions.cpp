@@ -1394,13 +1394,10 @@ string countAndSay(int n)
 void dfsSearchCombinationSumSolution(vector<int>& candidates, size_t currentIndex, int target, vector<int>& path, vector<vector<int>>& solutions)
 {
     // In this problem, because allow choosing element multiple times, so whether checking target == 0 
-    // first or checking currentIndex out of boundary first doesn't matter. But in next problem it matters.
+    // first or checking currentIndex out of boundary first doesn't matter, won't miss valid combination.
     // Thinking about this test case: [10,1,2,7,6,5] and target == 8. There is a valid combination [1,2,5],
     // when currentIndex == 5, next recursion function call, we can still have currentIndex == 5 then we 
-    // know we find a valid combination. But in next problem, one element can only be chosen one time, so
-    // currentIndex is updated in every recursion function call, then currentIndex == 6, which is out of
-    // boundary and return immediately, we don't have a chance to examine target == 0 so [1,2,5] will be 
-    // missed.
+    // know we find a valid combination.
     if (target == 0)
     {
         solutions.push_back(path);
@@ -1430,6 +1427,10 @@ vector<vector<int>> combinationSum(vector<int>& candidates, int target)
 // 40. Combination Sum II
 void dfsSearchCombinationSum2Solution(vector<int>& candidates, size_t currentIndex, int target, vector<int>& path, vector<vector<int>>& solutions)
 {
+    // Doesn't like problem 39, we must check target == 0 first, otherwise we could miss valid combination.
+    // Still using test case: [10,1,2,7,6,5] and target == 8, when currentIndex == 5, next recursion function
+    // call has currentIndex == 6 (one element can only be chosen one time), which is out of array boundary,
+    // if we check boundary first, we don't have a chance to examine target == 0 so [1,2,5] will be missed.
     if (target == 0)
     {
         solutions.push_back(path);
@@ -1444,6 +1445,9 @@ void dfsSearchCombinationSum2Solution(vector<int>& candidates, size_t currentInd
     path.push_back(candidates[currentIndex]);
     dfsSearchCombinationSum2Solution(candidates, currentIndex + 1, target - candidates[currentIndex], path, solutions);
     path.pop_back();
+
+    // Because in last call, we choose candidates[currentIndex] and may already found a solution. So if 
+    // candidates[currentIndex+1] == candidates[currentIndex], need to skip, otherwise will get duplicate solutions.
     for (; currentIndex < candidates.size() - 1 && candidates[currentIndex + 1] == candidates[currentIndex]; ++currentIndex);
     dfsSearchCombinationSum2Solution(candidates, currentIndex + 1, target, path, solutions);
 }
@@ -1511,7 +1515,7 @@ int trapBruteForce(vector<int>& height)
         // We need to include bar i itself when searching, so we know if all left/right bars are lower than bar i, in such a case
         // it means bar i cannot trap any water.
         int leftHighestIndex = 0;
-        for (int j = 0; j <= i; ++j) 
+        for (int j = 0; j <= i; ++j)
         {
             if (height[j] > height[leftHighestIndex])
             {
@@ -1577,6 +1581,92 @@ int trapOptimized(vector<int>& height)
 int trap(vector<int>& height)
 {
     return trapOptimized(height);
+}
+
+// 43. Multiply Strings
+// O(n1 *n2), O(1)
+string multiplyUseAddStrings(string num1, string num2)
+{
+    if (num1 == "0" || num2 == "0")
+    {
+        return "0";
+    }
+
+    string product = "0";
+    for (int i = num2.length() - 1; i >= 0; --i)
+    {
+        // calculate num1 * num2[i]
+        string intermediateResult;
+        char carry = '0';
+        for (int j = num1.length() - 1; j >= 0; --j)
+        {
+            int r = (num1[j] - '0') * (num2[i] - '0') + (carry - '0');
+            carry = r / 10 + '0';
+            intermediateResult.insert(0, 1, (char)((r % 10) + '0'));
+        }
+
+        if (carry - '0' > 0)
+        {
+            intermediateResult.insert(0, 1, carry);
+        }
+
+        for (int padding = num2.length() - i - 1; padding > 0; --padding)
+        {
+            intermediateResult += "0";
+        }
+
+        product = addStrings(product, intermediateResult);
+    }
+
+    return product;
+}
+
+// O(n1 *n2), O(n1 + n2)
+//        1      2     3
+// x             5     6
+//-----------------------
+//         6    12    18
+// + 5    10    15
+//-----------------------
+//   5    16    27    18
+//-----------------------
+//   5    16    28     8
+//-----------------------
+//   5    18     8     8
+//-----------------------
+//   6     8     8     8
+string multiply(string num1, string num2)
+{
+    if (num1 == "0" || num2 == "0")
+    {
+        return "0";
+    }
+
+    vector<int> result(num1.length() + num2.length(), 0);
+    for (int i = num1.length() - 1; i >= 0; --i)
+    {
+        for (int j = num2.length() - 1; j >= 0; --j)
+        {
+            result[i + j + 1] += (num1[i] - '0') * (num2[j] - '0');
+        }
+    }
+
+    for (int i = result.size() - 1; i > 0; --i)
+    {
+        if (result[i] >= 10)
+        {
+            result[i - 1] += result[i] / 10;
+            result[i] = result[i] % 10;
+        }
+    }
+
+    string product;
+    for (int i = result[0] == 0 ? 1 : 0; i < result.size(); ++i)
+    {
+        product += result[i] + '0';
+    }
+
+    return product;
 }
 
 // 53. Maximum Subarray
@@ -1718,4 +1808,36 @@ TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
     }
 
     return r;
+}
+
+// 415. Add Strings
+string addStrings(string num1, string num2)
+{
+    string sum;
+    char carry = '0';
+    for (int i = num1.length() - 1, j = num2.length() - 1, r; i >= 0 || j >= 0; --i, --j)
+    {
+        if (i >= 0 && j >= 0)
+        {
+            r = (num1[i] - '0') + (num2[j] - '0') + (carry - '0');
+        }
+        else if (i >= 0)
+        {
+            r = (num1[i] - '0') + (carry - '0');
+        }
+        else if (j >= 0)
+        {
+            r = (num2[j] - '0') + (carry - '0');
+        }
+
+        carry = r / 10 + '0';
+        sum.insert(0, 1, (char)((r % 10) + '0'));
+    }
+
+    if (carry - '0' > 0)
+    {
+        sum.insert(0, 1, carry);
+    }
+
+    return sum;
 }
