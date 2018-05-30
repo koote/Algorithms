@@ -1459,13 +1459,14 @@ vector<vector<int>> combinationSum2(vector<int>& candidates, int target)
 // 41. First Missing Positive
 int firstMissingPositive(vector<int>& nums)
 {
-    // For each positive number, try to put it on correct index.
+    // For each positive numbers nums[i] that greater than 0 and smaller than nums.size(), put it on nums[nums[i]-1].
+    // For numbers not in that range, can be left on their current position.
     for (size_t i = 0; i < nums.size();)
     {
         // Put 1 in nums[0], put 2 in num[1], etc.
-        if (nums[i] > 0 && nums[i] < (int)nums.size() && nums[i] != nums[nums[i] - 1])
+        if (nums[i] > 0 && nums[i] < static_cast<int>(nums.size()) && nums[i] != nums[nums[i] - 1])
         {
-            int temp = nums[nums[i] - 1];
+            const int temp = nums[nums[i] - 1];
             nums[nums[i] - 1] = nums[i];
             nums[i] = temp;
         }
@@ -1475,9 +1476,10 @@ int firstMissingPositive(vector<int>& nums)
         }
     }
 
+    // Now scan the array again, each index i, its element should be i + 1, if not, then we find the missing positive.
     for (size_t i = 0; i < nums.size(); ++i)
     {
-        if (nums[i] != (int)(i + 1))
+        if (nums[i] != static_cast<int>(i + 1))
         {
             return i + 1;
         }
@@ -1487,35 +1489,94 @@ int firstMissingPositive(vector<int>& nums)
 }
 
 // 42. Trapping Rain Water
-int trap(vector<int>& height)
+// Brute force is not the best solution but it is very important to show that how to think.
+// For this problem, DO NOT think about each hollows, that makes this problem looks complicated. Thinking 
+// each bar individually, let's say every bar can trap some water (physically it is impossble), if we can 
+// caculate how many water each bar can trap, and add them together, we get the toal trapped water.
+// So given a bar i, whose height is height[i], how to know how many water it can trap? Drawing a chart 
+// helps to show that:
+// water bar i can trap = min(height of the highest bar on bar i's left, height of the highest bar on bar i's right) - height[i]
+//            ___
+//            | |               ___
+//            | |      ___      | |
+//            | |      | |      | |
+//     _______|_|______|_|______|_|____________________
+// So we scan height array from left to right, for each bar, we scan its left highest bar and right highest bar,
+int trapBruteForce(vector<int>& height)
 {
-    if (height.size() <= 1) return 0;
-    unsigned int result = 0;
-    for (size_t i = 0; i < height.size();)
+    int total = 0;
+    for (int i = 0; i < height.size(); ++i)
     {
-        if (height[i] == 0)
+        // for bar i, find its left highest and right highest bar
+        // We need to include bar i itself when searching, so we know if all left/right bars are lower than bar i, in such a case
+        // it means bar i cannot trap any water.
+        int leftHighestIndex = 0;
+        for (int j = 0; j <= i; ++j) 
         {
-            ++i;
-            continue;
-        };
-
-        size_t j = i + 1;
-        unsigned int vol = 0;
-        while (j < height.size() && height[j] < height[i])
-        {
-            vol += height[j];
-            ++j;
+            if (height[j] > height[leftHighestIndex])
+            {
+                leftHighestIndex = j;
+            }
         }
 
-        if (j < height.size())
+        int rightHeightIndex = height.size() - 1;
+        for (int j = height.size() - 1; j >= i; --j)
         {
-            result += height[i] * (j - i) - vol;
+            if (height[j] > height[rightHeightIndex])
+            {
+                rightHeightIndex = j;
+            }
         }
 
-        i = j;
+        const int minHeight = height[leftHighestIndex] > height[rightHeightIndex] ? height[rightHeightIndex] : height[leftHighestIndex];
+        total += minHeight - height[i];
     }
 
-    return result;
+    return total;
+}
+// In brute force solution, for each bar, we search its left highest bar and right highest bar, the best solution need to
+// think in a reversed way, start from two end. 
+// Let's say, we have bar i and bar j, i < j, and without loss of generality,  say height[i] < height[j], between bar i 
+// and bar j there are some bars, can we answer how much water those bars can trap?
+// The answer is, start from bar i, we search on its right side, say the first bar that has height[k] > height[i] is k, 
+// for bar [i..k), water they can trap is height[i] - height[i..k).
+//                      ___
+//            ___       | |
+//            | |   ____| |
+//            | |___| | | |
+//            | || || | | |
+//     _______|_||_||_|_|_|__________________
+//             i         k
+int trapOptimized(vector<int>& height)
+{
+    int total = 0;
+    for (int left = 0, right = height.size() - 1, probe; left <= right; )
+    {
+        if (height[left] < height[right])
+        {
+            for (probe = left; probe <= right && height[probe] <= height[left]; ++probe)
+            {
+                total += height[left] - height[probe];
+            }
+
+            left = probe;
+        }
+        else
+        {
+            for (probe = right; probe >= left && height[probe] <= height[right]; --probe)
+            {
+                total += height[right] - height[probe];
+            }
+
+            right = probe;
+        }
+    }
+
+    return total;
+}
+int trap(vector<int>& height)
+{
+    return trapOptimized(height);
 }
 
 // 53. Maximum Subarray
