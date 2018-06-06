@@ -273,21 +273,21 @@ bool isPalindrome(int x)
 }
 
 // 10. Regular Expression Matching
-bool isMatch(string text, string pattern)
+bool isRegexMatch(string text, string pattern)
 {
-    // Exit condition of recursion should be: when pattern is processed, text must also be processed, 
-    // but not vice versa. Why? because when text is empty, pattern is a* or .*, they still match.
+    // Exit condition should be: when pattern is all processed, text must also be all processed,
+    // but not vice versa, because when text is empty, if pattern is a* or .*, they still match.
     if (pattern.length() == 0)
     {
         return text.length() == 0;
     }
 
     // If there is a * followed, there are 2 cases:
-    // (1) the preceding character of * appears zero times, next match would be isMatch(text, pattern.substr(2)).
-    // (2) the preceding character of * appears >= 1 times, next match would be isMatch(text.substr(1), pattern.substr(1)) if current character matches pattern.
+    // (1) the preceding character of * appears zero times, next match would be isRegexMatch(text, pattern.substr(2)).
+    // (2) the preceding character of * appears >= 1 times, next match would be isRegexMatch(text.substr(1), pattern.substr(1)) if current character matches pattern.
     return (pattern.length() > 1 && pattern[1] == '*') ?
-        isMatch(text, pattern.substr(2)) || (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isMatch(text.substr(1), pattern) :
-        (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isMatch(text.substr(1), pattern.substr(1));
+        isRegexMatch(text, pattern.substr(2)) || (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isRegexMatch(text.substr(1), pattern) :
+        (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isRegexMatch(text.substr(1), pattern.substr(1));
 }
 
 // 11. Container With Most Water
@@ -1615,6 +1615,7 @@ string multiplyUseAddStrings(string num1, string num2)
             intermediateResult += "0";
         }
 
+        string addStrings(string num1, string num2);
         product = addStrings(product, intermediateResult);
     }
 
@@ -1635,7 +1636,7 @@ string multiplyUseAddStrings(string num1, string num2)
 //   5    18     8     8
 //-----------------------
 //   6     8     8     8
-string multiply(string num1, string num2)
+string multiplyOptimized(string num1, string num2)
 {
     if (num1 == "0" || num2 == "0")
     {
@@ -1667,6 +1668,42 @@ string multiply(string num1, string num2)
     }
 
     return product;
+}
+string multiply(string num1, string num2)
+{
+    return multiplyOptimized(num1, num2);
+}
+
+// 44. Wildcard Matching
+bool isWildcardMatch(string text, string pattern)
+{
+    if (pattern.length() == 0)
+    {
+        return text.length() == 0;
+    }
+
+    if (pattern[0] == '*')
+    {
+        int j;
+        for (j = 1; j < pattern.length() && pattern[j] == '*'; ++j);
+
+        for (int i = 0; i <= text.length(); ++i)
+        {
+            if (isWildcardMatch(text.substr(i), pattern.substr(j)))
+            {
+                return true;
+            }
+        }
+    }
+    else
+    {
+        if (pattern[0] == '?' || pattern[0] == text[0])
+        {
+            return text.length() > 0 && isWildcardMatch(text.substr(1), pattern.substr(1));
+        }
+    }
+
+    return false;
 }
 
 // 53. Maximum Subarray
