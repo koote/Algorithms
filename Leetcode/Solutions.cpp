@@ -273,7 +273,7 @@ bool isPalindrome(int x)
 }
 
 // 10. Regular Expression Matching
-bool isRegexMatch(string text, string pattern)
+bool isMatch_Regex(string text, string pattern)
 {
     // Exit condition should be: when pattern is all processed, text must also be all processed,
     // but not vice versa, because when text is empty, if pattern is a* or .*, they still match.
@@ -286,8 +286,8 @@ bool isRegexMatch(string text, string pattern)
     // (1) the preceding character of * appears zero times, next match would be isRegexMatch(text, pattern.substr(2)).
     // (2) the preceding character of * appears >= 1 times, next match would be isRegexMatch(text.substr(1), pattern.substr(1)) if current character matches pattern.
     return (pattern.length() > 1 && pattern[1] == '*') ?
-        isRegexMatch(text, pattern.substr(2)) || (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isRegexMatch(text.substr(1), pattern) :
-        (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isRegexMatch(text.substr(1), pattern.substr(1));
+        isMatch_Regex(text, pattern.substr(2)) || (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isMatch_Regex(text.substr(1), pattern) :
+        (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isMatch_Regex(text.substr(1), pattern.substr(1));
 }
 
 // 11. Container With Most Water
@@ -1494,10 +1494,10 @@ int firstMissingPositive(vector<int>& nums)
 
 // 42. Trapping Rain Water
 // Brute force is not the best solution but it is very important to show that how to think.
-// For this problem, DO NOT think about each hollows, that makes this problem looks complicated. Thinking 
-// each bar individually, let's say every bar can trap some water (physically it is impossble), if we can 
-// caculate how many water each bar can trap, and add them together, we get the toal trapped water.
-// So given a bar i, whose height is height[i], how to know how many water it can trap? Drawing a chart 
+// For this problem, DO NOT try to start thinking each hollow, that makes this problem looks complicated. Thinking 
+// each bar instead. Let's say every bar can trap some water (physically it is impossble), if we can get how much  
+// water each bar can trap, and add them together, we get the toal trapped water.
+// Given a bar i, whose height is height[i], how much water it can trap? Drawing a chart 
 // helps to show that:
 // water bar i can trap = min(height of the highest bar on bar i's left, height of the highest bar on bar i's right) - height[i]
 //            ___
@@ -1505,7 +1505,8 @@ int firstMissingPositive(vector<int>& nums)
 //            | |      ___      | |
 //            | |      | |      | |
 //     _______|_|______|_|______|_|____________________
-// So we scan height array from left to right, for each bar, we scan its left highest bar and right highest bar,
+//                      i
+// So scan height array from left to right, for each bar, scan its left highest bar and right highest bar.
 int trapBruteForce(vector<int>& height)
 {
     int total = 0;
@@ -1538,19 +1539,22 @@ int trapBruteForce(vector<int>& height)
 
     return total;
 }
-// In brute force solution, for each bar, we search its left highest bar and right highest bar, the best solution need to
-// think in a reversed way, start from two end. 
-// Let's say, we have bar i and bar j, i < j, and without loss of generality,  say height[i] < height[j], between bar i 
-// and bar j there are some bars, can we answer how much water those bars can trap?
-// The answer is, start from bar i, we search on its right side, say the first bar that has height[k] > height[i] is k, 
-// for bar [i..k), water they can trap is height[i] - height[i..k).
-//                      ___
-//            ___       | |
-//            | |   ____| |
-//            | |___| | | |
-//            | || || | | |
-//     _______|_||_||_|_|_|__________________
-//             i         k
+// In brute force solution, for each bar we need to search its left highest bar and right highest bar, and how much water
+// it can trap is determined by the lower bar between its left highest bar and right highest bar, so time complexity is 
+// O(n2).
+// Let's think in a reversed way, given two bars i and j (i <= j), we compare their heights, without loss of generality,
+// let's say lower one is the left end i, we search its right side, before encounter a bar k has height[k] > height[i], 
+// for all bars on its right who are not higher than height[i], water they can trap is height[i] - height[m] (i < m < k).
+//                           ___
+//                           | |
+//                           | |                ___
+//                           | |                | |
+//            ___         ___| |                | |
+//            | |   ______| || |                | |
+//            | |___| || || || |                | |
+//            | || || || || || |                | |
+//     _______|_||_||_||_||_||_|________________|_|_________
+//             i              k                  j
 int trapOptimized(vector<int>& height)
 {
     int total = 0;
@@ -1585,6 +1589,7 @@ int trap(vector<int>& height)
 
 // 43. Multiply Strings
 // O(n1 *n2), O(1)
+string addStrings(string num1, string num2);
 string multiplyUseAddStrings(string num1, string num2)
 {
     if (num1 == "0" || num2 == "0")
@@ -1615,7 +1620,6 @@ string multiplyUseAddStrings(string num1, string num2)
             intermediateResult += "0";
         }
 
-        string addStrings(string num1, string num2);
         product = addStrings(product, intermediateResult);
     }
 
@@ -1675,7 +1679,7 @@ string multiply(string num1, string num2)
 }
 
 // 44. Wildcard Matching
-bool isWildcardMatch(string text, string pattern)
+bool isMatch_Wildcard_Recurisve(string text, string pattern)
 {
     if (pattern.length() == 0)
     {
@@ -1689,7 +1693,7 @@ bool isWildcardMatch(string text, string pattern)
 
         for (int i = 0; i <= text.length(); ++i)
         {
-            if (isWildcardMatch(text.substr(i), pattern.substr(j)))
+            if (isMatch_Wildcard_Recurisve(text.substr(i), pattern.substr(j)))
             {
                 return true;
             }
@@ -1699,11 +1703,79 @@ bool isWildcardMatch(string text, string pattern)
     {
         if (pattern[0] == '?' || pattern[0] == text[0])
         {
-            return text.length() > 0 && isWildcardMatch(text.substr(1), pattern.substr(1));
+            return text.length() > 0 && isMatch_Wildcard_Recurisve(text.substr(1), pattern.substr(1));
         }
     }
 
     return false;
+}
+/*
+(1) Why recursive solution timeout.
+Consider this case:
+         0        i                       k                       m-1
+    text ..........................................................
+    pattern ......*.......................*...*.....*..
+            0     j                       l           n-1
+Let's use two * as example, assuming pattern[0 .. j] matches text[i-j .. i]. now pattern[j] == '*', in recursive solution, a '*' means branch, because
+'*' can be empty, or 1 character, 2 characters, etc, means algorithm will first try to match pattern[j+1 .. n-1] with text[i .. m-1], if not succeeds,
+it will try to match pattern[j+1 .. n-1] with text[i+1 .. m-1], if not succeeds, then try to match pattern[j+1 .. n-1] with text[i + 2.. m-1], let's say
+there is another '*' in pattern[l], recursive algorithm branches at pattern[l] again. If representing in tree, piece of the tree looks like this:
+
+|- matching pattern[j+1 .. n-1] with text[i .. m-1]
+|---...
+|------- matching pattern[l+1 .. n-1] with text[k .. m-1]
+|- matching pattern[j+1 .. n-1] with text[i+1 .. m-1]
+|---...
+|------- matching pattern[l+1 .. n-1] with text[k+1 .. m-1]
+|- matching pattern[j+1 .. n-1] with text[i+2 .. m-1]
+|---...
+|------- matching pattern[l+1 .. n-1] with text[k+2 .. m-1]
+
+We found that, actually when matching pattern[l+1 .. n-1] with text[k .. m-1], the process includes matching pattern[l+1 .. n-1] with text[k+1 .. m-1],
+matching pattern[l+1 .. n-1] with text[k+2 .. m-1], so we can get the conlusion: if pattern[l+1 .. n-1] doesn't match with text[k .. m-1], we don't
+need to try to roll back to pattern[j] since its other branches: matching pattern[j+1 .. n-1] with text[i+1 .. m-1], matching pattern[j+1 .. n-1] with 
+text[i+2 .. m-1] cannot succeed. Further, we can say, everytime when mismatch happens, only need to roll back to its nearest '*', if we tried all possible
+branches of nearest '*' but cannot match, we can say the whole pattern won't match.
+ */
+bool isMatch_Wildcard_Iterative(string text, string pattern)
+{
+    // keep tracking index of nearest '*' in pattern and the index of its initial corresponding element in text.
+    size_t j = 0;
+    for (int i = 0, matchStartPosition = -1, lastAsteriskPosition = -1; i < text.length();)
+    {
+        // Everytime we see a '*', update indices and keep moving forward. This also solve the continous '*' case.
+        if (pattern[j] == '*')
+        {
+            matchStartPosition = i;
+            lastAsteriskPosition = j++;
+        }
+        else if (pattern[j] == text[i] || pattern[j] == '?')
+        {
+            ++i;
+            ++j;
+        }
+        else // mistmatch
+        {
+            if (lastAsteriskPosition >= 0) // rollback to nearest '*' if exists.
+            {
+                // dont worry that matchStartPosition will exceed, next iteration will catch it.
+                i = ++matchStartPosition;
+                j = lastAsteriskPosition + 1; // pattern always starts from next character.
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    // as we know, when text is all processed, pattern may still not finish, there is only one case, pattern now only has * remaining.
+    for (; j < pattern.length() && pattern[j] == '*'; ++j);
+    return j == pattern.length();
+}
+bool isMatch_Wildcard(string text, string pattern)
+{
+    return isMatch_Wildcard_Iterative(text, pattern);
 }
 
 // 53. Maximum Subarray

@@ -20,7 +20,7 @@ extern string zigzagConvert(string s, int numRows);
 extern int reverseInteger(int x);
 extern int myAtoi(string str);
 extern bool isPalindrome(int x);
-extern bool isRegexMatch(string text, string pattern);
+extern bool isMatch_Regex(string text, string pattern);
 extern int maxArea(vector<int>& height);
 extern string intToRoman(int num);
 extern int romanToInt(string s);
@@ -54,7 +54,7 @@ extern vector<vector<int>> combinationSum2(vector<int>& candidates, int target);
 extern int firstMissingPositive(vector<int>& nums);
 extern int trap(vector<int>& height);
 extern string multiply(string num1, string num2);
-extern bool isWildcardMatch(string text, string pattern);
+extern bool isMatch_Wildcard(string text, string pattern);
 
 extern int maxSubArray(vector<int>& nums);
 
@@ -70,7 +70,7 @@ void main()
 {
     auto start = std::clock();
 
-    bool a = isWildcardMatch("aaaaaaaaaaaab", "a*********b");
+    bool a = isMatch_Wildcard("aaaaaaaaaaaab", "a*********b");
 
     vector<vector<char>> sudoku({
         { '5', '3', '.', '.', '7', '.', '.', '.', '.' },
