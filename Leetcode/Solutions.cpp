@@ -1716,26 +1716,28 @@ Consider this case:
     text ..........................................................
     pattern ......*.......................*...*.....*..
             0     j                       l           n-1
-Let's use two * as example, assuming pattern[0 .. j] matches text[i-j .. i]. now pattern[j] == '*', in recursive solution, a '*' means branch, because
-'*' can be empty, or 1 character, 2 characters, etc, means algorithm will first try to match pattern[j+1 .. n-1] with text[i .. m-1], if not succeeds,
-it will try to match pattern[j+1 .. n-1] with text[i+1 .. m-1], if not succeeds, then try to match pattern[j+1 .. n-1] with text[i + 2.. m-1], let's say
-there is another '*' in pattern[l], recursive algorithm branches at pattern[l] again. If representing in tree, piece of the tree looks like this:
+Let's use two * as example, assuming pattern[0 .. j] matches text[i-j .. i], now encounter a '*' at pattern[j], in recursive solution, a '*' means
+branching, because a '*' can be empty, or 1 character, 2 characters, etc., so algorithm needs to try all possible cases, like this:
+it first tries to match pattern[j+1 .. n-1] with text[i .. m-1],
+if fails, it tries to match pattern[j+1 .. n-1] with text[i+1 .. m-1],
+if fails, then tries to match pattern[j+1 .. n-1] with text[i + 2.. m-1], etc.
+Let's say there is another '*' in pattern[l], recursive algorithm branches at pattern[l] again, repeating above process.
+If we draw this process in tree, piece of the tree looks like this:
 
-|- matching pattern[j+1 .. n-1] with text[i .. m-1]
+|- attempting to match pattern[j+1 .. n-1] with text[i .. m-1]
 |---...
-|------- matching pattern[l+1 .. n-1] with text[k .. m-1]
-|- matching pattern[j+1 .. n-1] with text[i+1 .. m-1]
+|------- attempting to match pattern[l+1 .. n-1] with text[k .. m-1]
+|- attempting to match pattern[j+1 .. n-1] with text[i+1 .. m-1]
 |---...
-|------- matching pattern[l+1 .. n-1] with text[k+1 .. m-1]
-|- matching pattern[j+1 .. n-1] with text[i+2 .. m-1]
+|------- attempting to match pattern[l+1 .. n-1] with text[k+1 .. m-1]
+|- attempting to match pattern[j+1 .. n-1] with text[i+2 .. m-1]
 |---...
-|------- matching pattern[l+1 .. n-1] with text[k+2 .. m-1]
+|------- attempting to match pattern[l+1 .. n-1] with text[k+2 .. m-1]
 
-We found that, actually when matching pattern[l+1 .. n-1] with text[k .. m-1], the process includes matching pattern[l+1 .. n-1] with text[k+1 .. m-1],
-matching pattern[l+1 .. n-1] with text[k+2 .. m-1], so we can get the conlusion: if pattern[l+1 .. n-1] doesn't match with text[k .. m-1], we don't
-need to try to roll back to pattern[j] since its other branches: matching pattern[j+1 .. n-1] with text[i+1 .. m-1], matching pattern[j+1 .. n-1] with 
-text[i+2 .. m-1] cannot succeed. Further, we can say, everytime when mismatch happens, only need to roll back to its nearest '*', if we tried all possible
-branches of nearest '*' but cannot match, we can say the whole pattern won't match.
+We found that, when matching pattern[l+1 .. n-1] with text[k .. m-1], the process includes matching pattern[l+1 .. n-1] with text[k+1 .. m-1],
+matching pattern[l+1 .. n-1] with text[k+2 .. m-1], etc., if pattern[l+1 .. n-1] cannot match with text[k .. m-1], rolling back to first '*' at
+pattern[j] is totally useless, so we can get the conlusion: everytime when mismatch happens, only need to roll back to nearest '*', if we tried
+all possible branches of nearest '*' but cannot match, we can say the whole pattern won't match.
  */
 bool isMatch_Wildcard_Iterative(string text, string pattern)
 {
@@ -1758,11 +1760,13 @@ bool isMatch_Wildcard_Iterative(string text, string pattern)
         {
             if (lastAsteriskPosition >= 0) // rollback to nearest '*' if exists.
             {
-                // dont worry that matchStartPosition will exceed, next iteration will catch it.
+                // Here we try to match the nearest '*' to 1 character, 2 characters, so everytime we shift matchStartPosition right by 1.
+                // Why don't match '*' with 0 character? Since we have tried and failed otherwise we will not roll back to nearest '*'.
+                // Don't worry that matchStartPosition will overflow, next iteration will catch it.
                 i = ++matchStartPosition;
                 j = lastAsteriskPosition + 1; // pattern always starts from next character.
             }
-            else
+            else // if there is no nearest '*', means pattern cannot match text.
             {
                 return false;
             }
@@ -1776,6 +1780,33 @@ bool isMatch_Wildcard_Iterative(string text, string pattern)
 bool isMatch_Wildcard(string text, string pattern)
 {
     return isMatch_Wildcard_Iterative(text, pattern);
+}
+
+// 45. Jump Game II
+int jump(vector<int>& nums)
+{
+    for (size_t levelStart = 0, levelEnd = 0, level = 0, currentLevelRighMostReach = 0;
+        levelStart < nums.size();
+        levelStart = levelEnd + 1, levelEnd = currentLevelRighMostReach, ++level)
+    {
+        // Current level covers the last element, means we've reached the destination in current level, so level is the shortest step count.
+        if (levelEnd >= nums.size() - 1)
+        {
+            return level;
+        }
+
+        // find the right most location that current level can reach. curent level elements are nums[levelEnd+1 .. currentLevelRighMostReach]
+        for (size_t i = levelStart; i <= levelEnd; ++i)
+        {
+            // for current element nums[i], its right most reachable location is nums[i] + i
+            if (nums[i] + i > currentLevelRighMostReach)
+            {
+                currentLevelRighMostReach = nums[i] + i;
+            }
+        }
+    }
+
+    return -1;
 }
 
 // 53. Maximum Subarray
