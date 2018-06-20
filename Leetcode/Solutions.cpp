@@ -13,12 +13,11 @@ using namespace std;
 // 1. Two Sum
 vector<int> twoSum(vector<int>& nums, int target)
 {
-    int length = nums.size();
     vector<int> result;
     unordered_map<int, int> map; // <value, original_index>
     unordered_map<int, int>::iterator iterator;
 
-    for (int i = 0; i < length; ++i)
+    for (int i = 0; i < nums.size(); ++i)
     {
         int new_target = target - nums[i];
         if ((iterator = map.find(new_target)) != map.end())
@@ -106,7 +105,7 @@ double findKth(int a[], int m, int b[], int n, int k)
 
     // let k = i+j. Please note that we are sure n <= m here
     int j = min(n, k / 2);
-    int i = k - j;
+    const int i = k - j;
 
     if (a[i - 1] > b[j - 1])
     {
@@ -124,8 +123,8 @@ double findKth(int a[], int m, int b[], int n, int k)
 }
 double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2)
 {
-    int m = nums1.size();
-    int n = nums2.size();
+    const int m = nums1.size();
+    const int n = nums2.size();
 
     if ((m + n) & 1) // odd
     {
@@ -146,7 +145,7 @@ string searchPalindrome(string s, int left, int right)
 }
 string longestPalindrome(string s)
 {
-    string result("");
+    string result;
     for (int position = 0; position < s.length(); ++position)
     {
         string palindrome1 = searchPalindrome(s, position, position);
@@ -176,11 +175,11 @@ string zigzagConvert(string s, int numRows)
         return s;
     }
 
-    string result("");
-    int distance = 2 * numRows - 2;
+    string result;
+    const int distance = 2 * numRows - 2;
     for (int r = 0; r < numRows; ++r)
     {
-        int curDistance1 = distance - r * 2;
+        const int curDistance1 = distance - r * 2;
         for (int j = r; j < s.length(); j += distance)
         {
             result += s[j];
@@ -197,7 +196,7 @@ string zigzagConvert(string s, int numRows)
 // 7. Reverse Integer
 int reverseInteger(int x)
 {
-    int sign = x < 0 ? -1 : 1;
+    const int sign = x < 0 ? -1 : 1;
     x = x < 0 ? -x : x;
     int result = 0;
     for (; x > 0; x /= 10)
@@ -236,7 +235,7 @@ int myAtoi(string str)
     int total = 0;
     for (; i < str.length() && str[i] >= '0' && str[i] <= '9'; ++i)
     {
-        int digit = str[i] - '0';
+        const int digit = str[i] - '0';
 
         // check overflow
         if (total > INT_MAX / 10 ||
@@ -296,7 +295,7 @@ int maxArea(vector<int>& height)
     int max = 0;
     for (int i = 0, j = height.size() - 1; i < j;)
     {
-        int current = 0;
+        int current;
         if (height[i] < height[j])
         {
             current = (j - i) * height[i];
@@ -332,7 +331,7 @@ string intToRoman(int num)
         int j = sizeof(n) / sizeof(n[0]) - 1;
         while (j - i > 1)
         {
-            int mid = (i + j) / 2;
+            const int mid = (i + j) / 2;
             if (n[mid] == d)
             {
                 result = string(r[mid]).append(result);
@@ -383,7 +382,7 @@ int romanToInt(string s)
 // 14. Longest Common Prefix
 string longestCommonPrefix(vector<string>& strs)
 {
-    if (strs.size() == 0)
+    if (strs.empty())
     {
         return "";
     }
@@ -436,7 +435,7 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum) // nums mus
         return result;
     }
 
-    for (int i = 0; i < (int)nums.size() - k + 1;)
+    for (int i = 0; i < static_cast<int>(nums.size()) - k + 1;)
     {
         /*
         // Because nums are sorted, so nums[i+1..i+k-1] are smallest in nums[i+1..size-1].
@@ -463,11 +462,12 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum) // nums mus
         */
 
         // downgrade current k sum problem to k-1 sum problem
-        vector<vector<int>> cures = kSum(vector<int>(nums.begin() + i + 1, nums.end()), k - 1, sum - nums[i]);
-        for (size_t j = 0; j < cures.size(); ++j)
+        vector<int> temp(nums.begin() + i + 1, nums.end());
+        vector<vector<int>> cures = kSum(temp, k - 1, sum - nums[i]);
+        for (auto& cure : cures)
         {
-            cures[j].insert(cures[j].begin(), nums[i]);
-            result.insert(result.end(), cures[j]);
+            cure.insert(cure.begin(), nums[i]);
+            result.insert(result.end(), cure);
         }
 
         for (++i; i < nums.size() && nums[i - 1] == nums[i]; ++i);
@@ -492,7 +492,7 @@ int threeSumClosest(vector<int>& nums, int target)
     {
         for (int j = i + 1, k = nums.size() - 1; j < k && j < nums.size() && k >= 0;)
         {
-            int cursum = nums[j] + nums[k] + nums[i];
+            const int cursum = nums[j] + nums[k] + nums[i];
 
             if (cursum > target)
             {
@@ -626,7 +626,7 @@ ListNode* removeNthFromEnd(ListNode* head, int n)
 bool isValid(string s)
 {
     stack<char> stk;
-    for (size_t i = 0; i < s.length(); ++i)
+    for (char i : s)
     {
         if (s[i] == '{' || s[i] == '[' || s[i] == '(')
         {
@@ -636,7 +636,7 @@ bool isValid(string s)
         {
             if (!stk.empty())
             {
-                char top = stk.top();
+                const char top = stk.top();
                 if ((s[i] == ')' && top == '(') || (s[i] == ']'&&top == '[') || (s[i] == '}' && top == '{'))
                 {
                     stk.pop();
@@ -948,7 +948,7 @@ int divide2(int dividend, int divisor)
     // If negative is false, quotient must <= INT_MAX, otherwise overflow, should return INT_MAX.
     return (dividend ^ divisor) >> 31 & 0x1 ? 0 - quotient : quotient > INT_MAX ? INT_MAX : quotient;
 }
-int divide(int dividend, int divisor)
+int divide(const int dividend, const int divisor)
 {
     unsigned int quotient = 0;
     for (unsigned int a = dividend < 0 ? -dividend : dividend, b = divisor < 0 ? -divisor : divisor, k, temp; a >= b; a -= temp, quotient += k)
@@ -1027,7 +1027,7 @@ void nextPermutation(vector<int>& nums)
     // Please note that starts from i, all elements are in descending order, so sorting is straightforward, just reverse them.
     for (size_t j = i, k = nums.size() - 1; j < k; ++j, --k)
     {
-        int temp = nums[j];
+        const int temp = nums[j];
         nums[j] = nums[k];
         nums[k] = temp;
     }
@@ -1038,7 +1038,7 @@ void nextPermutation(vector<int>& nums)
         size_t l;
         for (l = i; l < nums.size() && nums[l] < nums[i - 1]; ++l);
 
-        int temp = nums[l];
+        const int temp = nums[l];
         nums[i - 1] = nums[l];
         nums[l] = temp;
     }
@@ -1097,7 +1097,7 @@ int search(vector<int>& nums, int target)
     int right = nums.size() - 1;
     while (left <= right)
     {
-        size_t mid = (left + right) / 2;
+        const size_t mid = (left + right) / 2;
         if (nums[mid] == target)
         {
             return mid;
@@ -1607,7 +1607,7 @@ string multiplyUseAddStrings(string num1, string num2)
         {
             int r = (num1[j] - '0') * (num2[i] - '0') + (carry - '0');
             carry = r / 10 + '0';
-            intermediateResult.insert(0, 1, (char)((r % 10) + '0'));
+            intermediateResult.insert(0, 1, static_cast<char>(r % 10 + '0'));
         }
 
         if (carry - '0' > 0)
@@ -1783,11 +1783,14 @@ bool isMatch_Wildcard(string text, string pattern)
 }
 
 // 45. Jump Game II
+// BFS would be easier to understand than greedy.Starting from first element(root), mark all unvisited elements that current
+// level can reach as next level, keep finding the start and end of each level, until current level covers the last element.
 int jump(vector<int>& nums)
 {
-    for (size_t levelStart = 0, levelEnd = 0, level = 0, currentLevelRighMostReach = 0;
+    // Next level's range is nums[current level's end + 1 .. right most location current level can reach]
+    for (size_t levelStart = 0, levelEnd = 0, level = 0, currentLevelRighMostReachableLocation = 0;
         levelStart < nums.size();
-        levelStart = levelEnd + 1, levelEnd = currentLevelRighMostReach, ++level)
+        levelStart = levelEnd + 1, levelEnd = currentLevelRighMostReachableLocation, ++level)
     {
         // Current level covers the last element, means we've reached the destination in current level, so level is the shortest step count.
         if (levelEnd >= nums.size() - 1)
@@ -1795,18 +1798,53 @@ int jump(vector<int>& nums)
             return level;
         }
 
-        // find the right most location that current level can reach. curent level elements are nums[levelEnd+1 .. currentLevelRighMostReach]
+        // find the right most location that current level can reach.
         for (size_t i = levelStart; i <= levelEnd; ++i)
         {
-            // for current element nums[i], its right most reachable location is nums[i] + i
-            if (nums[i] + i > currentLevelRighMostReach)
+            // for element nums[i], its right most reachable location is nums[i] + i
+            if (nums[i] + i > currentLevelRighMostReachableLocation)
             {
-                currentLevelRighMostReach = nums[i] + i;
+                currentLevelRighMostReachableLocation = nums[i] + i;
             }
         }
     }
 
     return -1;
+}
+
+// 46. Permutations
+vector<vector<int>> permute(vector<int>& nums)
+{
+    vector<vector<int>> results;
+
+    if (nums.size() == 1)
+    {
+        results.emplace_back(nums);
+        return results;
+    }
+
+    vector<int> subarray(nums.begin() + 1, nums.end());
+    for (vector<int>& permutation : permute(subarray))
+    {
+        permutation.insert(permutation.begin(), nums[0]);
+        results.push_back(permutation);
+        for (int i = 0; i < static_cast<int>(permutation.size()) - 1; ++i)
+        {
+            //swap permutation[i] and permutation[i+1]
+            const int exchange = permutation[i];
+            permutation[i] = permutation[i + 1];
+            permutation[i + 1] = exchange;
+
+            results.push_back(permutation);
+        }
+    }
+
+    return results;
+}
+
+// 47.
+vector<vector<int>> permuteUnique(vector<int>& nums)
+{
 }
 
 // 53. Maximum Subarray
@@ -1885,7 +1923,7 @@ vector<int> preorderTraversal(TreeNode* root)
     vector<int> result;
     stack<TreeNode*> stk;
     stk.push(root);
-    while (stk.empty() == false)
+    while (!stk.empty())
     {
         root = stk.top(); // reuse root
         stk.pop();

@@ -11,5 +11,6 @@ ListNode* createList(vector<int>& nums)
         last->next = new ListNode(num);
         last = last->next;
     }
+
     return head.next;
 }

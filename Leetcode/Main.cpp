@@ -55,7 +55,9 @@ extern int firstMissingPositive(vector<int>& nums);
 extern int trap(vector<int>& height);
 extern string multiply(string num1, string num2);
 extern bool isMatch_Wildcard(string text, string pattern);
-int jump(vector<int>& nums);
+extern int jump(vector<int>& nums);
+extern vector<vector<int>> permute(vector<int>& nums);
+extern vector<vector<int>> permuteUnique(vector<int>& nums);
 
 extern int maxSubArray(vector<int>& nums);
 
@@ -71,8 +73,6 @@ void main()
 {
     auto start = std::clock();
 
-    bool a = isMatch_Wildcard("aaaaaaaaaaaab", "a*********b");
-
     vector<vector<char>> sudoku({
         { '5', '3', '.', '.', '7', '.', '.', '.', '.' },
         { '6', '.', '.', '1', '9', '5', '.', '.', '.' },
@@ -86,8 +86,6 @@ void main()
     });
 
     solveSudoku(sudoku);
-
-    auto x = trap(vector<int> {0, 2, 0});
 
     auto duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
     cout << duration << endl;
