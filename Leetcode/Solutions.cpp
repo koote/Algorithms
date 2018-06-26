@@ -1813,7 +1813,7 @@ int jump(vector<int>& nums)
 }
 
 // 46. Permutations
-vector<vector<int>> permute(vector<int>& nums)
+vector<vector<int>> permuteRecursive(vector<int>& nums)
 {
     vector<vector<int>> results;
 
@@ -1823,9 +1823,12 @@ vector<vector<int>> permute(vector<int>& nums)
         return results;
     }
 
+    // First we calculate permutations of subarray nums[i+1, size-1], then for each permutation of nums[i+1, size-1], inserting nums[i] to its
+    // every possible location, every insertion gets a new permutation, all  of those new permutations are the permutations of nums[i, size-1].
     vector<int> subarray(nums.begin() + 1, nums.end());
-    for (vector<int>& permutation : permute(subarray))
+    for (vector<int>& permutation : permuteRecursive(subarray))
     {
+        // here we don't do insertion directly, we put nums[i] at the beginning of permutation, then keep swapping ever two elements.
         permutation.insert(permutation.begin(), nums[0]);
         results.push_back(permutation);
         for (int i = 0; i < static_cast<int>(permutation.size()) - 1; ++i)
@@ -1841,10 +1844,61 @@ vector<vector<int>> permute(vector<int>& nums)
 
     return results;
 }
+// Given array nums[0, size-1], permutation is, every time we pick up a different element, then repeat the pick up
+// process for remaining size - 1 elements. Let's exchange the choosen element with the first element of array, then 
+// all unused elements are now in range nums[1, size-1], just need to recusively do it, the boundary of choosen elements
+// and ununsed elements is currentIndex, when currentIndex == size, we get one permutation.
+void dfsPermuteImpl(vector<int>& nums, size_t currentIndex, vector<vector<int>>& results)
+{
+    if (currentIndex == nums.size())
+    {
+        results.push_back(nums);
+        return;
+    }
 
-// 47.
+    // respectively choose nums[currentIndex], nums[currentIndex + 1], ... nums[size-1], swap it with nums[currentIndex]
+    // (first element of range), then continue the process for range [currentIndex+1 .. size-1].
+    for (size_t i = currentIndex; i < nums.size(); ++i)
+    {
+        swap(nums[currentIndex], nums[i]);
+        dfsPermuteImpl(nums, currentIndex + 1, results);
+        swap(nums[currentIndex], nums[i]); // need to restore subarray for next try
+    }
+}
+vector<vector<int>> dfsPermute(vector<int>& nums)
+{
+    // no need to define a vector<int> path since nums itself records current path.
+    vector<vector<int>> results;
+    dfsPermuteImpl(nums, 0, results);
+    return results;
+}
+vector<vector<int>> permute(vector<int>& nums)
+{
+    return dfsPermute(nums);
+}
+
+// 47. Permutations II
+void dfsPermuteUniqueImpl(vector<int> nums, int currentIndex, vector<vector<int>>& results) 
+{
+    if (currentIndex == nums.size() - 1)
+    {
+        results.push_back(nums);
+        return;
+    }
+
+    for (int i = currentIndex; i < nums.size(); ++i)
+    {
+        if (currentIndex != i && nums[currentIndex] == nums[i]) continue;
+        swap(nums[currentIndex], nums[i]);
+        dfsPermuteUniqueImpl(nums, currentIndex + 1, results);
+    }
+}
 vector<vector<int>> permuteUnique(vector<int>& nums)
 {
+    sort(nums.begin(), nums.end());
+    vector<vector<int>> results;
+    dfsPermuteUniqueImpl(nums, 0, results);
+    return results;
 }
 
 // 53. Maximum Subarray
