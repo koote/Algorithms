@@ -1813,7 +1813,7 @@ int jump(vector<int>& nums)
 }
 
 // 46. Permutations
-vector<vector<int>> permuteRecursive(vector<int>& nums)
+vector<vector<int>> permuteRecursiveInsertion(vector<int>& nums)
 {
     vector<vector<int>> results;
 
@@ -1826,7 +1826,7 @@ vector<vector<int>> permuteRecursive(vector<int>& nums)
     // First we calculate permutations of subarray nums[i+1, size-1], then for each permutation of nums[i+1, size-1], inserting nums[i] to its
     // every possible location, every insertion gets a new permutation, all  of those new permutations are the permutations of nums[i, size-1].
     vector<int> subarray(nums.begin() + 1, nums.end());
-    for (vector<int>& permutation : permuteRecursive(subarray))
+    for (vector<int>& permutation : permuteRecursiveInsertion(subarray))
     {
         // here we don't do insertion directly, we put nums[i] at the beginning of permutation, then keep swapping ever two elements.
         permutation.insert(permutation.begin(), nums[0]);
@@ -1844,25 +1844,26 @@ vector<vector<int>> permuteRecursive(vector<int>& nums)
 
     return results;
 }
-// Given array nums[0, size-1], permutation is, every time we pick up a different element, then repeat the pick up
-// process for remaining size - 1 elements. Let's exchange the choosen element with the first element of array, then 
-// all unused elements are now in range nums[1, size-1], just need to recusively do it, the boundary of choosen elements
-// and ununsed elements is currentIndex, when currentIndex == size, we get one permutation.
+// Given array nums[0, size-1], permutation is, every time we choose an unused element until all elements have been choosen, the
+// order how we choose elements is a permutation. To reuse storage, we use a variable currentIndex to indicates the beginning of
+// unused elements, its left, nums[0 .. currentIndex-1] are the elements we currently have choosen. Everytime we choose an element
+// in nums[currentIndex .. size-1] and exchange it with nums[currentIndex], treated this process as 'choose an unused element',
+// update currentIndex to currentIndex+1, and keep repeating this process until currentIndex == size, we get one permutation.
 void dfsPermuteImpl(vector<int>& nums, size_t currentIndex, vector<vector<int>>& results)
 {
-    if (currentIndex == nums.size())
+    if (currentIndex == nums.size() - 1)
     {
         results.push_back(nums);
         return;
     }
 
-    // respectively choose nums[currentIndex], nums[currentIndex + 1], ... nums[size-1], swap it with nums[currentIndex]
+    // respectively choose nums[currentIndex], nums[currentIndex + 1], ... nums[size-1], exchange it with nums[currentIndex]
     // (first element of range), then continue the process for range [currentIndex+1 .. size-1].
-    for (size_t i = currentIndex; i < nums.size(); ++i)
+    for (size_t i = currentIndex, j; i < nums.size(); ++i)
     {
         swap(nums[currentIndex], nums[i]);
         dfsPermuteImpl(nums, currentIndex + 1, results);
-        swap(nums[currentIndex], nums[i]); // need to restore subarray for next try
+        swap(nums[currentIndex], nums[i]);
     }
 }
 vector<vector<int>> dfsPermute(vector<int>& nums)
@@ -1878,7 +1879,7 @@ vector<vector<int>> permute(vector<int>& nums)
 }
 
 // 47. Permutations II
-void dfsPermuteUniqueImpl(vector<int> nums, int currentIndex, vector<vector<int>>& results) 
+void dfsPermuteUniqueImpl(vector<int>& nums, size_t currentIndex, vector<vector<int>>& results)
 {
     if (currentIndex == nums.size() - 1)
     {
@@ -1886,11 +1887,21 @@ void dfsPermuteUniqueImpl(vector<int> nums, int currentIndex, vector<vector<int>
         return;
     }
 
-    for (int i = currentIndex; i < nums.size(); ++i)
+    for (size_t i = currentIndex, j; i < nums.size(); ++i)
     {
-        if (currentIndex != i && nums[currentIndex] == nums[i]) continue;
-        swap(nums[currentIndex], nums[i]);
-        dfsPermuteUniqueImpl(nums, currentIndex + 1, results);
+        // As we did in problem 46, we are going to exchange nums[i] with nums[currentIndex], but we need to make sure that we 
+        // haven't choosen nums[i] before, we check if there is a duplication of nums[i] within range num[currentIndex .. i-1], 
+        // if true, then it means we have choosen nums[i] before so we should not choose it again.
+        //
+        // PLEASE NOTE that this check is for problem 47 which states nums array has duplications. For problem 46, no need to
+        // have this check, just do swapping.
+        for (j = currentIndex; j < i && nums[j] != nums[i]; ++j);
+        if (j == i)
+        {
+            swap(nums[currentIndex], nums[i]);
+            dfsPermuteUniqueImpl(nums, currentIndex + 1, results);
+            swap(nums[currentIndex], nums[i]);
+        }
     }
 }
 vector<vector<int>> permuteUnique(vector<int>& nums)
@@ -1899,6 +1910,60 @@ vector<vector<int>> permuteUnique(vector<int>& nums)
     vector<vector<int>> results;
     dfsPermuteUniqueImpl(nums, 0, results);
     return results;
+}
+
+// 48. Rotate Image
+// this solution rotate layer by layer, start from outmost layer.
+void clockwiseRotateByLayer(vector<vector<int>>& matrix)
+{
+    // Generally, for element matrix[i][j], it will be moved to matrix[j][n-i-1] after rotation, oppositely, for location
+    // matrix[i][j], after rotation, the element on it will be matrix[n-j-1][i].
+    for (size_t i = 0, n = matrix[i].size(); i < matrix.size() / 2; ++i)
+    {
+        for (size_t j = i; j < n - 1 - i; ++j)
+        {
+            const int temp = matrix[i][j];
+            matrix[i][j] = matrix[n - j - 1][i];
+            matrix[n - j - 1][i] = matrix[n - i - 1][n - j - 1];
+            matrix[n - i - 1][n - j - 1] = matrix[j][n - i - 1];
+            matrix[j][n - i - 1] = temp;
+        }
+    }
+}
+// This solution rotates array as whole, above solution is very easy to get messed in interview.
+// first step, swap matrix[i][j] with matrix[j][i], then if it is clockwise, swap each column matrix[*][j] with matrix[*][n-1-j]
+// 1 2 3     1 4 7    7 4 1
+// 4 5 6  => 2 5 8 => 8 5 2
+// 7 8 9     3 6 9    9 6 3
+// if it is counterclockwise, swap each row matrix[i] with row matrx[n-1-i]
+// 1 2 3     1 4 7    3 6 9
+// 4 5 6  => 2 5 8 => 2 5 8
+// 7 8 9     3 6 9    1 4 7
+void clockwiseRotateAsAWhole(vector<vector<int>>& matrix)
+{
+    for (size_t i = 0; i < matrix.size(); ++i)
+    {
+        for (size_t j = i + 1; j < matrix[i].size(); ++j) // Do swap for top half only!
+        {
+            const int temp = matrix[i][j];
+            matrix[i][j] = matrix[j][i];
+            matrix[j][i] = temp;
+        }
+    }
+
+    for (size_t i = 0; i < matrix.size(); ++i)
+    {
+        for (size_t j = 0; j < matrix[i].size() / 2; ++j)
+        {
+            const int temp = matrix[i][j];
+            matrix[i][j] = matrix[i][matrix[i].size() - 1 - j];
+            matrix[i][matrix[i].size() - 1 - j] = temp;
+        }
+    }
+}
+void rotate(vector<vector<int>>& matrix)
+{
+    return clockwiseRotateAsAWhole(matrix);
 }
 
 // 53. Maximum Subarray

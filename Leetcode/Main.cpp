@@ -58,6 +58,7 @@ extern bool isMatch_Wildcard(string text, string pattern);
 extern int jump(vector<int>& nums);
 extern vector<vector<int>> permute(vector<int>& nums);
 extern vector<vector<int>> permuteUnique(vector<int>& nums);
+extern void rotate(vector<vector<int>>& matrix);
 
 extern int maxSubArray(vector<int>& nums);
 
@@ -71,7 +72,7 @@ extern string addStrings(string num1, string num2);
 
 void main()
 {
-    auto start = std::clock();
+    const auto start = std::clock();
 
     vector<vector<char>> sudoku({
         { '5', '3', '.', '.', '7', '.', '.', '.', '.' },
@@ -87,6 +88,6 @@ void main()
 
     solveSudoku(sudoku);
 
-    auto duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+    const auto duration = (std::clock() - start) / static_cast<double>(CLOCKS_PER_SEC);
     cout << duration << endl;
 }
