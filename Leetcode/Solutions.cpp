@@ -1966,6 +1966,22 @@ void rotate(vector<vector<int>>& matrix)
     return clockwiseRotateAsAWhole(matrix);
 }
 
+// 49. Group Anagrams
+vector<vector<string>> groupAnagrams(vector<string>& strs)
+{
+    unordered_map<string, vector<string>> charset2Strings;
+    for (const string& str : strs)
+    {
+        string key = str;
+        sort(key.begin(), key.end());
+        charset2Strings[key].push_back(str);
+    }
+
+    vector<vector<string>> results(charset2Strings.size());
+    transform(charset2Strings.begin(), charset2Strings.end(), results.begin(), [](const auto &pair) {return pair.second; });
+    return results;
+}
+
 // 53. Maximum Subarray
 // Some throughts:
 // This is a DP problem, at first I want to define dp[i] as: the maximum sum of subarray in range nums[0..i], 

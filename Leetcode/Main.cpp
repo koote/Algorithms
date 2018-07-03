@@ -59,6 +59,7 @@ extern int jump(vector<int>& nums);
 extern vector<vector<int>> permute(vector<int>& nums);
 extern vector<vector<int>> permuteUnique(vector<int>& nums);
 extern void rotate(vector<vector<int>>& matrix);
+extern vector<vector<string>> groupAnagrams(vector<string>& strs);
 
 extern int maxSubArray(vector<int>& nums);
 
