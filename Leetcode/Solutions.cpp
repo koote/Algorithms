@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "DataStructure.h"
+#include <cvt/wstring>
 
 using namespace std;
 
@@ -1980,6 +1981,24 @@ vector<vector<string>> groupAnagrams(vector<string>& strs)
     vector<vector<string>> results(charset2Strings.size());
     transform(charset2Strings.begin(), charset2Strings.end(), results.begin(), [](const auto &pair) {return pair.second; });
     return results;
+}
+
+// 50. Pow(x, n)
+double myPow(double x, int n)
+{
+    if (n == 0)
+    {
+        return 1;
+    }
+
+    double result = myPow(x, n / 2);
+    result *= result;
+    if (n % 2)
+    {
+        result *= n > 0 ? x : 1 / x;
+    }
+
+    return result;
 }
 
 // 53. Maximum Subarray
