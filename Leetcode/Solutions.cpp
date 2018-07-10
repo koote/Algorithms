@@ -4,10 +4,10 @@
 #include <vector>
 #include <cassert>
 #include <algorithm>
+#include <cstddef>
 #include <unordered_map>
 #include <unordered_set>
 #include "DataStructure.h"
-#include <cvt/wstring>
 
 using namespace std;
 
@@ -889,7 +889,7 @@ ListNode* reverseKGroup(ListNode* head, int k)
 // 26. Remove Duplicates from Sorted Array
 int removeDuplicates(vector<int>& nums)
 {
-    size_t last = -1;
+    int last = -1;
     for (size_t probe = 0; probe < nums.size(); nums.at(++last) = nums.at(probe++))
     {
         for (; probe + 1 < nums.size() && nums.at(probe + 1) == nums.at(probe); ++probe);
@@ -1914,8 +1914,8 @@ vector<vector<int>> permuteUnique(vector<int>& nums)
 }
 
 // 48. Rotate Image
-// this solution rotate layer by layer, start from outmost layer.
-void clockwiseRotateByLayer(vector<vector<int>>& matrix)
+// this solution rotate coil by coil, start from outmost coil.
+void clockwiseRotateByCoil(vector<vector<int>>& matrix)
 {
     // Generally, for element matrix[i][j], it will be moved to matrix[j][n-i-1] after rotation, oppositely, for location
     // matrix[i][j], after rotation, the element on it will be matrix[n-j-1][i].
@@ -1932,15 +1932,16 @@ void clockwiseRotateByLayer(vector<vector<int>>& matrix)
     }
 }
 // This solution rotates array as whole, above solution is very easy to get messed in interview.
-// first step, swap matrix[i][j] with matrix[j][i], then if it is clockwise, swap each column matrix[*][j] with matrix[*][n-1-j]
+// first step, mirror on diagnoal (swap matrix[i][j] with matrix[j][i]). Then if it is clockwise, 
+// flip matrix's each column (swap each column matrix[*][j] with matrix[*][n-1-j])
 // 1 2 3     1 4 7    7 4 1
 // 4 5 6  => 2 5 8 => 8 5 2
 // 7 8 9     3 6 9    9 6 3
-// if it is counterclockwise, swap each row matrix[i] with row matrx[n-1-i]
+// if it is counterclockwise, flip matrix's each row (swap each row matrix[i] with row matrx[n-1-i])
 // 1 2 3     1 4 7    3 6 9
 // 4 5 6  => 2 5 8 => 2 5 8
 // 7 8 9     3 6 9    1 4 7
-void clockwiseRotateAsAWhole(vector<vector<int>>& matrix)
+void clockwiseRotateByFlipping(vector<vector<int>>& matrix)
 {
     for (size_t i = 0; i < matrix.size(); ++i)
     {
@@ -1964,7 +1965,7 @@ void clockwiseRotateAsAWhole(vector<vector<int>>& matrix)
 }
 void rotate(vector<vector<int>>& matrix)
 {
-    return clockwiseRotateAsAWhole(matrix);
+    return clockwiseRotateByFlipping(matrix);
 }
 
 // 49. Group Anagrams
@@ -1984,21 +1985,40 @@ vector<vector<string>> groupAnagrams(vector<string>& strs)
 }
 
 // 50. Pow(x, n)
-double myPow(double x, int n)
+double myPowRecusive(const double x, const int n)
 {
     if (n == 0)
     {
         return 1;
     }
 
-    double result = myPow(x, n / 2);
-    result *= result;
-    if (n % 2)
+    double result = myPowRecusive(x, n / 2);
+    result *= result; // don't recursively calculate pow(x, n-n/2), that will exceed time limit.
+    if (n % 2)        // still need to do multiplication 1 more time.
     {
         result *= n > 0 ? x : 1 / x;
     }
 
     return result;
+}
+double myPowIterative(double x, int n)
+{
+    double result = 1.0;
+    for (x = n > 0 ? x : 1 / x; n != 0; n /= 2)
+    {
+        if (n & 1)
+        {
+            result *= x;
+        }
+        
+        x *= x;
+    }
+
+    return result;
+}
+double myPow(double x, int n)
+{
+    return myPowIterative(x, n);
 }
 
 // 53. Maximum Subarray
@@ -2163,7 +2183,7 @@ string addStrings(string num1, string num2)
         }
 
         carry = r / 10 + '0';
-        sum.insert(0, 1, (char)((r % 10) + '0'));
+        sum.insert(0, 1, static_cast<char>((r % 10) + '0'));
     }
 
     if (carry - '0' > 0)
