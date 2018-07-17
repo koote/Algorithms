@@ -2001,24 +2001,80 @@ double myPowRecusive(const double x, const int n)
 
     return result;
 }
-double myPowIterative(double x, int n)
+double myPowIterativeLogN(double x, int n)
 {
     double result = 1.0;
-    for (x = n > 0 ? x : 1 / x; n != 0; n /= 2)
+    for (x = n > 0 ? x : 1 / x; n != 0; n /= 2, x *= x)
     {
         if (n & 1)
         {
             result *= x;
         }
-        
-        x *= x;
     }
 
     return result;
 }
 double myPow(double x, int n)
 {
-    return myPowIterative(x, n);
+    double result = 1.0;
+    for (unsigned i = 0, absn = abs(n); i <= 31; ++i, absn >>= 1, x *= x)
+    {
+        if (absn & 1)
+        {
+            result *= x;
+        }
+    }
+
+    return n < 0 ? 1 / result : result;
+}
+
+// 51. N-Queens
+void dpsSearchNQueen(vector<vector<unsigned>>& results, vector<unsigned>& path, unsigned currentRow)
+{
+    if (currentRow == path.size())
+    {
+        results.push_back(path);
+        return;
+    }
+
+    // Try every possible column in current row. Note: for path[i], it means a queue is put on [i, path[i]].
+    for (unsigned j = 0; j < path.size(); ++j)
+    {
+        // check all previous rows, see if current location [currentRow, j] is allowed.
+        bool invalid = false;
+        for (unsigned i = 0; i < currentRow && !invalid; ++i)
+        {
+            invalid = path[i] == j || i + path[i] == currentRow + j || (int)(i - path[i]) == (int)(currentRow - j);
+        }
+
+        if (!invalid)
+        {
+            path[currentRow] = j;
+            dpsSearchNQueen(results, path, currentRow + 1);
+        }
+    }
+}
+vector<vector<string>> solveNQueens(const int n)
+{
+    vector<vector<unsigned>> solutions;
+    vector<unsigned> path(n, 0);
+    dpsSearchNQueen(solutions, path, 0);
+
+    vector<vector<string>> results;
+    for (const vector<unsigned>& solution : solutions)
+    {
+        vector<string> matrix;
+        for(unsigned column : solution)
+        {
+            string row(n, '.');
+            row[column] = 'Q';
+            matrix.push_back(row);
+        }
+
+        results.push_back(matrix);
+    }
+
+    return results;
 }
 
 // 53. Maximum Subarray

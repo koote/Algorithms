@@ -61,6 +61,7 @@ extern vector<vector<int>> permuteUnique(vector<int>& nums);
 extern void rotate(vector<vector<int>>& matrix);
 extern vector<vector<string>> groupAnagrams(vector<string>& strs);
 extern double myPow(double x, int n);
+extern vector<vector<string>> solveNQueens(int n);
 
 extern int maxSubArray(vector<int>& nums);
 
