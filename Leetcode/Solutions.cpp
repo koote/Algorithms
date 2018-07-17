@@ -2077,6 +2077,40 @@ vector<vector<string>> solveNQueens(const int n)
     return results;
 }
 
+// 52. N-Queens II
+void dpsCountNQueen(unsigned& solutionCount, vector<unsigned>& path, unsigned currentRow)
+{
+    if (currentRow == path.size())
+    {
+        ++solutionCount;
+        return;
+    }
+
+    // Try every possible column in current row. Note: for path[i], it means a queue is put on [i, path[i]].
+    for (unsigned j = 0; j < path.size(); ++j)
+    {
+        // check all previous rows, see if current location [currentRow, j] is allowed.
+        bool invalid = false;
+        for (unsigned i = 0; i < currentRow && !invalid; ++i)
+        {
+            invalid = path[i] == j || i + path[i] == currentRow + j || (int)(i - path[i]) == (int)(currentRow - j);
+        }
+
+        if (!invalid)
+        {
+            path[currentRow] = j;
+            dpsCountNQueen(solutionCount, path, currentRow + 1);
+        }
+    }
+}
+int totalNQueens(int n)
+{
+    unsigned solutionCount = 0;
+    vector<unsigned> path(n, 0);
+    dpsCountNQueen(solutionCount, path, 0);
+    return solutionCount;
+}
+
 // 53. Maximum Subarray
 // Some throughts:
 // This is a DP problem, at first I want to define dp[i] as: the maximum sum of subarray in range nums[0..i], 
