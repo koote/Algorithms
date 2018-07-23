@@ -1784,28 +1784,30 @@ bool isMatch_Wildcard(string text, string pattern)
 }
 
 // 45. Jump Game II
-// BFS would be easier to understand than greedy.Starting from first element(root), mark all unvisited elements that current
+// BFS would be easier to understand than greedy. Starting from first element(root), mark all unvisited elements that current
 // level can reach as next level, keep finding the start and end of each level, until current level covers the last element.
 int jump(vector<int>& nums)
 {
-    // Next level's range is nums[current level's end + 1 .. right most location current level can reach]
-    for (size_t levelStart = 0, levelEnd = 0, level = 0, currentLevelRighMostReachableLocation = 0;
-        levelStart < nums.size();
-        levelStart = levelEnd + 1, levelEnd = currentLevelRighMostReachableLocation, ++level)
+    // Next level's range is nums[current level's end + 1 .. farthest location that current level elements can reach]
+    // Please note, Jump Game II assumes that you can always reach the destination, here I made a modification that it is possible 
+    // that you cannot reach the destination, to deal test case [3,2,1,0,4] from Jump Game I. 0 here likes a hole, when jump on it
+    // you will never get out. In this case we need to do an additional check start <= end, since according to our logic, when jump
+    // on the hole, in next iteration, start = end + 1 but end = farthest = end, so start > end, without that check loop will not end.
+    for (unsigned start = 0, end = 0, level = 0, farthest = 0; start < nums.size() && start <= end; start = end + 1, end = farthest, ++level)
     {
         // Current level covers the last element, means we've reached the destination in current level, so level is the shortest step count.
-        if (levelEnd >= nums.size() - 1)
+        if (end >= nums.size() - 1)
         {
             return level;
         }
 
-        // find the right most location that current level can reach.
-        for (size_t i = levelStart; i <= levelEnd; ++i)
+        // find the farthest reachable location that current level can reach.
+        for (unsigned i = start; i <= end; ++i)
         {
             // for element nums[i], its right most reachable location is nums[i] + i
-            if (nums[i] + i > currentLevelRighMostReachableLocation)
+            if (nums[i] + i > farthest)
             {
-                currentLevelRighMostReachableLocation = nums[i] + i;
+                farthest = nums[i] + i;
             }
         }
     }
@@ -2064,7 +2066,7 @@ vector<vector<string>> solveNQueens(const int n)
     for (const vector<unsigned>& solution : solutions)
     {
         vector<string> matrix;
-        for(unsigned column : solution)
+        for (unsigned column : solution)
         {
             string row(n, '.');
             row[column] = 'Q';
@@ -2179,6 +2181,50 @@ int maxSubArrayStraightforward(vector<int>& nums)
 int maxSubArray(vector<int>& nums)
 {
     return maxSubArrayStraightforward(nums);
+}
+
+// 54. Spiral Matrix
+vector<int> spiralOrder(vector<vector<int>>& matrix)
+{
+    vector<int> result;
+    if (!matrix.empty())
+    {
+        for (int rowStart = 0, colStart = 0, rowEnd = matrix.size() - 1, colEnd = matrix[0].size() - 1;
+            rowStart <= rowEnd && colStart <= colEnd;
+            ++rowStart, ++colStart, --colEnd, --rowEnd)
+        {
+            for (int j = colStart; j <= colEnd; ++j)
+            {
+                result.push_back(matrix[rowStart][j]);
+            }
+
+            for (int i = rowStart + 1; i <= rowEnd; ++i)
+            {
+                result.push_back(matrix[i][colEnd]);
+            }
+
+            if (rowStart < rowEnd && colStart < colEnd)
+            {
+                for (int j = colEnd - 1; j > colStart; --j)
+                {
+                    result.push_back(matrix[rowEnd][j]);
+                }
+
+                for (int i = rowEnd; i > rowStart; --i)
+                {
+                    result.push_back(matrix[i][colStart]);
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+// 55. Jump Game
+bool canJump(vector<int>& nums)
+{
+    return jump(nums) != -1;
 }
 
 // 144. Binary Tree Preorder Traversal

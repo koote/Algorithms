@@ -64,6 +64,8 @@ extern double myPow(double x, int n);
 extern vector<vector<string>> solveNQueens(int n);
 extern int totalNQueens(int n);
 extern int maxSubArray(vector<int>& nums);
+extern vector<int> spiralOrder(vector<vector<int>>& matrix);
+extern bool canJump(vector<int>& nums);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 
@@ -87,7 +89,7 @@ void main()
         { '.', '6', '.', '.', '.', '.', '2', '8', '.' },
         { '.', '.', '.', '4', '1', '9', '.', '.', '5' },
         { '.', '.', '.', '.', '8', '.', '.', '7', '9' }
-    });
+        });
 
     solveSudoku(sudoku);
 
