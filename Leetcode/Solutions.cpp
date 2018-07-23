@@ -2222,9 +2222,27 @@ vector<int> spiralOrder(vector<vector<int>>& matrix)
 }
 
 // 55. Jump Game
-bool canJump(vector<int>& nums)
+bool canJumpUse45(vector<int>& nums)
 {
     return jump(nums) != -1;
+}
+bool canJump(vector<int>& nums)
+{
+    unsigned farthest = 0;
+    for (unsigned i = 0; i <= farthest && farthest < nums.size(); ++i)
+    {
+        if (nums[i] + i > farthest)
+        {
+            farthest = nums[i] + i;
+        }
+
+        if (farthest >= nums.size()-1)
+        {
+            return true;
+        }
+    }
+
+    return farthest >= nums.size() - 1;
 }
 
 // 144. Binary Tree Preorder Traversal
