@@ -2226,6 +2226,8 @@ bool canJumpUse45(vector<int>& nums)
 {
     return jump(nums) != -1;
 }
+// Starting from nums[0], keep updating farthest which is the left most position we can reach so far.
+// When loop ends, check whether farthest beyonds the last elements of array.
 bool canJump(vector<int>& nums)
 {
     unsigned farthest = 0;
@@ -2236,13 +2238,81 @@ bool canJump(vector<int>& nums)
             farthest = nums[i] + i;
         }
 
-        if (farthest >= nums.size()-1)
+        if (farthest >= nums.size() - 1)
         {
             return true;
         }
     }
 
     return farthest >= nums.size() - 1;
+}
+
+// 56. Merge Intervals
+vector<Interval> merge(vector<Interval>& intervals)
+{
+    int last = intervals.size() - 1;
+
+    // intervals[0 .. unmerged-1] are sorted and merged intervals, intervals[unmerged .. last] are unmerged intervals.
+    for (int unmerged = 1, i, j; unmerged <= last; ++unmerged)
+    {
+        const Interval current = intervals[unmerged];
+        for (i = 0, j = unmerged - 1; i <= j;)
+        {
+            const unsigned mid = (i + j) / 2;
+            if (intervals[mid].start < current.start)
+            {
+                i = mid + 1;
+            }
+            else
+            {
+                j = mid - 1;
+            }
+        }
+
+        // When above loop ends, i > j, and i is the insert location.
+        // Check if current interval overlaps with its left element interval[i-1] first, merge current interval
+        // with intervals[i-1] instead of inserting it.
+        if (i > 0 && intervals[i - 1].end >= current.start)
+        {
+            intervals[i - 1].end = max(intervals[i - 1].end, current.end);
+            --i; // Update i so we treat merged intervals[i-1] as the newly inserted interval, later we merge it with its right intervals.
+
+            // Erase intervals[unmerged] by move intervals[last] to it, and shrink the last.
+            // Please note that in current iteration we need to maintain that unmerged is the end of current merged segment.
+            intervals[unmerged--] = intervals[last--];
+        }
+        else
+        {
+            for (j = unmerged - 1; j >= i; --j) // shift intervals[i .. unmerged-1] right by 1
+            {
+                intervals[j + 1] = intervals[j];
+            }
+
+            intervals[i] = current;
+        }
+
+        // check if we need to merge intervals[i] with its right intervals.
+        for (j = i + 1; j <= unmerged && intervals[i].end >= intervals[j].start; ++j)
+        {
+            intervals[i].end = max(intervals[i].end, intervals[j].end);
+        }
+
+        // now erase intervals[i+1 .. j-1] by shifting intervals[j .. last] left.
+        for (int k = i + 1, p = j; p <= last; ++k, ++p)
+        {
+            intervals[k] = intervals[p];
+        }
+
+        // last step is updating unmerged and last.
+        const int offset = j - i - 1;
+        unmerged -= offset;
+        last -= offset;
+    }
+
+    // finally only keep intervals[0 .. last] and return it.
+    intervals.resize(last + 1);
+
+    return intervals;
 }
 
 // 144. Binary Tree Preorder Traversal

@@ -14,3 +14,11 @@ struct TreeNode
     TreeNode *right;
     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
 };
+
+struct Interval
+{
+    int start;
+    int end;
+    Interval() : start(0), end(0) {}
+    Interval(const int s, const int e) : start(s), end(e) {}
+};
