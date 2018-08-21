@@ -2248,7 +2248,30 @@ bool canJump(vector<int>& nums)
 }
 
 // 56. Merge Intervals
-vector<Interval> merge(vector<Interval>& intervals)
+vector<Interval> mergeUseSortAndNewVector(vector<Interval>& intervals)
+{
+    vector<Interval> result;
+
+    if (!intervals.empty())
+    {
+        std::sort(intervals.begin(), intervals.end(), [](const Interval a, const Interval b) {return a.start < b.start; });
+        result.push_back(intervals[0]);
+        for (unsigned i = 1; i < intervals.size(); ++i)
+        {
+            if (result.back().end >= intervals[i].start)
+            {
+                result.back().end = max(result.back().end, intervals[i].end);
+            }
+            else
+            {
+                result.push_back(intervals[i]);
+            }
+        }
+    }
+
+    return result;
+}
+vector<Interval> mergeInPlace(vector<Interval>& intervals)
 {
     int last = intervals.size() - 1;
 
@@ -2313,6 +2336,10 @@ vector<Interval> merge(vector<Interval>& intervals)
     intervals.resize(last + 1);
 
     return intervals;
+}
+vector<Interval> merge(vector<Interval>& intervals)
+{
+    return mergeUseSortAndNewVector(intervals);
 }
 
 // 144. Binary Tree Preorder Traversal
