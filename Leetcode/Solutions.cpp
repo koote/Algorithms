@@ -1982,7 +1982,7 @@ vector<vector<string>> groupAnagrams(vector<string>& strs)
     }
 
     vector<vector<string>> results(charset2Strings.size());
-    transform(charset2Strings.begin(), charset2Strings.end(), results.begin(), [](const auto &pair) {return pair.second; });
+    transform(charset2Strings.begin(), charset2Strings.end(), results.begin(), [](const auto &pair) { return pair.second; });
     return results;
 }
 
@@ -2254,7 +2254,7 @@ vector<Interval> mergeUseSortAndNewVector(vector<Interval>& intervals)
 
     if (!intervals.empty())
     {
-        std::sort(intervals.begin(), intervals.end(), [](const Interval a, const Interval b) {return a.start < b.start; });
+        std::sort(intervals.begin(), intervals.end(), [](const Interval a, const Interval b) { return a.start < b.start; });
         result.push_back(intervals[0]);
         for (unsigned i = 1; i < intervals.size(); ++i)
         {
@@ -2436,8 +2436,43 @@ int lengthOfLastWord(string s)
 
     // no need to check if i < 0 before start next loop, if i == -1, j = i so j == -1, next loop won't execute thus j - i == 0
     int j = i;
-    for (; j >= 0 && s[j] != ' '; --j); 
+    for (; j >= 0 && s[j] != ' '; --j);
     return i - j;
+}
+
+// 59. Spiral Matrix II
+vector<vector<int>> generateMatrix(const int n)
+{
+    vector<vector<int>> matrix(n, vector<int>(n));
+    for (int start = 0, end = n - 1, number = 1, i, j; start <= end; ++start, --end)
+    {
+        // pre initialize the matrix[start][start] since when start == end, following loops won't execute.
+        i = start;
+        j = start;
+        matrix[i][j] = number;
+
+        for (; j < end; ++j) // i is row no., j is col no., when ends, i == start and j == end.
+        {
+            matrix[i][j] = number++;
+        }
+
+        for (; i < end; ++i) // when ends, i == end and j == end
+        {
+            matrix[i][j] = number++;
+        }
+
+        for (; j > start; --j) // when ends, i == end and j == start
+        {
+            matrix[i][j] = number++;
+        }
+
+        for (; i > start; --i) // when ends, i == start and j == start
+        {
+            matrix[i][j] = number++;
+        }
+    }
+
+    return matrix;
 }
 
 // 144. Binary Tree Preorder Traversal

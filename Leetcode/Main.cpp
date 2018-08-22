@@ -69,6 +69,7 @@ extern bool canJump(vector<int>& nums);
 extern vector<Interval> merge(vector<Interval>& intervals);
 extern vector<Interval> insert(vector<Interval>& intervals, Interval newInterval);
 extern int lengthOfLastWord(string s);
+extern vector<vector<int>> generateMatrix(int n);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 
