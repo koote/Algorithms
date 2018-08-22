@@ -67,6 +67,7 @@ extern int maxSubArray(vector<int>& nums);
 extern vector<int> spiralOrder(vector<vector<int>>& matrix);
 extern bool canJump(vector<int>& nums);
 extern vector<Interval> merge(vector<Interval>& intervals);
+extern vector<Interval> insert(vector<Interval>& intervals, Interval newInterval);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 

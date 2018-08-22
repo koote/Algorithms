@@ -2281,7 +2281,7 @@ vector<Interval> mergeInPlace(vector<Interval>& intervals)
         const Interval current = intervals[unmerged];
         for (i = 0, j = unmerged - 1; i <= j;)
         {
-            const unsigned mid = (i + j) / 2;
+            const int mid = (i + j) / 2;
             if (intervals[mid].start < current.start)
             {
                 i = mid + 1;
@@ -2340,6 +2340,62 @@ vector<Interval> mergeInPlace(vector<Interval>& intervals)
 vector<Interval> merge(vector<Interval>& intervals)
 {
     return mergeUseSortAndNewVector(intervals);
+}
+
+// 57. Insert Interval
+vector<Interval> insert(vector<Interval>& intervals, const Interval newInterval)
+{
+    // First find the insert location based on start
+    int i = 0;
+    int j = intervals.size() - 1;
+    while (i <= j)
+    {
+        const int mid = (i + j) / 2;
+        if (intervals[mid].start < newInterval.start)
+        {
+            i = mid + 1;
+        }
+        else
+        {
+            j = mid - 1;
+        }
+    }
+
+    // When above loop ends, i > j, and i is the insert location.
+    // Check if current interval overlaps with its left element interval[i-1] first, merge current interval
+    // with intervals[i-1] instead of inserting.
+    if (i > 0 && intervals[i - 1].end >= newInterval.start)
+    {
+        intervals[i - 1].end = max(intervals[i - 1].end, newInterval.end);
+        --i; // Update i so we treat merged intervals[i-1] as the newly inserted interval, later we merge it with its right intervals.
+    }
+    else // insert newInterval to i
+    {
+        intervals.resize(intervals.size() + 1);
+        for (j = intervals.size() - 1; j >= i; --j) // shift intervals[i .. unmerged-1] right by 1
+        {
+            intervals[j + 1] = intervals[j];
+        }
+
+        intervals[i] = newInterval;
+    }
+
+    // check if we need to merge intervals[i] with its right intervals.
+    for (j = i + 1; j < intervals.size() && intervals[i].end >= intervals[j].start; ++j)
+    {
+        intervals[i].end = max(intervals[i].end, intervals[j].end);
+    }
+
+    // now erase intervals[i+1 .. j-1] by shifting intervals[j .. last] left.
+    for (int k = i + 1, p = j; p < intervals.size(); ++k, ++p)
+    {
+        intervals[k] = intervals[p];
+    }
+
+    // finally only keep intervals[0 .. last] and return it.
+    intervals.resize(intervals.size() - j + i + 1);
+
+    return intervals;
 }
 
 // 144. Binary Tree Preorder Traversal
