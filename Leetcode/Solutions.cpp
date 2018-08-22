@@ -2343,7 +2343,7 @@ vector<Interval> merge(vector<Interval>& intervals)
 }
 
 // 57. Insert Interval
-vector<Interval> insert(vector<Interval>& intervals, const Interval newInterval)
+vector<Interval> insertUseBinarySearch(vector<Interval>& intervals, const Interval newInterval)
 {
     // First find the insert location based on start
     int i = 0;
@@ -2396,6 +2396,36 @@ vector<Interval> insert(vector<Interval>& intervals, const Interval newInterval)
     intervals.resize(intervals.size() - j + i + 1);
 
     return intervals;
+}
+vector<Interval> insertUseSTL(vector<Interval>& intervals, const Interval newInterval)
+{
+    // Given two intervals a and b, define a < b when a is on the left of b and there is no overlap between a and b. Since
+    // initially intervals array is sorted and no overlaps between any two elements, means for any i and j, i < j implies 
+    // intervals[i] < intervals[j].
+    // The logic of equal_range is given an object x and a sorted object array, it returns 2 iterators, *(first-1) is the
+    // first element that smaller than x, *last is the first element that x smaller than (*last), given the way how define
+    // order of intervals, elements in range intervals[first .. last-1] all have overlap with newInterval.
+    const pair<vector<Interval>::iterator, vector<Interval>::iterator> range = equal_range(intervals.begin(), intervals.end(), newInterval, [](const Interval& a, const Interval& b) { return a.end < b.start; });
+    const vector<Interval>::iterator first = range.first;
+    vector<Interval>::iterator last = range.second;
+    if (first == last) // no elements in array has overlap with newInterval so just insert it.
+    {
+        intervals.insert(first, newInterval);
+    }
+    else
+    {
+        // intervals[last-1] is the last element has overlap with newInterval.
+        --last;
+        last->start = min(newInterval.start, first->start);
+        last->end = max(newInterval.end, last->end);
+        intervals.erase(first, last); // note that last will not be earsed.
+    }
+
+    return intervals;
+}
+vector<Interval> insert(vector<Interval>& intervals, const Interval newInterval)
+{
+    return insertUseSTL(intervals, newInterval);
 }
 
 // 144. Binary Tree Preorder Traversal
