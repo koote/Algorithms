@@ -3,8 +3,9 @@
 #include <string>
 #include <vector>
 #include <cassert>
-#include <algorithm>
 #include <cstddef>
+#include <numeric>
+#include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
 #include "DataStructure.h"
@@ -1037,11 +1038,11 @@ void nextPermutation(vector<int>& nums)
     if (i > 0)
     {
         size_t l;
-        for (l = i; l < nums.size() && nums[l] < nums[i - 1]; ++l);
+        for (l = i; l < nums.size() && nums[l] <= nums[i - 1]; ++l);
 
         const int temp = nums[l];
-        nums[i - 1] = nums[l];
-        nums[l] = temp;
+        nums[l] = nums[i - 1];
+        nums[i - 1] = temp;
     }
 }
 
@@ -2473,6 +2474,26 @@ vector<vector<int>> generateMatrix(const int n)
     }
 
     return matrix;
+}
+
+// 60. Permutation Sequence
+string getPermutation(int n, int k)
+{
+    vector<int> numbers(n);
+    iota(numbers.begin(), numbers.end(), 1);
+
+    while (--k > 0)
+    {
+        nextPermutation(numbers);
+    }
+
+    string result;
+    for (int number : numbers)
+    {
+        result += number + '0';
+    }
+
+    return result;
 }
 
 // 144. Binary Tree Preorder Traversal
