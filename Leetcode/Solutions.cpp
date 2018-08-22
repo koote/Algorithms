@@ -2428,6 +2428,18 @@ vector<Interval> insert(vector<Interval>& intervals, const Interval newInterval)
     return insertUseSTL(intervals, newInterval);
 }
 
+// 58. Length of Last Word
+int lengthOfLastWord(string s)
+{
+    int i = s.length() - 1;
+    for (; i >= 0 && s[i] == ' '; --i); // skip trailing spaces
+
+    // no need to check if i < 0 before start next loop, if i == -1, j = i so j == -1, next loop won't execute thus j - i == 0
+    int j = i;
+    for (; j >= 0 && s[j] != ' '; --j); 
+    return i - j;
+}
+
 // 144. Binary Tree Preorder Traversal
 vector<int> preorderTraversal(TreeNode* root)
 {
