@@ -2479,18 +2479,30 @@ vector<vector<int>> generateMatrix(const int n)
 // 60. Permutation Sequence
 string getPermutation(int n, int k)
 {
+    int factorial = 1;
     vector<int> numbers(n);
-    iota(numbers.begin(), numbers.end(), 1);
-
-    while (--k > 0)
+    for (int i = 1; i <= n; ++i)
     {
-        nextPermutation(numbers);
+        factorial *= i;
+        numbers[i - 1] = i;
     }
 
     string result;
-    for (int number : numbers)
+
+    if (k-- <= factorial)
     {
-        result += number + '0';
+        for (int gs = factorial / n; n > 1; k %= gs, gs /= --n) // gs = (n-1)!
+        {
+            int choose = numbers[k / gs];
+            result += choose + '0';
+
+            for (unsigned i = k / gs; i < n - 1; ++i)
+            {
+                numbers[i] = numbers[i + 1];
+            }
+        }
+
+        result += numbers[0] + '0';
     }
 
     return result;
