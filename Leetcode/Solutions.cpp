@@ -2539,16 +2539,9 @@ ListNode* rotateRightUseSinglePointer(ListNode* head, int k)
         int length = 1;
         for (; p->next != nullptr; ++length, p = p->next);
         p->next = head; // circle the list.
-
-        if (k %= length != 0)
-        {
-            // cut point is length - k - 1, remember that fast is pointing to last node, so we move length - k steps.
-            for (k = length - k - 1; k >= 0; --k, p = p->next);
-        }
-
-        // remember to unchain the tail and head no matter k == length or not.
+        for (k = length - k % length; k > 0; --k, p = p->next);
         head = p->next;
-        p->next = nullptr;
+        p->next = NULL;
     }
 
     return head;
