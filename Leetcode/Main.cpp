@@ -71,6 +71,7 @@ extern vector<Interval> insert(vector<Interval>& intervals, Interval newInterval
 extern int lengthOfLastWord(string s);
 extern vector<vector<int>> generateMatrix(int n);
 extern string getPermutation(int n, int k);
+extern ListNode* rotateRight(ListNode* head, int k);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 
@@ -83,7 +84,6 @@ extern string addStrings(string num1, string num2);
 void main()
 {
     const auto start = clock();
-    getPermutation(3, 3);
 
     vector<vector<char>> sudoku({
         { '5', '3', '.', '.', '7', '.', '.', '.', '.' },

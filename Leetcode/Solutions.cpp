@@ -2489,23 +2489,73 @@ string getPermutation(int n, int k)
 
     string result;
 
-    if (k-- <= factorial)
+    if (k-- <= factorial) // Decreasing k by 1 because index starts from 0, this can make calculation more easier.
     {
-        for (int gs = factorial / n; n > 1; k %= gs, gs /= --n) // gs = (n-1)!
+        // n is count of unused numbers in numbers array.
+        for (int groupSize = factorial / n; n > 1; k %= groupSize, groupSize /= --n) // groupSize == (n-1)!
         {
-            int choose = numbers[k / gs];
-            result += choose + '0';
+            // current choose number is numbers[k/groupSize].
+            result += numbers[k / groupSize] + '0';
 
-            for (unsigned i = k / gs; i < n - 1; ++i)
+            // then erase number[k/groupSize] by shifting its right elements to left by 1, and decrease n by 1.
+            for (int i = k / groupSize; i < n - 1; ++i)
             {
                 numbers[i] = numbers[i + 1];
             }
         }
 
+        // when n == 1, no grouping.
         result += numbers[0] + '0';
     }
 
     return result;
+}
+
+// 61. Rotate List
+ListNode* rotateRightUseFastSlowPointer(ListNode* head, int k)
+{
+    ListNode* fast = head;
+    int length = 0;
+    for (; fast != nullptr; ++length, fast = fast->next);
+    if (length > 0 && k % length > 0)
+    {
+        for (k %= length, fast = head; k > 0 && fast != nullptr; --k, fast = fast->next);
+
+        ListNode* slow = head;
+        for (; fast->next != nullptr; fast = fast->next, slow = slow->next);
+
+        fast->next = head;
+        head = slow->next;
+        slow->next = nullptr;
+    }
+
+    return head;
+}
+ListNode* rotateRightUseSinglePointer(ListNode* head, int k)
+{
+    if (head != nullptr)
+    {
+        ListNode* p = head;
+        int length = 1;
+        for (; p->next != nullptr; ++length, p = p->next);
+        p->next = head; // circle the list.
+
+        if (k %= length != 0)
+        {
+            // cut point is length - k - 1, remember that fast is pointing to last node, so we move length - k steps.
+            for (k = length - k - 1; k >= 0; --k, p = p->next);
+        }
+
+        // remember to unchain the tail and head no matter k == length or not.
+        head = p->next;
+        p->next = nullptr;
+    }
+
+    return head;
+}
+ListNode* rotateRight(ListNode* head, int k)
+{
+    return rotateRightUseSinglePointer(head, k);
 }
 
 // 144. Binary Tree Preorder Traversal
