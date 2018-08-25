@@ -2020,14 +2020,7 @@ double myPowIterativeLogN(double x, int n)
 double myPow(double x, int n)
 {
     double result = 1.0;
-    for (unsigned i = 0, absn = abs(n); i <= 31; ++i, absn >>= 1, x *= x)
-    {
-        if (absn & 1)
-        {
-            result *= x;
-        }
-    }
-
+    for (unsigned i = 0, absn = abs(n); absn > 0 && i <= 31; ++i, result *= absn & 1 ? x : 1, absn >>= 1, x *= x);
     return n < 0 ? 1 / result : result;
 }
 
