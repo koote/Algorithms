@@ -2581,6 +2581,14 @@ int uniquePaths2D(int m, int n) // n is row count, m is column count.
 // the answer.
 int uniquePaths(int m, int n) // n is row count, m is column count.
 {
+    // So this doesn't affect the correctness of solution but is to save more space. Considering a 
+    // matrix that m > n, if we swap m and n, which is actually roate matrix by 90 degree, the count
+    // of unique paths from top left to right bottom won't change.
+    if (m > n)
+    {
+        swap(m, n);
+    }
+
     vector<int> dp(m, 1);
     for (int i = 1; i < n; ++i)
     {
