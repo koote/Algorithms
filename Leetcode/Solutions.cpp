@@ -1497,8 +1497,8 @@ int firstMissingPositive(vector<int>& nums)
 // 42. Trapping Rain Water
 // Brute force is not the best solution but it is very important to show that how to think.
 // For this problem, DO NOT try to start thinking each hollow, that makes this problem looks complicated. Thinking 
-// each bar instead. Let's say every bar can trap some water (physically it is impossble), if we can get how much  
-// water each bar can trap, and add them together, we get the toal trapped water.
+// each bar instead. Let's say every bar can trap some water (physically it is impossible), if we can get how much  
+// water each bar can trap, and add them together, we get the total trapped water.
 // Given a bar i, whose height is height[i], how much water it can trap? Drawing a chart 
 // helps to show that:
 // water bar i can trap = min(height of the highest bar on bar i's left, height of the highest bar on bar i's right) - height[i]
@@ -1848,9 +1848,9 @@ vector<vector<int>> permuteRecursiveInsertion(vector<int>& nums)
 
     return results;
 }
-// Given array nums[0, size-1], permutation is, every time we choose an unused element until all elements have been choosen, the
+// Given array nums[0, size-1], permutation is, every time we choose an unused element until all elements have been chosen, the
 // order how we choose elements is a permutation. To reuse storage, we use a variable currentIndex to indicates the beginning of
-// unused elements, its left, nums[0 .. currentIndex-1] are the elements we currently have choosen. Everytime we choose an element
+// unused elements, its left, nums[0 .. currentIndex-1] are the elements we currently have chosen. Every time we choose an element
 // in nums[currentIndex .. size-1] and exchange it with nums[currentIndex], treated this process as 'choose an unused element',
 // update currentIndex to currentIndex+1, and keep repeating this process until currentIndex == size, we get one permutation.
 void dfsPermuteImpl(vector<int>& nums, size_t currentIndex, vector<vector<int>>& results)
@@ -1935,12 +1935,12 @@ void clockwiseRotateByCoil(vector<vector<int>>& matrix)
     }
 }
 // This solution rotates array as whole, above solution is very easy to get messed in interview.
-// first step, mirror on diagnoal (swap matrix[i][j] with matrix[j][i]). Then if it is clockwise, 
+// first step, mirror on diagonal (swap matrix[i][j] with matrix[j][i]). Then if it is clockwise, 
 // flip matrix's each column (swap each column matrix[*][j] with matrix[*][n-1-j])
 // 1 2 3     1 4 7    7 4 1
 // 4 5 6  => 2 5 8 => 8 5 2
 // 7 8 9     3 6 9    9 6 3
-// if it is counterclockwise, flip matrix's each row (swap each row matrix[i] with row matrx[n-1-i])
+// if it is counterclockwise, flip matrix's each row (swap each row matrix[i] with row matrix[n-1-i])
 // 1 2 3     1 4 7    3 6 9
 // 4 5 6  => 2 5 8 => 2 5 8
 // 7 8 9     3 6 9    1 4 7
@@ -2108,10 +2108,10 @@ int totalNQueens(int n)
 }
 
 // 53. Maximum Subarray
-// Some throughts:
+// Some thoughts:
 // This is a DP problem, at first I want to define dp[i] as: the maximum sum of subarray in range nums[0..i], 
 // so when i increases from 0 to n-1 (n is the length of nums array), we got the final answer at dp[n-1]. However
-// I soon realize this doesn't work. The reason is given an i, we only konw the max subarray's sum in the range 
+// I soon realize this doesn't work. The reason is given an i, we only know the max subarray's sum in the range 
 // nums[0..i-1], but we don't know where the previous max subarray ends, it could end at nums[i-1], or before 
 // nums[i-1], this information is very important because we need to decide whether nums[i] is possible to join 
 // previous max subarray, or must become a start of new subarray. It is very like to the question 32 (longest
@@ -2412,7 +2412,7 @@ vector<Interval> insertUseSTL(vector<Interval>& intervals, const Interval newInt
         --last;
         last->start = min(newInterval.start, first->start);
         last->end = max(newInterval.end, last->end);
-        intervals.erase(first, last); // note that last will not be earsed.
+        intervals.erase(first, last); // note that last will not be erased.
     }
 
     return intervals;
@@ -2543,6 +2543,56 @@ ListNode* rotateRight(ListNode* head, int k)
 {
     return rotateRightUseSinglePointer(head, k);
 }
+
+// 62. Unique Paths
+// This can use DFS but it will get time exceed and DFS will actually get every route. DP is the correct way.
+int uniquePaths2D(int m, int n) // n is row count, m is column count.
+{
+    // Given a cell [i, j], robot can only get to it from above cell [i-1,j] or left cell [i, j-1]. So 
+    // we define dp[i,j] as the count of unique paths from [0,0] => [i,j], so we can get this equation:
+    // dp[i][j] = dp[i-1][j] + dp[i][j-1]
+    vector<vector<int>> dp(n, vector<int>(m, 0));
+
+    // initialization, it actually says if the maze is 1 dimension array, then there is only 1 unique path to get to the destination.
+    for (int i = 0; i < m; ++i)
+    {
+        dp[0][i] = 1;
+    }
+
+    for (int i = 0; i < n; ++i)
+    {
+        dp[i][0] = 1;
+    }
+
+    for (int i = 1; i < n; ++i)
+    {
+        for (int j = 1; j < m; ++j)
+        {
+            dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+        }
+    }
+
+    return dp[n - 1][m - 1];
+}
+// The above solution uses 2 dimensions array so space complexity is O(n^2). Let's got back to the initial equation,
+// we can find that to get value of dp[i,j], it actually only needs its left element's value and above element's value.
+// So we need two 1d arrays? No, actually only need one 1d array. Initially we initialize it to 1, then starts from dp[1],
+// adding dp[i] with its left element dp[i-1] and store back to dp[i], keep doing this n-1 times, last element in dp is
+// the answer.
+int uniquePaths(int m, int n) // n is row count, m is column count.
+{
+    vector<int> dp(m, 1);
+    for (int i = 1; i < n; ++i)
+    {
+        for (int j = 1; j < m; ++j)
+        {
+            dp[j] += dp[j - 1];
+        }
+    }
+
+    return dp[m - 1];
+}
+
 
 // 144. Binary Tree Preorder Traversal
 vector<int> preorderTraversal(TreeNode* root)

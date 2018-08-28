@@ -72,6 +72,7 @@ extern int lengthOfLastWord(string s);
 extern vector<vector<int>> generateMatrix(int n);
 extern string getPermutation(int n, int k);
 extern ListNode* rotateRight(ListNode* head, int k);
+extern int uniquePaths(int m, int n);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 
