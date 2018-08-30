@@ -2574,11 +2574,11 @@ int uniquePaths2D(int m, int n) // n is row count, m is column count.
 
     return dp[n - 1][m - 1];
 }
-// The above solution uses 2 dimensions array so space complexity is O(n^2). Let's got back to the initial equation,
-// we can find that to get value of dp[i,j], it actually only needs its left element's value and above element's value.
-// So we need two 1d arrays? No, actually only need one 1d array. Initially we initialize it to 1, then starts from dp[1],
-// adding dp[i] with its left element dp[i-1] and store back to dp[i], keep doing this n-1 times, last element in dp is
-// the answer.
+// The above solution uses a 2 dimensions array so space complexity is O(n^2). Let's got back to the equation, we can find 
+// that to get value of dp[i,j], it actually only needs its left element's value and above element's value.
+// So do we need two one dimension arrays? No, actually only need one one dimension array. Initially initialize it to all 1, 
+// then starts from dp[1], adding dp[i] with its left element dp[i-1] and store back to dp[i] (note before adding, dp[i] stores 
+// the above element's value of new dp[i]), keep doing this n-1 times, last element in dp is the answer.
 int uniquePaths(int m, int n) // n is row count, m is column count.
 {
     // So this doesn't affect the correctness of solution but is to save more space. Considering a 
@@ -2601,6 +2601,35 @@ int uniquePaths(int m, int n) // n is row count, m is column count.
     return dp[m - 1];
 }
 
+// 63. Unique Paths II
+// the algorithm is similar to problem 62, however the dp calculation rule needs some updates.
+// In 62, we keep adding dp[j] and dp[j-1] to get new dp[j], here we need to check if grid[i][j] 
+// is obstacle or not first, if yes, set dp[j] to 0, otherwise do adding as problem 62.
+int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid)
+{
+    vector<int> dp(obstacleGrid[0].size(), 0);
+
+    // initialize dp[] to 1 until encounter an obstacle, then set dp[] value to 0 (means unreachable) after obstacle.
+    for (unsigned i = 0; i < obstacleGrid[0].size() && obstacleGrid[0][i] == 0; ++i)
+    {
+        dp[i] = 1;
+    }
+
+    for (unsigned i = 1; i < obstacleGrid.size(); ++i)
+    {
+        if (obstacleGrid[i][0] == 1)
+        {
+            dp[0] = 0;
+        }
+
+        for (unsigned j = 1; j < obstacleGrid[i].size(); ++j)
+        {
+            dp[j] = obstacleGrid[i][j] == 0 ? dp[j] + dp[j - 1] : 0;
+        }
+    }
+
+    return dp.back();
+}
 
 // 144. Binary Tree Preorder Traversal
 vector<int> preorderTraversal(TreeNode* root)

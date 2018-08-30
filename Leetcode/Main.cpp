@@ -73,6 +73,7 @@ extern vector<vector<int>> generateMatrix(int n);
 extern string getPermutation(int n, int k);
 extern ListNode* rotateRight(ListNode* head, int k);
 extern int uniquePaths(int m, int n);
+extern int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 
