@@ -2602,9 +2602,10 @@ int uniquePaths(int m, int n) // n is row count, m is column count.
 }
 
 // 63. Unique Paths II
-// the algorithm is similar to problem 62, however the dp calculation rule needs some updates.
-// In 62, we keep adding dp[j] and dp[j-1] to get new dp[j], here we need to check if grid[i][j] 
-// is obstacle or not first, if yes, set dp[j] to 0, otherwise do adding as problem 62.
+// the algorithm is similar to problem 62, however the dp calculation rule needs some updates. In 62, we keep adding
+// dp[j] and dp[j-1] to get new dp[j], here we need to first check if grid[i][j] is obstacle or not. If yes, set dp[j]
+// to 0 (remember the definition of dp[i][j] is the count of unique paths from grid[0][0] to grid[i][j], so set dp[i][j]
+// to 0 means the obstacle cell is unreachable) instead of adding dp[j] to dp[j-1].
 int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid)
 {
     vector<int> dp(obstacleGrid[0].size(), 0);
@@ -2617,6 +2618,7 @@ int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid)
 
     for (unsigned i = 1; i < obstacleGrid.size(); ++i)
     {
+        // first element could be obstacle.
         if (obstacleGrid[i][0] == 1)
         {
             dp[0] = 0;
@@ -2629,6 +2631,33 @@ int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid)
     }
 
     return dp.back();
+}
+
+// 64. Minimum Path Sum
+int minPathSum(vector<vector<int>>& grid)
+{
+    vector<vector<int>> dp(grid.size(), vector<int>(grid[0].size(), 0));
+
+    dp[0][0] = grid[0][0];
+    for (unsigned i = 1; i < dp[0].size(); ++i)
+    {
+        dp[0][i] = grid[0][i] + dp[0][i - 1];
+    }
+
+    for (unsigned i = 1; i < dp.size(); ++i)
+    {
+        dp[i][0] = grid[i][0] + dp[i - 1][0];
+    }
+
+    for (unsigned i = 1; i < dp.size(); ++i)
+    {
+        for (unsigned j = 1; j < dp[i].size(); ++j)
+        {
+            dp[i][j] = min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
+        }
+    }
+
+    return dp[grid.size() - 1][grid[0].size() - 1];
 }
 
 // 144. Binary Tree Preorder Traversal
