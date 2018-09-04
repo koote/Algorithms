@@ -75,6 +75,7 @@ extern ListNode* rotateRight(ListNode* head, int k);
 extern int uniquePaths(int m, int n);
 extern int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid);
 extern int minPathSum(vector<vector<int>>& grid);
+extern bool isNumber(string s);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 

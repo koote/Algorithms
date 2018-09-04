@@ -2470,6 +2470,24 @@ vector<vector<int>> generateMatrix(const int n)
 }
 
 // 60. Permutation Sequence
+// We can keep calling nextPermutation() k-1 times to get the answer but that is not the best solution. Thinking in 
+// this way, assume n = 4, choosing 1, 2, 3, 4 respectively as first number, we get 4 groups: {1, x, x, x}, 
+// {2, x, x, x}, {3, x, x, x} and {4, x, x, x}. First it is obvious that each group has 3! = 6 elements; second, all
+// elements of group {1, x, x, x} are smaller than any element of other 3 groups, accordingly, all elements in group
+// {2, x, x, x} are smaller than any elements of group {3, x, x, x} and {4, x, x, x}. So, we can divided all 4! = 24 
+// elements into 4 groups: 
+//              {1, x, x, x} | {2, x, x, x} | {3, x, x, x} | {4, x, x, x}
+//                 0 - 5     |    6 - 11    |    12 - 18   |    19 - 23
+//.Let's say k = 8, first decrease k by 1 since index starts from 0, the kth element cannot from first group since it 
+// only has 6 elements, it falls into second group {2, x, x, x}'s range, here we get 2 things: (a)the kth permutation's
+// first number is 2; (b)k % 6 = 1, the kth permutation is the 2nd element inside second group {2, x, x, x}.
+// Now we only have 3 candidates: 1, 3, 4, likewise there are 3 groups: {1, x, x}, {3, x, x} and {4, x, x}, each group
+// has 2! = 2 elements, since now k = 1 so we know k is from first group, and the kth permutation's second number is 1,
+// new k = 1 % 2 = 1.
+// Now remaining candidates are 3 and 4 and k = 1, there are only 2 groups, {3, 4} and {4, 3}, each group has 1 element,
+// so the kth permutation is in second group {4, 3}, the kth permutation's third number is 4, and new k = 1 % 1 = 0.
+// Now we only have 1 number remaining, which is 3, so there is no need to do grouping, just return this only number.
+// Finally we get all 4 numbers of kth permutation, it is {2, 1, 4, 3}.
 string getPermutation(int n, int k)
 {
     int factorial = 1;
@@ -2482,7 +2500,7 @@ string getPermutation(int n, int k)
 
     string result;
 
-    if (k-- <= factorial) // Decreasing k by 1 because index starts from 0, this can make calculation more easier.
+    if (k-- <= factorial) // Decreasing k by 1 because index starts from 0, this can make counting easier.
     {
         // n is count of unused numbers in numbers array.
         for (int groupSize = factorial / n; n > 1; k %= groupSize, groupSize /= --n) // groupSize == (n-1)!
@@ -2534,7 +2552,7 @@ ListNode* rotateRightUseSinglePointer(ListNode* head, int k)
         p->next = head; // circle the list.
         for (k = length - k % length; k > 0; --k, p = p->next);
         head = p->next;
-        p->next = NULL;
+        p->next = nullptr;
     }
 
     return head;
@@ -2634,6 +2652,11 @@ int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid)
 }
 
 // 64. Minimum Path Sum
+// Note that it asks for the smallest path sum, not the path itself, if we use DFS, we do unnecessary calculation which will 
+// get time exceeded, so it is still a DP problem. Thinking in this way, given a cell grid[i][j] (i >=1 and j >=1) , it can
+// only be entered either from top (grid[i-1][j]) or left (grid[i][j-1]), so the minimum path from grid[0][0] to grid[i][j] is
+// min (min path from grid[0][0] to grid[i-1][j], min path from grid[0][0] to grid[i][j-1]). Define dp[i][j] as the minimum path
+// sum that from grid[0][0] to grid[i][j], after all cells in grid have been iterated, last element of dp is the answer.
 int minPathSum(vector<vector<int>>& grid)
 {
     vector<vector<int>> dp(grid.size(), vector<int>(grid[0].size(), 0));
@@ -2658,6 +2681,88 @@ int minPathSum(vector<vector<int>>& grid)
     }
 
     return dp[grid.size() - 1][grid[0].size() - 1];
+}
+
+// 65. Valid Number
+// Valid input character: sign(+/-), dot(.) digit(0-9), e/E, whitespace, others are invalid characters.
+// Manually build a state transition matrix:
+/*
++-------------------------------------+-----+-----+-----+----+------------+-------+
+|         State(Example)\Input        | 0-9 | e/E | +/- |  . | whitespace | other |
++-------------------------------------+-----+-----+-----+----+------------+-------+
+|  0 |                                |  1  |  -1 |  2  |  3 |      0     |   -1  |
++----+--------------------------------+-----+-----+-----+----+------------+-------+
+|  1 |            0, 1, 123           |  1  |  4  |  -1 |  5 |      6     |   -1  |
++----+--------------------------------+-----+-----+-----+----+------------+-------+
+|  2 |              +, -              |  1  |  -1 |  -1 |  3 |     -1     |   -1  |
++----+--------------------------------+-----+-----+-----+----+------------+-------+
+|  3 |                .               |  5  |  -1 |  -1 | -1 |     -1     |   -1  |
++----+--------------------------------+-----+-----+-----+----+------------+-------+
+|  4 |          0e, 1e, 123e          |  7  |  -1 |  8  | -1 |     -1     |   -1  |
++----+--------------------------------+-----+-----+-----+----+------------+-------+
+|  5 |          0., 1., 123.          |  5  |  4  |  -1 | -1 |      6     |   -1  |
++----+--------------------------------+-----+-----+-----+----+------------+-------+
+|  6 | 0{space}, 1{space}, 123{space} |  -1 |  -1 |  -1 | -1 |      6     |   -1  |
++----+--------------------------------+-----+-----+-----+----+------------+-------+
+|  7 |        0e0, 1e0, 123e456       |  7  |  -1 |  -1 | -1 |      6     |   -1  |
++----+--------------------------------+-----+-----+-----+----+------------+-------+
+|  8 |         0e+, 1e-, 123e+        |  7  |  -1 |  -1 | -1 |     -1     |   -1  |
++----+--------------------------------+-----+-----+-----+----+------------+-------+
+*/
+bool isNumber(string s)
+{
+    enum InputType { digit = 0, eE, sign, dot, whitespace, other };
+    vector<vector<int>> transitionTable({
+        { 1, -1, 2, 3, 0, -1},
+        { 1, 4, -1, 5, 6, -1 },
+        { 1, -1, -1, 3, -1, -1 },
+        { 5, -1, -1, -1, -1, -1 },
+        { 7, -1, 8, -1, -1, -1 },
+        { 5, 4, -1, -1, 6, -1},
+        { -1, -1, -1, -1, 6, -1 },
+        { 7, -1, -1, -1, 6, -1 },
+        { 7, -1, -1, -1, -1, -1 }
+    });
+
+    int state = 0; // start state
+    for (char c : s)
+    {
+        InputType input;
+
+        if (isdigit(c))
+        {
+            input = digit;
+        }
+        else if (c == 'e' || c == 'E')
+        {
+            input = eE;
+        }
+        else if (c == '+' || c == '-')
+        {
+            input = sign;
+        }
+        else if (c == '.')
+        {
+            input = dot;
+        }
+        else if (c == ' ')
+        {
+            input = whitespace;
+        }
+        else
+        {
+            input = other;
+        }
+
+        state = transitionTable[state][input];
+        if (state == -1)
+        {
+            return false;
+        }
+    }
+
+    // back to transition table, only state 1, 5, 6, 7 means a successful identified number.
+    return state == 1 || state == 5 || state == 6 || state == 7; 
 }
 
 // 144. Binary Tree Preorder Traversal
