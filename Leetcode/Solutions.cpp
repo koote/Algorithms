@@ -39,13 +39,11 @@ vector<int> twoSum(vector<int>& nums, int target)
 // 2. Add Two Numbers
 ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
 {
-    ListNode* a = l1;
-    ListNode* b = l2;
     ListNode* dummy = new ListNode(-1);
     ListNode* c = dummy;
-    int carry = 0;
 
-    while (a != nullptr || b != nullptr)
+    unsigned char carry = 0;
+    for (ListNode *a = l1, *b = l2; a != nullptr || b != nullptr || carry != 0; )
     {
         int val = (a == nullptr ? 0 : a->val) + (b == nullptr ? 0 : b->val) + carry;
         carry = val / 10;
@@ -53,14 +51,16 @@ ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
 
         c->next = new ListNode(val);
         c = c->next;
-        a = a == nullptr ? a : a->next;
-        b = b == nullptr ? b : b->next;
-    }
 
-    if (carry > 0) // don't forget the carry
-    {
-        c->next = new ListNode(carry);
-        c = c->next;
+        if (a != nullptr)
+        {
+            a = a->next;
+        }
+
+        if (b != nullptr)
+        {
+            b = b->next;
+        }
     }
 
     c->next = nullptr; //close the result list
@@ -2720,7 +2720,7 @@ bool isNumber(string s)
         { -1, -1, -1, -1, 6, -1 },
         { 7, -1, -1, -1, 6, -1 },
         { 7, -1, -1, -1, -1, -1 }
-    });
+        });
 
     int state = 0; // start state
     for (char c : s)
@@ -2760,7 +2760,7 @@ bool isNumber(string s)
     }
 
     // back to transition table, only state 1, 5, 6, 7 means a completely identified number, other states are not.
-    return state == 1 || state == 5 || state == 6 || state == 7; 
+    return state == 1 || state == 5 || state == 6 || state == 7;
 }
 
 // 66. Plus One
@@ -2780,6 +2780,73 @@ vector<int> plusOne(vector<int>& digits)
     }
 
     return digits;
+}
+
+// 67. Add Binary
+string addBinary(string a, string b)
+{
+    string result;
+    unsigned char carry = 0;
+    for (string::reverse_iterator p = a.rbegin(), q = b.rbegin(); p != a.rend() || q != b.rend() || carry != 0; )
+    {
+        unsigned char val = (p == a.rend() ? 0 : *p++ - '0') + (q == b.rend() ? 0 : *q++ - '0') + carry;
+        result.insert(0, 1, (val & 1) + '0');
+        carry = val >> 1;
+    }
+
+    return result;
+}
+string addBinary2(string a, string b)
+{
+    string result;
+    unsigned char carry = 0;
+    for (int i = a.size() - 1, j = b.size() - 1, val; i >= 0 || j >= 0 || carry != 0; carry = val >> 1)
+    {
+        val = (i >= 0 ? a[i--] - '0' : 0) + (j >= 0 ? b[j--] - '0' : 0) + carry;
+        result.insert(0, 1, (val & 1) + '0');
+    }
+
+    return result;
+}
+
+// 68. Text Justification
+vector<string> fullJustify(vector<string>& words, int maxWidth)
+{
+    vector<string> justifiedText;
+
+    for (unsigned i = 0, j, lineWordsLength = 0; i < words.size(); i = j, lineWordsLength = 0) // lineWordsLength doesn't count whitespace
+    {
+        // Starting from word[i], add as many words as possible to current line, when loop ends, word[j] is the first word of next line.
+        for (j = i; j < words.size() && lineWordsLength + words[j].size() + (j - i) <= maxWidth; lineWordsLength += words[j++].size());
+
+        // Justify current line, which is composed by words[i .. j-1], with a total of (maxWidth - lineWordsLength) whitespace.
+        string line;
+        for (unsigned k = i, totalSpace = maxWidth - lineWordsLength; k < j; ++k)
+        {
+            line.append(words[k]);
+
+            if (k < j - 1)
+            {
+                int padding = 1;
+                if (j < words.size())// when j == words.size(), means we are current processing last line
+                {
+                    // j-k-1 is the count of remaining slots.
+                    int slots = j - k - 1;
+                    padding = totalSpace % slots == 0 ? totalSpace / slots : 1 + (totalSpace / slots);
+                    totalSpace -= padding;
+                }
+
+                line.append(padding, ' ');
+            }
+        }
+
+        // If we are processing last line, or a line only has 1 word, now pad trailing whitespace up to maxWidth.
+        // otherwise, here line.size() should equal to maxWidth, so no trailing padding will be made.
+        line.append(maxWidth - line.size(), ' ');
+        justifiedText.push_back(line);
+    }
+
+    return justifiedText;
 }
 
 // 144. Binary Tree Preorder Traversal

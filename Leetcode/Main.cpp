@@ -77,6 +77,8 @@ extern int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid);
 extern int minPathSum(vector<vector<int>>& grid);
 extern bool isNumber(string s);
 extern vector<int> plusOne(vector<int>& digits);
+extern string addBinary(string a, string b);
+extern vector<string> fullJustify(vector<string>& words, int maxWidth);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 
