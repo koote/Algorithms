@@ -2819,29 +2819,31 @@ vector<string> fullJustify(vector<string>& words, int maxWidth)
         // Starting from word[i], add as many words as possible to current line, when loop ends, word[j] is the first word of next line.
         for (j = i; j < words.size() && lineWordsLength + words[j].size() + (j - i) <= maxWidth; lineWordsLength += words[j++].size());
 
-        // Justify current line, which is composed by words[i .. j-1], with a total of (maxWidth - lineWordsLength) whitespace.
-        string line;
-        for (unsigned k = i, totalSpace = maxWidth - lineWordsLength; k < j; ++k)
+        // Now justify current line, which is composed by words[i .. j-1], with a total of (maxWidth - lineWordsLength) whitespace.
+        string line = words[i];
+        for (unsigned k = i + 1; k < j; ++k) // we start from i+1 so if current line only have 1 word, no inter-word padding will be made.
         {
-            line.append(words[k]);
+            int paddingSize = 1;
 
-            if (k < j - 1)
+            // When j == words.size(), current line is the last line, should only have 1 whitespace between words, no padding actually.
+            // Only need to calculate padding size when current line is not the last line.
+            if (j < words.size())
             {
-                int padding = 1;
-                if (j < words.size())// when j == words.size(), means we are current processing last line
-                {
-                    // j-k-1 is the count of remaining slots.
-                    int slots = j - k - 1;
-                    padding = totalSpace % slots == 0 ? totalSpace / slots : 1 + (totalSpace / slots);
-                    totalSpace -= padding;
-                }
-
-                line.append(padding, ' ');
+                // j-k is the count of remaining padding slots. First we calculate average count of whitespace, e.g. if we have total of 10
+                // whitespace and 4 slots (5 words), average count of whitespace = 10/4 = 2, so every two words have 2 whitespace, but it
+                // is not done yet, still need to check if reminder is 0 or not, if not, means there are some whitespace cannot be distributed
+                // among slots evenly, according to problem, left slots should have more whitespace than right, so in this example, 2+1=3, then
+                // remaining slots becomes 3 and remaining count of whitespace become 10-3=7, repeat this process we get distribution array 
+                // [3, 3, 2, 2].
+                paddingSize = (maxWidth - lineWordsLength) / (j - k) + ((maxWidth - lineWordsLength) % (j - k) != 0 ? 1 : 0);
+                lineWordsLength += paddingSize;
             }
+
+            line.append(paddingSize, ' ').append(words[k]);
         }
 
         // If we are processing last line, or a line only has 1 word, now pad trailing whitespace up to maxWidth.
-        // otherwise, here line.size() should equal to maxWidth, so no trailing padding will be made.
+        // otherwise, here line.size() should equal to maxWidth after above loop, thus no trailing padding will be made.
         line.append(maxWidth - line.size(), ' ');
         justifiedText.push_back(line);
     }
