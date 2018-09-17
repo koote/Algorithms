@@ -79,6 +79,7 @@ extern bool isNumber(string s);
 extern vector<int> plusOne(vector<int>& digits);
 extern string addBinary(string a, string b);
 extern vector<string> fullJustify(vector<string>& words, int maxWidth);
+extern int mySqrt(int x);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 

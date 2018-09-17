@@ -2787,7 +2787,7 @@ string addBinary(string a, string b)
 {
     string result;
     unsigned char carry = 0;
-    for (string::reverse_iterator p = a.rbegin(), q = b.rbegin(); p != a.rend() || q != b.rend() || carry != 0; )
+    for (string::const_reverse_iterator p = a.rbegin(), q = b.rbegin(); p != a.rend() || q != b.rend() || carry != 0; )
     {
         unsigned char val = (p == a.rend() ? 0 : *p++ - '0') + (q == b.rend() ? 0 : *q++ - '0') + carry;
         result.insert(0, 1, (val & 1) + '0');
@@ -2836,6 +2836,9 @@ vector<string> fullJustify(vector<string>& words, int maxWidth)
                 // remaining slots becomes 3 and remaining count of whitespace become 10-3=7, repeat this process we get distribution array 
                 // [3, 3, 2, 2].
                 paddingSize = (maxWidth - lineWordsLength) / (j - k) + ((maxWidth - lineWordsLength) % (j - k) != 0 ? 1 : 0);
+
+                // update lineWordsLength to reflect the whitespace we are about to pad in current iteration, so in next iteration 
+                // we can get correct count of remaining whitespace.
                 lineWordsLength += paddingSize;
             }
 
@@ -2849,6 +2852,69 @@ vector<string> fullJustify(vector<string>& words, int maxWidth)
     }
 
     return justifiedText;
+}
+
+// 69. Sqrt(x)
+int mySqrtBinarySearch(int x)
+{
+    for (unsigned left = 1, right = x; left <= right; )
+    {
+        unsigned mid = (left + right) / 2;
+        if (mid == x / mid)
+        {
+            return mid;
+        }
+        else if (mid > x / mid)
+        {
+            right = mid - 1;
+        }
+        else // mid * mid < x
+        {
+            if ((mid + 1) > x / (mid + 1))
+            {
+                return mid;
+            }
+
+            left = mid + 1;
+        }
+    }
+
+    return 0;
+}
+int mySqrtNewton(int x)
+{
+    unsigned r = x;
+    for (; r > 0 && x > 0 && r > x / r; r = (r + x / r) / 2);
+    return r;
+}
+int mySqrt(int x)
+{
+    // No matter binary search or Newton iterative, they all start from an initial value that is greater than
+    // sqrt(x), then keep iterating to get more and more close to answer. So choosing a initial value that as
+    // much close to answer as possible can improve performance. The easiest is starting from x, since always
+    // have 0 <= sqrt(x) <= x (x >= 0), Can we easily get an initial value smaller than x?
+    // Let's assume (x/2^k) > sqrt(x), so we can get x > 2^(2k), it means, if we know x is greater than a power
+    // of 2, say 2^n, we can start from x / 2^(n/2), which is proved to be greater than sqrt(x).
+    //
+    // To find the maximum 2^n < x, we search for the most signicant bit of 1, and count of 1s. The reason is
+    // if there is only one 1, it means x is a power of 2, e.g. 8 = 2^3, so the maximum power of 2 that smaller
+    // than x, is 2^(3-1) = 2^2 = 4.
+    int msb = -1;
+    int countofOne = 0;
+    for (unsigned i = 0, y = x; i < 31 && y > 0; ++i, y >>= 1)
+    {
+        if (y & 1)
+        {
+            msb = i;
+            ++countofOne;
+        }
+    }
+
+    unsigned startValue = x;
+    for (unsigned half = (countofOne == 1 ? msb - 1 : msb) / 2; half > 0; startValue >>= 1, --half);
+
+    // we can pass the startValue into sub functions or just paste the code into sub functions to get startValue.
+    return mySqrtNewton(x);
 }
 
 // 144. Binary Tree Preorder Traversal
