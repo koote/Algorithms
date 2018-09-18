@@ -80,6 +80,8 @@ extern vector<int> plusOne(vector<int>& digits);
 extern string addBinary(string a, string b);
 extern vector<string> fullJustify(vector<string>& words, int maxWidth);
 extern int mySqrt(int x);
+extern int climbStairs(int n);
+extern string simplifyPath(string& path);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 

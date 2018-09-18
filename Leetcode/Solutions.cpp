@@ -2917,6 +2917,94 @@ int mySqrt(int x)
     return mySqrtNewton(x);
 }
 
+// 70. Climbing Stairs
+// Let dp[n] is the different ways to reach stair n, then dp[n] = dp[n-1] + dp[n-2]. Since for each dp[i] only needs
+// dp[i-1] and dp[i-2] so no need to allocate an array.
+int climbStairs(int n)
+{
+    int dp0 = 1;
+    int dp = 1;
+    for (; n > 1; --n) // dp[1] == 1, we have manually set it, so iteration ends when n == 1.
+    {
+        int next = dp0 + dp;
+        dp0 = dp;
+        dp = next;
+    }
+
+    return dp;
+}
+
+// 71. Simplify Path
+string simplifyPathWithStack(string& path)
+{
+    vector<string> stack; // slash, no matter it is root or not, will not be pushed to stack. Note std::stack doesn't support iteration.
+    for (unsigned i = 0, j; i < path.length(); i = j)
+    {
+        if (path[i] == '/')
+        {
+            for (j = i; j < path.length() && path[j] == '/'; ++j);  // consecutive slashes are treated as one slash.
+        }
+        else
+        {
+            for (j = i; j < path.length() && path[j] != '/'; ++j);
+            string fraction = path.substr(i, j - i);
+            if (fraction == "..")
+            {
+                if (stack.empty() == false)
+                {
+                    stack.pop_back();
+                }
+            }
+            else if (fraction != ".")
+            {
+                stack.push_back(fraction);
+            }
+        }
+    }
+
+    string result;
+    for (string fraction : stack)
+    {
+        result.append("/").append(fraction);
+    }
+
+    return result.empty() ? "/" : result;
+}
+string simplifyPathWithoutStack(string& path)
+{
+    string result;
+    for (int i = 0, j, k; i < path.length(); i = j)
+    {
+        if (path[i] == '/')
+        {
+            for (j = i; j < path.length() && path[j] == '/'; ++j);
+        }
+        else
+        {
+            for (j = i; j < path.length() && path[j] != '/'; ++j);
+            string fraction = path.substr(i, j - i);
+            if (fraction == "..")
+            {
+                for (k = result.length() - 1; k >= 0 && result[k] != '/'; --k);
+                if (k >= 0)
+                {
+                    result.resize(k);
+                }
+            }
+            else if (fraction != ".")
+            {
+                result.append("/").append(fraction);
+            }
+        }
+    }
+
+    return result.empty() ? "/" : result;
+}
+string simplifyPath(string& path)
+{
+    // Note that Unix like system accepts >= 3 dots as folder name while Windows doesn't.
+    return simplifyPathWithoutStack(path);
+}
 // 144. Binary Tree Preorder Traversal
 vector<int> preorderTraversal(TreeNode* root)
 {
