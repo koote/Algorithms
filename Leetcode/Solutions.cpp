@@ -1917,7 +1917,7 @@ vector<vector<int>> permuteUnique(vector<int>& nums)
 }
 
 // 48. Rotate Image
-// this solution rotate coil by coil, start from outmost coil.
+// this solution rotate coil by coil, start from out most coil.
 void clockwiseRotateByCoil(vector<vector<int>>& matrix)
 {
     // Generally, for element matrix[i][j], it will be moved to matrix[j][n-i-1] after rotation, oppositely, for location
@@ -2680,7 +2680,7 @@ int minPathSum(vector<vector<int>>& grid)
         }
     }
 
-    return dp[grid.size() - 1][grid[0].size() - 1];
+    return dp.back().back();
 }
 
 // 65. Valid Number
@@ -3005,6 +3005,81 @@ string simplifyPath(string& path)
     // Note that Unix like system accepts >= 3 dots as folder name while Windows doesn't.
     return simplifyPathWithoutStack(path);
 }
+
+// 72. Edit Distance
+int minDistanceRecursive(string word1, string word2)
+{
+    if (word1.empty())
+    {
+        return word2.length();
+    }
+
+    if (word2.empty())
+    {
+        return word1.length();
+    }
+
+    if (word1.front() == word2.front())
+    {
+        return minDistanceRecursive(word1.substr(1), word2.substr(1));
+    }
+
+    // delete first character from word1
+    int d = 1 + minDistanceRecursive(word1.substr(1), word2);
+
+    // replace word1's first character with word2's first character
+    int r = 1 + minDistanceRecursive(word1.substr(1), word2.substr(1));
+
+    // insert word2's first character to word1's front (which is equal to move word2 forward by 1 character).
+    int i = 1 + minDistanceRecursive(word1, word2.substr(1));
+
+    return min(d, min(r, i)); // nest min to workaround leetcode system error.
+}
+int minDistanceDP(string& word1, string& word2)
+{
+    vector<vector<unsigned>> dp(word1.length() + 1, vector<unsigned>(word2.length() + 1));
+
+    for (unsigned j = 0; j < dp[0].size(); ++j)
+    {
+        dp[0][j] = j;
+    }
+
+    for (unsigned i = 0; i < dp.size(); ++i)
+    {
+        dp[i][0] = i;
+    }
+
+    for (unsigned i = 1; i < dp.size(); ++i)
+    {
+        for (unsigned j = 1; j < dp[i].size(); ++j)
+        {
+            if (word1[i - 1] == word2[j - 1])
+            {
+                dp[i][j] = dp[i - 1][j - 1];
+            }
+            else
+            {
+                // delete word[i-1]
+                unsigned d = dp[i - 1][j] + 1;
+
+                // replace word1[i-1] with word2[j-1]
+                unsigned r = dp[i - 1][j - 1] + 1;
+
+                // insert word[j-1] to word1[i-1]
+                unsigned s = dp[i][j - 1] + 1;
+
+                dp[i][j] = min(d, min(r, s));
+            }
+        }
+    }
+
+    return dp.back().back();
+}
+int minDistance(string word1, string word2)
+{
+    return minDistanceDP(word1, word2);
+}
+
 // 144. Binary Tree Preorder Traversal
 vector<int> preorderTraversal(TreeNode* root)
 {
