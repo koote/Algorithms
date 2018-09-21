@@ -3024,26 +3024,29 @@ int minDistanceRecursive(string word1, string word2)
         return minDistanceRecursive(word1.substr(1), word2.substr(1));
     }
 
-    // delete first character from word1
+    // delete first character from word1, word1 moves forward by 1 character
     int d = 1 + minDistanceRecursive(word1.substr(1), word2);
 
-    // replace word1's first character with word2's first character
+    // replace word1's first character with word2's first character, both move forward by 1 character
     int r = 1 + minDistanceRecursive(word1.substr(1), word2.substr(1));
 
     // insert word2's first character to word1's front (which is equal to move word2 forward by 1 character).
     int i = 1 + minDistanceRecursive(word1, word2.substr(1));
 
-    return min(d, min(r, i)); // nest min to workaround leetcode system error.
+    return min(d, min(r, i));
 }
-int minDistanceDP(string& word1, string& word2)
+int minDistanceDP2D(string& word1, string& word2)
 {
+    // Defines DP[i][j] as the minimum edit distance between word1[0..i-1] and word2[0..j-1], allocate DP array with one additional row and column.
     vector<vector<unsigned>> dp(word1.length() + 1, vector<unsigned>(word2.length() + 1));
 
+    // it means, when word1 is empty, then minimum edit distance between word1 and word2, is depends on length of word2.
     for (unsigned j = 0; j < dp[0].size(); ++j)
     {
         dp[0][j] = j;
     }
 
+    // it means, when word2 is empty, then minimum edit distance between word1 and word2, is depends on length of word1.
     for (unsigned i = 0; i < dp.size(); ++i)
     {
         dp[i][0] = i;
@@ -3074,6 +3077,49 @@ int minDistanceDP(string& word1, string& word2)
     }
 
     return dp.back().back();
+}
+int minDistanceDP(string& word1, string& word2)
+{
+    // previous solution use a 2 dimensions array, for dp[i][j], actually only use its top element, top left element and left element,
+    // so we can use a 1 dimension array to store previous row plus an integer to store dp[i][j-1], thus we can reduce space complexity.
+    vector<unsigned> dp(word2.length() + 1);
+
+    for (unsigned i = 0; i < dp.size(); ++i)
+    {
+        dp[i] = i;
+    }
+
+    for (unsigned i = 1; i <= word1.length(); ++i)
+    {
+        dp[0] = i;
+        for (unsigned j = 1, topleft = i - 1; j < dp.size(); ++j)
+        {
+            // when a cell dp[j] hasn't been changed, itself is dp[i-1][j], its left cell's current value is dp[i][j-1], left cell's previous
+            // value (saved in topleft) is dp[i-1][j-1].
+            unsigned temp = dp[j];
+            if (word1[i - 1] == word2[j - 1])
+            {
+                dp[j] = topleft;
+            }
+            else
+            {
+                // delete word[i-1]
+                unsigned d = dp[j] + 1;
+
+                // replace word1[i-1] with word2[j-1]
+                unsigned r = topleft + 1;
+
+                // insert word[j-1] to word1[i-1]
+                unsigned s = dp[j - 1] + 1;
+
+                dp[j] = min(d, min(r, s));
+            }
+
+            topleft = temp;
+        }
+    }
+
+    return dp.back();
 }
 int minDistance(string word1, string word2)
 {
