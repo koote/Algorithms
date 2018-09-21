@@ -3096,7 +3096,7 @@ int minDistanceDP(string& word1, string& word2)
         {
             // when a cell dp[j] hasn't been changed, itself is dp[i-1][j], its left cell's current value is dp[i][j-1], left cell's previous
             // value (saved in topleft) is dp[i-1][j-1].
-            unsigned temp = dp[j];
+            unsigned temp = dp[j]; //dp[j]'s before-change value is dp[j+1]'s topleft dp[i-1][j-1].
             if (word1[i - 1] == word2[j - 1])
             {
                 dp[j] = topleft;
@@ -3154,6 +3154,99 @@ vector<int> preorderTraversal(TreeNode* root)
     }
 
     return result;
+}
+
+// 73. Set Matrix Zeros
+void setZeroesUseExtraSpace(vector<vector<int>>& matrix)
+{
+    vector<unsigned> rows(matrix.size(), 0);
+    vector<unsigned> cols(matrix[0].size(), 0);
+
+    for (unsigned i = 0; i < matrix.size(); ++i)
+    {
+        for (unsigned j = 0; j < matrix[i].size(); ++j)
+        {
+            if (matrix[i][j] == 0)
+            {
+                rows[i] = 1;
+                cols[j] = 1;
+            }
+        }
+    }
+
+    for (unsigned i = 0; i < matrix.size(); ++i)
+    {
+        for (unsigned j = 0; j < matrix[i].size(); ++j)
+        {
+            if (rows[i] == 1 || cols[j] == 1)
+            {
+                matrix[i][j] = 0;
+            }
+        }
+    }
+}
+void setZeroesNoExtraSpace(vector<vector<int>>& matrix)
+{
+    // Idea is to use first column to mark rows that need to be cleared.
+    bool clearFirstColumn = false;
+    for (unsigned i = 0; i < matrix.size(); ++i)
+    {
+        if (matrix[i][0] == 0)
+        {
+            clearFirstColumn = true;
+            break;
+        }
+    }
+
+    // Go through column 1 -> column n
+    for (unsigned j = 1, i; j < matrix[0].size(); ++j)
+    {
+        bool clearnCurrentColumn = false;
+        for (i = 0; i < matrix.size(); ++i)
+        {
+            // When matrix[i][j] == 0, row i and column j will be cleared. For row i, set matrix[i][0] to 0, row i will be cleared later.
+            // For column j, it will be cleared now.
+            if (matrix[i][j] == 0)
+            {
+                clearnCurrentColumn = true;
+                matrix[i][0] = 0;
+            }
+        }
+
+        // Clear current column
+        if (clearnCurrentColumn)
+        {
+            for (i = 0; i < matrix.size(); ++i)
+            {
+                matrix[i][j] = 0;
+            }
+        }
+    }
+
+    // Now clear rows. Go through column 0, for matrix[i][0] == 0, set row i to 0
+    for (unsigned i = 0; i < matrix.size(); ++i)
+    {
+        if (matrix[i][0] == 0)
+        {
+            for (unsigned j = 1; j < matrix[i].size(); ++j)
+            {
+                matrix[i][j] = 0;
+            }
+        }
+    }
+
+    // finally check if column 0 should be cleared also.
+    if (clearFirstColumn)
+    {
+        for (unsigned i = 0; i < matrix.size(); ++i)
+        {
+            matrix[i][0] = 0;
+        }
+    }
+}
+void setZeroes(vector<vector<int>>& matrix)
+{
+    return setZeroesNoExtraSpace(matrix);
 }
 
 // 226. Invert Binary Tree

@@ -83,6 +83,7 @@ extern int mySqrt(int x);
 extern int climbStairs(int n);
 extern string simplifyPath(string& path);
 extern int minDistance(string word1, string word2);
+extern void setZeroes(vector<vector<int>>& matrix);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 
