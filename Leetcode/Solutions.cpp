@@ -2040,7 +2040,7 @@ void dpsSearchNQueen(vector<vector<unsigned>>& results, vector<unsigned>& path, 
         bool invalid = false;
         for (unsigned i = 0; i < currentRow && !invalid; ++i)
         {
-            invalid = path[i] == j || i + path[i] == currentRow + j || (int)(i - path[i]) == (int)(currentRow - j);
+            invalid = path[i] == j || i + path[i] == currentRow + j || static_cast<int>(i - path[i]) == static_cast<int>(currentRow - j);
         }
 
         if (!invalid)
@@ -2478,11 +2478,11 @@ vector<vector<int>> generateMatrix(const int n)
 // elements into 4 groups: 
 //              {1, x, x, x} | {2, x, x, x} | {3, x, x, x} | {4, x, x, x}
 //                 0 - 5     |    6 - 11    |    12 - 18   |    19 - 23
-//.Let's say k = 8, first decrease k by 1 since index starts from 0, the kth element cannot from first group since it 
+//.Let's say k = 8, first decrease k by 1 since index starts from 0, the k-th element cannot from first group since it 
 // only has 6 elements, it falls into second group {2, x, x, x}'s range, here we get 2 things: (a)the kth permutation's
 // first number is 2; (b)k % 6 = 1, the kth permutation is the 2nd element inside second group {2, x, x, x}.
 // Now we only have 3 candidates: 1, 3, 4, likewise there are 3 groups: {1, x, x}, {3, x, x} and {4, x, x}, each group
-// has 2! = 2 elements, since now k = 1 so we know k is from first group, and the kth permutation's second number is 1,
+// has 2! = 2 elements, since now k = 1 so we know k is from first group, and the k-th permutation's second number is 1,
 // new k = 1 % 2 = 1.
 // Now remaining candidates are 3 and 4 and k = 1, there are only 2 groups, {3, 4} and {4, 3}, each group has 1 element,
 // so the kth permutation is in second group {4, 3}, the kth permutation's third number is 4, and new k = 1 % 1 = 0.
@@ -2769,7 +2769,7 @@ vector<int> plusOne(vector<int>& digits)
     unsigned carry = 1;
     for (int i = digits.size() - 1; i >= 0 && carry > 0; --i)
     {
-        int val = digits[i] + carry;
+        const int val = digits[i] + carry;
         digits[i] = val % 10;
         carry = val / 10;
     }
@@ -2859,16 +2859,12 @@ int mySqrtBinarySearch(int x)
 {
     for (unsigned left = 1, right = x; left <= right; )
     {
-        unsigned mid = (left + right) / 2;
-        if (mid == x / mid)
-        {
-            return mid;
-        }
-        else if (mid > x / mid)
+        const unsigned mid = (left + right) / 2;
+        if (mid > x / mid)
         {
             right = mid - 1;
         }
-        else // mid * mid < x
+        else if (mid < x / mid)
         {
             if ((mid + 1) > x / (mid + 1))
             {
@@ -2876,6 +2872,10 @@ int mySqrtBinarySearch(int x)
             }
 
             left = mid + 1;
+        }
+        else
+        {
+            return mid;
         }
     }
 
@@ -2926,7 +2926,7 @@ int climbStairs(int n)
     int dp = 1;
     for (; n > 1; --n) // dp[1] == 1, we have manually set it, so iteration ends when n == 1.
     {
-        int next = dp0 + dp;
+        const int next = dp0 + dp;
         dp0 = dp;
         dp = next;
     }
@@ -2947,10 +2947,10 @@ string simplifyPathWithStack(string& path)
         else
         {
             for (j = i; j < path.length() && path[j] != '/'; ++j);
-            string fraction = path.substr(i, j - i);
+            const string fraction = path.substr(i, j - i);
             if (fraction == "..")
             {
-                if (stack.empty() == false)
+                if (!stack.empty())
                 {
                     stack.pop_back();
                 }
@@ -2963,7 +2963,7 @@ string simplifyPathWithStack(string& path)
     }
 
     string result;
-    for (string fraction : stack)
+    for (const string fraction : stack)
     {
         result.append("/").append(fraction);
     }
@@ -2982,7 +2982,7 @@ string simplifyPathWithoutStack(string& path)
         else
         {
             for (j = i; j < path.length() && path[j] != '/'; ++j);
-            string fraction = path.substr(i, j - i);
+            const string fraction = path.substr(i, j - i);
             if (fraction == "..")
             {
                 for (k = result.length() - 1; k >= 0 && result[k] != '/'; --k);
@@ -3025,13 +3025,13 @@ int minDistanceRecursive(string word1, string word2)
     }
 
     // delete first character from word1, word1 moves forward by 1 character
-    int d = 1 + minDistanceRecursive(word1.substr(1), word2);
+    const int d = 1 + minDistanceRecursive(word1.substr(1), word2);
 
     // replace word1's first character with word2's first character, both move forward by 1 character
-    int r = 1 + minDistanceRecursive(word1.substr(1), word2.substr(1));
+    const int r = 1 + minDistanceRecursive(word1.substr(1), word2.substr(1));
 
     // insert word2's first character to word1's front (which is equal to move word2 forward by 1 character).
-    int i = 1 + minDistanceRecursive(word1, word2.substr(1));
+    const int i = 1 + minDistanceRecursive(word1, word2.substr(1));
 
     return min(d, min(r, i));
 }
@@ -3063,13 +3063,13 @@ int minDistanceDP2D(string& word1, string& word2)
             else
             {
                 // delete word[i-1]
-                unsigned d = dp[i - 1][j] + 1;
+                const unsigned d = dp[i - 1][j] + 1;
 
                 // replace word1[i-1] with word2[j-1]
-                unsigned r = dp[i - 1][j - 1] + 1;
+                const unsigned r = dp[i - 1][j - 1] + 1;
 
                 // insert word[j-1] to word1[i-1]
-                unsigned s = dp[i][j - 1] + 1;
+                const unsigned s = dp[i][j - 1] + 1;
 
                 dp[i][j] = min(d, min(r, s));
             }
@@ -3096,7 +3096,7 @@ int minDistanceDP(string& word1, string& word2)
         {
             // when a cell dp[j] hasn't been changed, itself is dp[i-1][j], its left cell's current value is dp[i][j-1], left cell's previous
             // value (saved in topleft) is dp[i-1][j-1].
-            unsigned temp = dp[j]; //dp[j]'s before-change value is dp[j+1]'s topleft dp[i-1][j-1].
+            const unsigned temp = dp[j]; //dp[j]'s before-change value is dp[j+1]'s topleft dp[i-1][j-1].
             if (word1[i - 1] == word2[j - 1])
             {
                 dp[j] = topleft;
@@ -3104,13 +3104,13 @@ int minDistanceDP(string& word1, string& word2)
             else
             {
                 // delete word[i-1]
-                unsigned d = dp[j] + 1;
+                const unsigned d = dp[j] + 1;
 
                 // replace word1[i-1] with word2[j-1]
-                unsigned r = topleft + 1;
+                const unsigned r = topleft + 1;
 
                 // insert word[j-1] to word1[i-1]
-                unsigned s = dp[j - 1] + 1;
+                const unsigned s = dp[j - 1] + 1;
 
                 dp[j] = min(d, min(r, s));
             }
@@ -3124,36 +3124,6 @@ int minDistanceDP(string& word1, string& word2)
 int minDistance(string word1, string word2)
 {
     return minDistanceDP(word1, word2);
-}
-
-// 144. Binary Tree Preorder Traversal
-vector<int> preorderTraversal(TreeNode* root)
-{
-    vector<int> result;
-    stack<TreeNode*> stk;
-    stk.push(root);
-    while (!stk.empty())
-    {
-        root = stk.top(); // reuse root
-        stk.pop();
-
-        if (root != nullptr)
-        {
-            result.push_back(root->val);
-
-            if (root->right != nullptr)
-            {
-                stk.push(root->right);
-            }
-
-            if (root->left != nullptr)
-            {
-                stk.push(root->left);
-            }
-        }
-    }
-
-    return result;
 }
 
 // 73. Set Matrix Zeros
@@ -3252,7 +3222,7 @@ void setZeroes(vector<vector<int>>& matrix)
 // 74. Search a 2D Matrix
 bool searchMatrix(vector<vector<int>>& matrix, int target)
 {
-    if (matrix.size() == 0 || matrix[0].size() == 0)
+    if (matrix.empty() || matrix[0].empty())
     {
         return false;
     }
@@ -3263,7 +3233,7 @@ bool searchMatrix(vector<vector<int>>& matrix, int target)
     // first search in first column, use binary search
     for (low = 0, high = matrix.size() - 1; low <= high;)
     {
-        int middle = (low + high) / 2;
+        const int middle = (low + high) / 2;
         if (matrix[middle][0] < target)
         {
             low = middle + 1;
@@ -3279,12 +3249,12 @@ bool searchMatrix(vector<vector<int>>& matrix, int target)
     }
 
     // when above loop ends, row[high] is the row
-    int row = high;
+    const int row = high;
     if (row >= 0)
     {
         for (low = 0, high = matrix[row].size() - 1; low <= high;)
         {
-            int middle = (low + high) / 2;
+            const int middle = (low + high) / 2;
             if (matrix[row][middle] < target)
             {
                 low = middle + 1;
@@ -3301,6 +3271,70 @@ bool searchMatrix(vector<vector<int>>& matrix, int target)
     }
 
     return false;
+}
+
+// 75. Sort Colors
+// partitionByPivot is a generic helper function. Given a pivot value, partitioning nums[] into 3 partitions: <pivot, ==pivot, >pivot.
+// This helper function is also the solution of Dutch national flag problem, the key ideal is similar to quick sort partitioning.
+void partitionByPivot(vector<int>& nums, int pivot)
+{
+    // Our goal is to partition nums[] into 3 partitions, less, equal and greater. Initially they are all empty except a temporary 
+    // partition called unprocessed which starts from 0 and ends at nums.size()-1. We keep taking element from unprocessed partition
+    // and inserting into corresponding partition until unprocessed partition becomes empty. Here are the start and end of each
+    // partitions:
+    // [0 .. less] is less partition
+    // [less+1 .. unprocessed-1] is equal partition
+    // [unprocessed .. greater-1] is unprocessed partition
+    // [greater .. nums.size()-1] is greater partition
+    for (int less = -1, unprocessed = 0, greater = nums.size(); unprocessed < greater;)
+    {
+        if (nums[unprocessed] < pivot) // insert to less partition
+        {
+            swap(nums[unprocessed++], nums[++less]); // actually swapping nums[unprocessed] with first element of equal partition.
+        }
+        else if (nums[unprocessed] > pivot) // insert to greater partition.
+        {
+            swap(nums[unprocessed], nums[--greater]);
+        }
+        else // remain in pivot partition, just update unprocessed
+        {
+            ++unprocessed;
+        }
+    }
+}
+void sortColors(vector<int>& nums)
+{
+    return partitionByPivot(nums, 1);
+}
+
+// 144. Binary Tree Preorder Traversal
+vector<int> preorderTraversal(TreeNode* root)
+{
+    vector<int> result;
+    stack<TreeNode*> stk;
+    stk.push(root);
+    while (!stk.empty())
+    {
+        root = stk.top(); // reuse root
+        stk.pop();
+
+        if (root != nullptr)
+        {
+            result.push_back(root->val);
+
+            if (root->right != nullptr)
+            {
+                stk.push(root->right);
+            }
+
+            if (root->left != nullptr)
+            {
+                stk.push(root->left);
+            }
+        }
+    }
+
+    return result;
 }
 
 // 226. Invert Binary Tree

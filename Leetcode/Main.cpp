@@ -85,6 +85,7 @@ extern string simplifyPath(string& path);
 extern int minDistance(string word1, string word2);
 extern void setZeroes(vector<vector<int>>& matrix);
 extern bool searchMatrix(vector<vector<int>>& matrix, int target);
+extern void sortColors(vector<int>& nums);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 
