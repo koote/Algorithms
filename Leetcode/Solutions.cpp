@@ -3314,7 +3314,7 @@ string minWindow(string s, string t)
     unordered_map<char, int> charMap;
     for (char c : t)
     {
-        charMap[c] = charMap.find(c) == charMap.end() ? 1 : charMap[c] + 1;
+        ++charMap[c];
     }
 
     string result;
@@ -3366,6 +3366,53 @@ string minWindow(string s, string t)
                 }
 
                 ++charMap[s[left++]];
+            }
+        }
+    }
+
+    return result;
+}
+string minWindow2(string s, string t)
+{
+    // For every character in t, count its occurrence, since order is not cared.
+    unordered_map<char, int> charMap;
+    for (char c : t)
+    {
+        ++charMap[c];
+    }
+
+    string result;
+    for (unsigned left = 0, right = 0, unusedChars = t.size(); right < s.length(); ++right)
+    {
+        // Expand window's right boundary until get a window s[left..right] that contains all characters in t.
+        if (charMap.find(s[right]) != charMap.end())
+        {
+            if (charMap[s[right]]-- > 0)
+            {
+                --unusedChars;
+            }
+
+            // Keep maintain unusedChars == 0
+            while (unusedChars == 0)
+            {
+                string cur = s.substr(left, right - left + 1);
+                if (result.length() == 0 || cur.length() < result.length())
+                {
+                    result = cur;
+                }
+
+                // Try to retract left boundary. If s[left]'s mapping value < 0, say -1, it means window s[left..right] contains one
+                // additional s[left], so we can shift left boundary by 1 to exclude this additional s[left], thus we get a smaller 
+                // window s[left+1..right] which still contains all characters in t.
+                // By the way if s[left] is not a character in t, obviously also shift left boundary by 1.
+                if (charMap.find(s[left]) == charMap.end())
+                {
+                    ++left;
+                }
+                else if (charMap[s[left++]]++ == 0)
+                {
+                    ++unusedChars;
+                }
             }
         }
     }
