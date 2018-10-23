@@ -3274,8 +3274,7 @@ bool searchMatrix(vector<vector<int>>& matrix, int target)
 }
 
 // 75. Sort Colors
-// partitionByPivot is a generic helper function. Given a pivot value, partitioning nums[] into 3 partitions: <pivot, ==pivot, >pivot.
-// This helper function is also the solution of Dutch national flag problem, the key ideal is similar to quick sort partitioning.
+// partitionByPivot is a generic helper function, given a pivot value, partitioning nums[] into 3 partitions: <pivot, ==pivot, >pivot.
 void partitionByPivot(vector<int>& nums, int pivot)
 {
     // Our goal is to partition nums[] into 3 partitions, less, equal and greater. Initially they are all empty except a temporary 
@@ -3288,11 +3287,12 @@ void partitionByPivot(vector<int>& nums, int pivot)
     // [greater .. nums.size()-1] is greater partition
     for (int less = -1, unprocessed = 0, greater = nums.size(); unprocessed < greater;)
     {
-        if (nums[unprocessed] < pivot) // insert to less partition
+        if (nums[unprocessed] < pivot)
         {
-            swap(nums[unprocessed++], nums[++less]); // actually swapping nums[unprocessed] with first element of equal partition.
+            // When inserting into less partition, actually swapping nums[unprocessed] with first element of equal partition.
+            swap(nums[unprocessed++], nums[++less]);
         }
-        else if (nums[unprocessed] > pivot) // insert to greater partition.
+        else if (nums[unprocessed] > pivot)
         {
             swap(nums[unprocessed], nums[--greater]);
         }
@@ -3305,6 +3305,72 @@ void partitionByPivot(vector<int>& nums, int pivot)
 void sortColors(vector<int>& nums)
 {
     return partitionByPivot(nums, 1);
+}
+
+// 76. Minimum Window Substring
+string minWindow(string s, string t)
+{
+    // For every character in t, count its occurrence, since order is not cared.
+    unordered_map<char, int> charMap;
+    for (char c : t)
+    {
+        charMap[c] = charMap.find(c) == charMap.end() ? 1 : charMap[c] + 1;
+    }
+
+    string result;
+    for (unsigned left = 0, right = 0; right < s.length(); ++right)
+    {
+        // Expand window's right boundary until get a window s[left..right] that contains all characters in t.
+        if (charMap.find(s[right]) != charMap.end())
+        {
+            --charMap[s[right]];
+
+            bool found = true;
+            for (auto c : charMap)
+            {
+                if (c.second > 0)
+                {
+                    found = false;
+                    break;
+                }
+            }
+
+            // We found a window s[left..right] that contains all characters in t.
+            if (found)
+            {
+                // Try to retract left boundary. If s[left]'s mapping value < 0, say -1, it means window s[left..right] contains one
+                // additional s[left], so we can shift left boundary by 1 to exclude this additional s[left], thus we get a smaller 
+                // window s[left+1..right] which still contains all characters in t.
+                // By the way if s[left] is not a character in t, obviously also shift left boundary by 1.
+                for (;left <= right;)
+                {
+                    if (charMap.find(s[left]) == charMap.end())
+                    {
+                        ++left;
+                    }
+                    else if (charMap[s[left]] < 0)
+                    {
+                        ++charMap[s[left]];
+                        ++left;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                string cur = s.substr(left, right - left + 1);
+                if (result.length() == 0 || cur.length() < result.length())
+                {
+                    result = cur;
+                }
+
+                ++charMap[s[left++]];
+            }
+        }
+    }
+
+    return result;
 }
 
 // 144. Binary Tree Preorder Traversal
