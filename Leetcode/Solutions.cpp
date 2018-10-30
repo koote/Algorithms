@@ -1393,7 +1393,7 @@ string countAndSay(int n)
 }
 
 // 39. Combination Sum
-void dfsSearchCombinationSumSolution(vector<int>& candidates, size_t currentIndex, int target, vector<int>& path, vector<vector<int>>& solutions)
+void dfsCombinationSum(vector<int>& candidates, size_t currentIndex, int target, vector<int>& path, vector<vector<int>>& solutions)
 {
     // In this problem, because allow choosing element multiple times, so whether checking target == 0 
     // first or checking currentIndex out of boundary first doesn't matter, won't miss valid combination.
@@ -1414,20 +1414,20 @@ void dfsSearchCombinationSumSolution(vector<int>& candidates, size_t currentInde
     // At each position we have 2 choices: choose the number on current position and keep going; or skip it.
     // Because it is allowed to choose an element multiple times so don't update the currentIndex.
     path.push_back(candidates[currentIndex]);
-    dfsSearchCombinationSumSolution(candidates, currentIndex, target - candidates[currentIndex], path, solutions);
+    dfsCombinationSum(candidates, currentIndex, target - candidates[currentIndex], path, solutions);
     path.pop_back();
-    dfsSearchCombinationSumSolution(candidates, currentIndex + 1, target, path, solutions);
+    dfsCombinationSum(candidates, currentIndex + 1, target, path, solutions);
 }
 vector<vector<int>> combinationSum(vector<int>& candidates, int target)
 {
     vector<vector<int>> solutions;
     vector<int> path;
-    dfsSearchCombinationSumSolution(candidates, 0, target, path, solutions);
+    dfsCombinationSum(candidates, 0, target, path, solutions);
     return solutions;
 }
 
 // 40. Combination Sum II
-void dfsSearchCombinationSum2Solution(vector<int>& candidates, size_t currentIndex, int target, vector<int>& path, vector<vector<int>>& solutions)
+void dfsCombinationSum2(vector<int>& candidates, size_t currentIndex, int target, vector<int>& path, vector<vector<int>>& solutions)
 {
     // Doesn't like problem 39, we must check target == 0 first, otherwise we could miss valid combination.
     // Still using test case: [10,1,2,7,6,5] and target == 8, when currentIndex == 5, next recursion function
@@ -1445,20 +1445,20 @@ void dfsSearchCombinationSum2Solution(vector<int>& candidates, size_t currentInd
     }
 
     path.push_back(candidates[currentIndex]);
-    dfsSearchCombinationSum2Solution(candidates, currentIndex + 1, target - candidates[currentIndex], path, solutions);
+    dfsCombinationSum2(candidates, currentIndex + 1, target - candidates[currentIndex], path, solutions);
     path.pop_back();
 
     // Because in last call, we choose candidates[currentIndex] and may already found a solution. So if 
     // candidates[currentIndex+1] == candidates[currentIndex], need to skip, otherwise will get duplicate solutions.
     for (; currentIndex < candidates.size() - 1 && candidates[currentIndex + 1] == candidates[currentIndex]; ++currentIndex);
-    dfsSearchCombinationSum2Solution(candidates, currentIndex + 1, target, path, solutions);
+    dfsCombinationSum2(candidates, currentIndex + 1, target, path, solutions);
 }
 vector<vector<int>> combinationSum2(vector<int>& candidates, int target)
 {
     sort(candidates.begin(), candidates.end());
     vector<vector<int>> solutions;
     vector<int> path;
-    dfsSearchCombinationSum2Solution(candidates, 0, target, path, solutions);
+    dfsCombinationSum2(candidates, 0, target, path, solutions);
     return solutions;
 }
 
@@ -1817,6 +1817,7 @@ int jump(vector<int>& nums)
 }
 
 // 46. Permutations
+// Solution 1, use recursion
 vector<vector<int>> permuteRecursiveInsertion(vector<int>& nums)
 {
     vector<vector<int>> results;
@@ -1848,6 +1849,7 @@ vector<vector<int>> permuteRecursiveInsertion(vector<int>& nums)
 
     return results;
 }
+// Solution 2, use DFS
 // Given array nums[0, size-1], permutation is, every time we choose an unused element until all elements have been chosen, the
 // order how we choose elements is a permutation. To reuse storage, we use a variable currentIndex to indicates the beginning of
 // unused elements, its left, nums[0 .. currentIndex-1] are the elements we currently have chosen. Every time we choose an element
@@ -1870,7 +1872,7 @@ void dfsPermuteImpl(vector<int>& nums, size_t currentIndex, vector<vector<int>>&
         swap(nums[currentIndex], nums[i]);
     }
 }
-vector<vector<int>> dfsPermute(vector<int>& nums)
+vector<vector<int>> permuteUseDFS(vector<int>& nums)
 {
     // no need to define a vector<int> path since nums itself records current path.
     vector<vector<int>> results;
@@ -1879,7 +1881,7 @@ vector<vector<int>> dfsPermute(vector<int>& nums)
 }
 vector<vector<int>> permute(vector<int>& nums)
 {
-    return dfsPermute(nums);
+    return permuteUseDFS(nums);
 }
 
 // 47. Permutations II
@@ -1894,8 +1896,8 @@ void dfsPermuteUniqueImpl(vector<int>& nums, size_t currentIndex, vector<vector<
     for (size_t i = currentIndex, j; i < nums.size(); ++i)
     {
         // As we did in problem 46, we are going to exchange nums[i] with nums[currentIndex], but we need to make sure that we 
-        // haven't choosen nums[i] before, we check if there is a duplication of nums[i] within range num[currentIndex .. i-1], 
-        // if true, then it means we have choosen nums[i] before so we should not choose it again.
+        // haven't chosen nums[i] before, we check if there is a duplication of nums[i] within range num[currentIndex .. i-1], 
+        // if true, then it means we have chosen nums[i] before so we should not choose it again.
         //
         // PLEASE NOTE that this check is for problem 47 which states nums array has duplications. For problem 46, no need to
         // have this check, just do swapping.
@@ -3308,9 +3310,13 @@ void sortColors(vector<int>& nums)
 }
 
 // 76. Minimum Window Substring
+// Use a dictionary to record occurrence of each unique character in string t, because order of characters in t is not considered.
+// Starting from beginning of string s, for each character that appears in t, decrease the occurrence in dictionary, when the dictionary
+// values are all 0, it means we found a window in s that contains all characters in t.
+// Next step is try to shrink window's size by increase its left boundary, during the time, the dictionary must keep all 0, if not, 
+// current window cannot be smaller, it is time to move right boundary to search for next window.
 string minWindow(string s, string t)
 {
-    // For every character in t, count its occurrence, since order is not cared.
     unordered_map<char, int> charMap;
     for (char c : t)
     {
@@ -3318,106 +3324,109 @@ string minWindow(string s, string t)
     }
 
     string result;
-    for (unsigned left = 0, right = 0; right < s.length(); ++right)
-    {
-        // Expand window's right boundary until get a window s[left..right] that contains all characters in t.
-        if (charMap.find(s[right]) != charMap.end())
-        {
-            --charMap[s[right]];
-
-            bool found = true;
-            for (auto c : charMap)
-            {
-                if (c.second > 0)
-                {
-                    found = false;
-                    break;
-                }
-            }
-
-            // We found a window s[left..right] that contains all characters in t.
-            if (found)
-            {
-                // Try to retract left boundary. If s[left]'s mapping value < 0, say -1, it means window s[left..right] contains one
-                // additional s[left], so we can shift left boundary by 1 to exclude this additional s[left], thus we get a smaller 
-                // window s[left+1..right] which still contains all characters in t.
-                // By the way if s[left] is not a character in t, obviously also shift left boundary by 1.
-                for (;left <= right;)
-                {
-                    if (charMap.find(s[left]) == charMap.end())
-                    {
-                        ++left;
-                    }
-                    else if (charMap[s[left]] < 0)
-                    {
-                        ++charMap[s[left]];
-                        ++left;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                string cur = s.substr(left, right - left + 1);
-                if (result.length() == 0 || cur.length() < result.length())
-                {
-                    result = cur;
-                }
-
-                ++charMap[s[left++]];
-            }
-        }
-    }
-
-    return result;
-}
-string minWindow2(string s, string t)
-{
-    // For every character in t, count its occurrence, since order is not cared.
-    unordered_map<char, int> charMap;
-    for (char c : t)
-    {
-        ++charMap[c];
-    }
-
-    string result;
-    for (unsigned left = 0, right = 0, unusedChars = t.size(); right < s.length(); ++right)
+    for (unsigned left = 0, right = 0, countOfUnusedChars = t.size(); right < s.length(); ++right)
     {
         // Expand window's right boundary until get a window s[left..right] that contains all characters in t.
         if (charMap.find(s[right]) != charMap.end())
         {
             if (charMap[s[right]]-- > 0)
             {
-                --unusedChars;
+                --countOfUnusedChars;
             }
 
-            // Keep maintain unusedChars == 0
-            while (unusedChars == 0)
+            // Found a valid window, try to shrink current window by retracting its left boundary, should keep countOfUnusedChars == 0
+            while (countOfUnusedChars == 0)
             {
-                string cur = s.substr(left, right - left + 1);
-                if (result.length() == 0 || cur.length() < result.length())
+                string currentWindow = s.substr(left, right - left + 1);
+                if (result.length() == 0 || currentWindow.length() < result.length())
                 {
-                    result = cur;
+                    result = currentWindow;
                 }
 
-                // Try to retract left boundary. If s[left]'s mapping value < 0, say -1, it means window s[left..right] contains one
-                // additional s[left], so we can shift left boundary by 1 to exclude this additional s[left], thus we get a smaller 
-                // window s[left+1..right] which still contains all characters in t.
-                // By the way if s[left] is not a character in t, obviously also shift left boundary by 1.
-                if (charMap.find(s[left]) == charMap.end())
+                if (charMap.find(s[left]) == charMap.end()) // s[left] is not in t, it is safe to exclude it from current window.
                 {
                     ++left;
                 }
                 else if (charMap[s[left++]]++ == 0)
                 {
-                    ++unusedChars;
+                    // if s[left] exists in t, and if we are going to exclude it from current window, we need to know if current
+                    // window still contains all characters in t. 
+                    // If charMap[s[left]] < 0, it means window s[left..right] contains one or more additional s[left], it's safe
+                    // to exclude current s[left], s[left+1 .. right] still contains all characters in s.
+                    // If charMap[s[left]] == 0, it means if we exclude s[left], window s[left+1..right] no longer contains all
+                    // characters in s, so this inner loop will end and outer loop starts to expand right boundary to search for
+                    // next valid window.
+                    ++countOfUnusedChars;
                 }
             }
         }
     }
 
     return result;
+}
+
+// 77. Combinations
+// Solution 1, use DFS search
+void dfsCombineImpl(const int n, const int k, vector<vector<int>>& result, vector<int>& path, int currentNumber)
+{
+    if (path.size() == k)
+    {
+        result.push_back(path);
+        return;
+    }
+
+    // Note here we always keep trying from small number to big number. The reason is combination doesn't consider order.
+    // The easiest way to achieve this is for a group of numbers, we only pick up the sorted sequence.
+    for (unsigned i = currentNumber; i <= n; ++i)
+    {
+        path.push_back(i);
+        dfsCombineImpl(n, k, result, path, i + 1); // i + 1 means no duplicate numbers.
+        path.pop_back();
+    }
+}
+vector<vector<int>> combineUseDFS(int n, int k)
+{
+    vector<vector<int>> result;
+    vector<int> path;
+
+    dfsCombineImpl(n, k, result, path, 1);
+    return result;
+}
+// Solution 2, use recursion
+// This is a DP-like thought. Given N numbers, consider Nth number, if choose it, then problem becomes:
+// get all possible combinations of K-1 numbers out of 1, 2, ... N-1; if DON'T choose the Nth number,
+// problem becomes: get all possible combinations of K numbers out of 1, 2, ... N-1. So C(N, K) = C(N-1, K-1) + C(N-1, K)
+vector<vector<int>> combineUseRecursion(int n, int k)
+{
+    if (k > n || k < 0)
+    {
+        return {};
+    }
+
+    if (k == 0)
+    {
+        return { {} };
+    }
+
+    // This we get all possible combinations of K-1 numbers out of 1, 2, ... N-1, back to the analysis at the beginning,
+    // this implies that the number N is chosen, so for each combination here, append number N. Why appending here, since
+    // we need to keep whole sequence sorted order, to make no duplication.
+    vector<vector<int>> results = combineUseRecursion(n - 1, k - 1); 
+    for (vector<int>& c : results)
+    {
+        c.push_back(n);
+    }
+
+    for (vector<int>& c : combineUseRecursion(n - 1, k))
+    {
+        results.push_back(c);
+    }
+
+    return results;
+}
+vector<vector<int>> combine(int n, int k)
+{
+    return combineUseDFS(n, k);
 }
 
 // 144. Binary Tree Preorder Traversal
