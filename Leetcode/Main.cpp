@@ -88,6 +88,7 @@ extern bool searchMatrix(vector<vector<int>>& matrix, int target);
 extern void sortColors(vector<int>& nums);
 extern string minWindow(string s, string t);
 extern vector<vector<int>> combine(int n, int k);
+extern vector<vector<int>> subsets(vector<int>& nums);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 

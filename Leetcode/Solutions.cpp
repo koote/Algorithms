@@ -3386,11 +3386,11 @@ void dfsCombineImpl(const int n, const int k, vector<vector<int>>& result, vecto
 }
 vector<vector<int>> combineUseDFS(int n, int k)
 {
-    vector<vector<int>> result;
+    vector<vector<int>> results;
     vector<int> path;
 
-    dfsCombineImpl(n, k, result, path, 1);
-    return result;
+    dfsCombineImpl(n, k, results, path, 1);
+    return results;
 }
 // Solution 2, use recursion
 // This is a DP-like thought. Given N numbers, consider Nth number, if choose it, then problem becomes:
@@ -3427,6 +3427,31 @@ vector<vector<int>> combineUseRecursion(int n, int k)
 vector<vector<int>> combine(int n, int k)
 {
     return combineUseDFS(n, k);
+}
+
+// 78. Subsets
+void dfsSubsets(vector<vector<int>>& results, vector<int>& path, vector<int>& nums, unsigned currentIndex)
+{
+    if (currentIndex == nums.size()) // all numbers have been used (choose or not choose)
+    {
+        results.push_back(path);
+        return;
+    }
+
+    // At every location(index), we have 2 choices, choose current number or don't choose.
+    dfsSubsets(results, path, nums, currentIndex + 1); // don't choose nums[currentIndex]
+
+    path.push_back(nums[currentIndex]);
+    dfsSubsets(results, path, nums, currentIndex + 1);
+    path.pop_back();
+}
+vector<vector<int>> subsets(vector<int>& nums)
+{
+    vector<vector<int>> results;
+    vector<int> path;
+
+    dfsSubsets(results, path, nums, 0);
+    return results;
 }
 
 // 144. Binary Tree Preorder Traversal
