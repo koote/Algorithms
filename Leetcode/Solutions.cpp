@@ -1855,17 +1855,19 @@ vector<vector<int>> permuteRecursiveInsertion(vector<int>& nums)
 // unused elements, its left, nums[0 .. currentIndex-1] are the elements we currently have chosen. Every time we choose an element
 // in nums[currentIndex .. size-1] and exchange it with nums[currentIndex], treated this process as 'choose an unused element',
 // update currentIndex to currentIndex+1, and keep repeating this process until currentIndex == size, we get one permutation.
-void dfsPermuteImpl(vector<int>& nums, size_t currentIndex, vector<vector<int>>& results)
+void dfsPermuteImpl(vector<int>& nums, unsigned currentIndex, vector<vector<int>>& results)
 {
-    if (currentIndex == nums.size() - 1)
+    if (currentIndex == nums.size())
     {
         results.push_back(nums);
         return;
     }
 
-    // respectively choose nums[currentIndex], nums[currentIndex + 1], ... nums[size-1], exchange it with nums[currentIndex]
-    // (first element of range), then continue the process for range [currentIndex+1 .. size-1].
-    for (size_t i = currentIndex, j; i < nums.size(); ++i)
+    // currentIndex split whole nums array into 2 parts, nums[0..curentIndex-1] contains the numbers we have chosen and also that range
+    // forms a partial permutation. At every step (currentIndex), we have N-currentIndex choices, we can choose any one of nums[currentIndex .. N-1].
+    // So here respectively choose nums[currentIndex], nums[currentIndex + 1], ... nums[N-1], exchange it with nums[currentIndex] which
+    // means we choose it, then continue the process for nums[currentIndex+1 .. N-1].
+    for (unsigned i = currentIndex; i < nums.size(); ++i)
     {
         swap(nums[currentIndex], nums[i]);
         dfsPermuteImpl(nums, currentIndex + 1, results);
@@ -1874,7 +1876,7 @@ void dfsPermuteImpl(vector<int>& nums, size_t currentIndex, vector<vector<int>>&
 }
 vector<vector<int>> permuteUseDFS(vector<int>& nums)
 {
-    // no need to define a vector<int> path since nums itself records current path.
+    // no need to define a vector<int> to record current path since nums itself records current path.
     vector<vector<int>> results;
     dfsPermuteImpl(nums, 0, results);
     return results;
@@ -3411,7 +3413,7 @@ vector<vector<int>> combineUseRecursion(int n, int k)
     // This we get all possible combinations of K-1 numbers out of 1, 2, ... N-1, back to the analysis at the beginning,
     // this implies that the number N is chosen, so for each combination here, append number N. Why appending here, since
     // we need to keep whole sequence sorted order, to make no duplication.
-    vector<vector<int>> results = combineUseRecursion(n - 1, k - 1); 
+    vector<vector<int>> results = combineUseRecursion(n - 1, k - 1);
     for (vector<int>& c : results)
     {
         c.push_back(n);
@@ -3438,11 +3440,11 @@ void dfsSubsets(vector<vector<int>>& results, vector<int>& path, vector<int>& nu
         return;
     }
 
-    // At every location(index), we have 2 choices, choose current number or don't choose.
+    // Not like DFS permutation, at every step(index), we only have 2 choices, choose current number or don't choose.
     dfsSubsets(results, path, nums, currentIndex + 1); // don't choose nums[currentIndex]
 
     path.push_back(nums[currentIndex]);
-    dfsSubsets(results, path, nums, currentIndex + 1);
+    dfsSubsets(results, path, nums, currentIndex + 1); // choose nums[currentIndex]
     path.pop_back();
 }
 vector<vector<int>> subsets(vector<int>& nums)
@@ -3452,6 +3454,52 @@ vector<vector<int>> subsets(vector<int>& nums)
 
     dfsSubsets(results, path, nums, 0);
     return results;
+}
+
+// 79. Word Search
+bool dfsSearchWord(vector<vector<char>>& board,const string& word, unsigned currentIndex, int i, int j)
+{
+    if (board[i][j] == '*' || board[i][j] != word[currentIndex])
+    {
+        return false;
+    }
+
+    if (currentIndex == word.length() - 1)
+    {
+        return true;
+    }
+
+    char current = board[i][j];
+    board[i][j] = '*';
+
+    if ((i > 0 && dfsSearchWord(board, word, currentIndex + 1, i - 1, j)) ||                    //top
+        (j < board[i].size() - 1 && dfsSearchWord(board, word, currentIndex + 1, i, j + 1)) ||  //right
+        (i < board.size() - 1 && dfsSearchWord(board, word, currentIndex + 1, i + 1, j)) ||     //bottom
+        (j > 0 && dfsSearchWord(board, word, currentIndex + 1, i, j - 1)))                      //left
+    {
+        return true;
+    }
+
+    // When current location cannot proceed after having tried all 4 directions, we must restore current board[i][j], 
+    // we only change cell to * for the cells on current path, this is very important! It is because current cell 
+    // may be visited later and could be a valid cell in the future when current path expands.
+    board[i][j] = current;
+    return false;
+}
+bool exist(vector<vector<char>>& board, string word)
+{
+    for (unsigned i = 0; i < board.size(); ++i)
+    {
+        for (unsigned j = 0; j < board[i].size(); ++j)
+        {
+            if (board[i][j] == word[0] && dfsSearchWord(board, word, 0, i, j)) // start to search
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 // 144. Binary Tree Preorder Traversal
