@@ -833,7 +833,7 @@ ListNode* swapPairs(ListNode* head)
     ListNode dummy(0);
     dummy.next = head;
 
-    // What will be swaped are p->next and q->next.
+    // What will be swapped are p->next and q->next.
     // check q is null is only for empty list. check q->next is null is really needed for non empty list.
     for (ListNode* p = &dummy, *q = head; q != nullptr && q->next != nullptr;)
     {
@@ -869,7 +869,7 @@ ListNode* reverseKGroup(ListNode* head, int k)
             p = r->next;
             r->next = q->next;
 
-            // reuse q and p for linked list reversing. p is q's succeedor
+            // reuse q and p for linked list reversing. p is q's succeeder
             for (n = k - 1, q = r; n > 0; --n)
             {
                 ListNode* temp = p->next;
@@ -888,15 +888,33 @@ ListNode* reverseKGroup(ListNode* head, int k)
 }
 
 // 26. Remove Duplicates from Sorted Array
-int removeDuplicates(vector<int>& nums)
+// Here is the generic solution for remove duplicates (only allow k duplicates) from sorted array. It leverages the truth
+// that array is sorted. For every number, it can only duplicated for k times, problem 26 is when k==1, problem 80 is when
+// k==2.
+// nums[0..last-1] is the range that have been packed. Back to the truth of array is sorted and a number is only allowed to
+// duplicate for k times, so we have two facts:
+// (1) When last < k, it is impossbile to have a number duplicated more than k times, just append num to end of packed range.
+// (2) When last >= k, means packed range already has no less than k elements, need to check before appending num, here is
+//     the key point, since num[0 .. last-1] is also sorted, so we compare num[last-k] and num. if num[last-k] == num, it means
+//     if we put num on nums[last], nums[last-k .. last] are all equal to num, so num is duplicated k+1 times, which is not 
+//     allowed, so num should be skipped and last keeps unchanged; otherwise if num[last-k] < num, it is safe to append num.
+// At last since last always points to the next location of end of packed range, so last is the packed range length.
+int removeDuplicatesK(vector<int>& nums, int k)
 {
-    int last = -1;
-    for (size_t probe = 0; probe < nums.size(); nums.at(++last) = nums.at(probe++))
+    int last = 0;
+    for (int num : nums)
     {
-        for (; probe + 1 < nums.size() && nums.at(probe + 1) == nums.at(probe); ++probe);
+        if (last < k || num > nums[last - k])
+        {
+            nums[last++] = num;
+        }
     }
 
-    return last + 1;
+    return last;
+}
+int removeDuplicates(vector<int>& nums)
+{
+    return removeDuplicatesK(nums, 1);
 }
 
 // 27. Remove Element
@@ -1680,7 +1698,7 @@ string multiply(string num1, string num2)
     return multiplyOptimized(num1, num2);
 }
 
-// 44. Wildcard Matching
+// 44. Wild card Matching
 bool isMatch_Wildcard_Recurisve(string text, string pattern)
 {
     if (pattern.length() == 0)
@@ -1718,8 +1736,9 @@ Consider this case:
     text ..........................................................
     pattern ......*.......................*...*.....*..
             0     j                       l           n-1
-Let's use two * as example, assuming pattern[0 .. j] matches text[i-j .. i], now encounter a '*' at pattern[j], in recursive solution, a '*' means
-branching, because a '*' can be empty, or 1 character, 2 characters, etc., so algorithm needs to try all possible cases, like this:
+Let's use two * as example, assuming pattern[0 .. j] matches text[i-j .. i], now encounter a '*' at pattern[j], in recursive solution, a '*'
+means branching, because a '*' can be empty, or 1 character, 2 characters, etc., so recursive algorithm needs to try all possible cases, like
+this:
 it first tries to match pattern[j+1 .. n-1] with text[i .. m-1],
 if fails, it tries to match pattern[j+1 .. n-1] with text[i+1 .. m-1],
 if fails, then tries to match pattern[j+1 .. n-1] with text[i + 2.. m-1], etc.
@@ -1738,7 +1757,7 @@ If we draw this process in tree, piece of the tree looks like this:
 
 We found that, when matching pattern[l+1 .. n-1] with text[k .. m-1], the process includes matching pattern[l+1 .. n-1] with text[k+1 .. m-1],
 matching pattern[l+1 .. n-1] with text[k+2 .. m-1], etc., if pattern[l+1 .. n-1] cannot match with text[k .. m-1], rolling back to first '*' at
-pattern[j] is totally useless, so we can get the conlusion: everytime when mismatch happens, only need to roll back to nearest '*', if we tried
+pattern[j] is totally useless, so we can get the conclusion: every time when mismatch happens, only need to roll back to nearest '*', if we tried
 all possible branches of nearest '*' but cannot match, we can say the whole pattern won't match.
  */
 bool isMatch_Wildcard_Iterative(string text, string pattern)
@@ -1747,7 +1766,7 @@ bool isMatch_Wildcard_Iterative(string text, string pattern)
     size_t j = 0;
     for (int i = 0, matchStartPosition = -1, lastAsteriskPosition = -1; i < text.length();)
     {
-        // Everytime we see a '*', update indices and keep moving forward. This also solve the continous '*' case.
+        // Every time we see a '*', update indices and keep moving forward. This also solve the continuous '*' case.
         if (pattern[j] == '*')
         {
             matchStartPosition = i;
@@ -1758,11 +1777,11 @@ bool isMatch_Wildcard_Iterative(string text, string pattern)
             ++i;
             ++j;
         }
-        else // mistmatch
+        else // mismatch
         {
             if (lastAsteriskPosition >= 0) // rollback to nearest '*' if exists.
             {
-                // Here we try to match the nearest '*' to 1 character, 2 characters, so everytime we shift matchStartPosition right by 1.
+                // Here we try to match the nearest '*' to 1 character, 2 characters, so every time we shift matchStartPosition right by 1.
                 // Why don't match '*' with 0 character? Since we have tried and failed otherwise we will not roll back to nearest '*'.
                 // Don't worry that matchStartPosition will overflow, next iteration will catch it.
                 i = ++matchStartPosition;
@@ -3457,7 +3476,7 @@ vector<vector<int>> subsets(vector<int>& nums)
 }
 
 // 79. Word Search
-bool dfsSearchWord(vector<vector<char>>& board,const string& word, unsigned currentIndex, int i, int j)
+bool dfsSearchWord(vector<vector<char>>& board, const string& word, unsigned currentIndex, int i, int j)
 {
     if (board[i][j] == '*' || board[i][j] != word[currentIndex])
     {
@@ -3500,6 +3519,12 @@ bool exist(vector<vector<char>>& board, string word)
     }
 
     return false;
+}
+
+// 80. Remove Duplicates from Sorted Array II
+int removeDuplicates2(vector<int>& nums)
+{
+    return removeDuplicatesK(nums, 2);
 }
 
 // 144. Binary Tree Preorder Traversal

@@ -90,6 +90,7 @@ extern string minWindow(string s, string t);
 extern vector<vector<int>> combine(int n, int k);
 extern vector<vector<int>> subsets(vector<int>& nums);
 extern bool exist(vector<vector<char>>& board, string word);
+extern int removeDuplicates2(vector<int>& nums);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 
