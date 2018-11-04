@@ -91,6 +91,7 @@ extern vector<vector<int>> combine(int n, int k);
 extern vector<vector<int>> subsets(vector<int>& nums);
 extern bool exist(vector<vector<char>>& board, string word);
 extern int removeDuplicates2(vector<int>& nums);
+extern bool search2(vector<int>& nums, int target);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 
@@ -103,6 +104,9 @@ extern string addStrings(string num1, string num2);
 void main()
 {
     const auto start = clock();
+
+    vector<int> v({ 4,5,6,7,0,1,2 });
+    search2(v, 0);
 
     vector<vector<char>> sudoku({
         { '5', '3', '.', '.', '7', '.', '.', '.', '.' },

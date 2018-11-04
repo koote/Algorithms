@@ -1113,11 +1113,50 @@ int longestValidParentheses(string s)
 // 33. Search in Rotated Sorted Array
 int search(vector<int>& nums, int target)
 {
-    int left = 0;
-    int right = nums.size() - 1;
-    while (left <= right)
+    for (int left = 0, right = nums.size() - 1; left <= right;)
     {
-        const size_t mid = (left + right) / 2;
+        const int middle = (left + right) / 2;
+
+        if (nums[middle] < target)
+        {
+            // If middle is on right part, we have: nums[left] > nums[right] >= nums[middle].
+            // When middle is on right part and target is greater than nums[right] (means not in nums[middle .. right]), should search in left part.
+            if (nums[right] >= nums[middle] && target > nums[right])
+            {
+                right = middle - 1;
+            }
+            else // When (1) middle is on left part, (2) middle is on right part and target is in nums[middle ... right], continue search in right part.
+            {
+                left = middle + 1;
+            }
+        }
+        else if (nums[middle] > target)
+        {
+            // If middle is on left part, we have: nums[middle] >= nums[left] > nums[right]
+            // When middle is on left part and target is smaller than nums[left] (means not in nums[left .. middle]), should search in right part.
+            if (nums[middle] >= nums[left] && target < nums[left])
+            {
+                left = middle + 1;
+            }
+            else // When (1) middle is on the right part, (2) middle is on left part and target is in nums[left .. middle], continue search in left part.
+            {
+                right = middle - 1;
+            }
+        }
+        else //nums[mid] == target
+        {
+            return middle;
+        }
+    }
+
+    return -1;
+}
+int search1_2(vector<int>& nums, int target)
+{
+    for (int left = 0, right = nums.size() - 1; left <= right;)
+    {
+        const int mid = (left + right) / 2;
+
         if (nums[mid] == target)
         {
             return mid;
@@ -1143,46 +1182,6 @@ int search(vector<int>& nums, int target)
             else
             {
                 right = mid - 1;
-            }
-        }
-    }
-
-    return -1;
-}
-int search2(vector<int>& nums, const int target)
-{
-    int left = 0;
-    int right = nums.size() - 1;
-    while (left <= right)
-    {
-        const int middle = (left + right) / 2;
-        if (nums[middle] == target)
-        {
-            return middle;
-        }
-
-        if (target > nums[middle]) // Have 2 cases
-        {
-            // When middle is on right part and target is not in range nums[middle .. right]
-            if (nums[right] >= nums[middle] && target > nums[right])
-            {
-                right = middle - 1;
-            }
-            else // for other 2 cases (1) middle is on left part, (2) middle is on right part and target is in range nums[middle ... right]
-            {
-                left = middle + 1;
-            }
-        }
-        else // nums[middle] > target
-        {
-            // When middle is on left part and target is not in range nums[left .. middle]
-            if (nums[left] <= nums[middle] && target < nums[left])
-            {
-                left = middle + 1;
-            }
-            else // for other 2 cases (1) middle is on the right part, (2) middle is on left part and target is in range nums[left .. middle]
-            {
-                right = middle - 1;
             }
         }
     }
@@ -3478,11 +3477,13 @@ vector<vector<int>> subsets(vector<int>& nums)
 // 79. Word Search
 bool dfsSearchWord(vector<vector<char>>& board, const string& word, unsigned currentIndex, int i, int j)
 {
+    // visited, or not a valid character in word.
     if (board[i][j] == '*' || board[i][j] != word[currentIndex])
     {
         return false;
     }
 
+    // All characters in word have been found
     if (currentIndex == word.length() - 1)
     {
         return true;
@@ -3499,9 +3500,9 @@ bool dfsSearchWord(vector<vector<char>>& board, const string& word, unsigned cur
         return true;
     }
 
-    // When current location cannot proceed after having tried all 4 directions, we must restore current board[i][j], 
-    // we only change cell to * for the cells on current path, this is very important! It is because current cell 
-    // may be visited later and could be a valid cell in the future when current path expands.
+    // When current location cannot proceed after having tried all 4 directions, we must restore current board[i][j]
+    // before roll back, this is very important! It is because current cell may be visited and used later
+    // we only change cell to * for the cells on current path.
     board[i][j] = current;
     return false;
 }
@@ -3526,6 +3527,99 @@ int removeDuplicates2(vector<int>& nums)
 {
     return removeDuplicatesK(nums, 2);
 }
+
+// 81. Search in Rotated Sorted Array II
+// In problem 33, we use nums[mid] to compare with nums[left] or nums[right] to determine whether mid is fall in left part or right part.
+// Now when arry contains duplication, it no longer works, since it is possible that nums[mid] == nums[left] == nums[right], e.g.:
+// {1, 3, 1, 1, 1}, or {2, 2, 2, 1, 2}.
+bool search2(vector<int>& nums, int target)
+{
+    for (int left = 0, right = nums.size() - 1; left <= right; )
+    {
+        const int mid = (left + right) / 2;
+
+        if (nums[mid] < target)
+        {
+            if (nums[mid] == nums[left] && nums[mid] == nums[right])
+            {
+                ++left;
+                --right;
+            }
+            else if (nums[left] > nums[mid] && target > nums[right])
+            {
+                right = mid - 1;
+            }
+            else
+            {
+                left = mid + 1;
+            }
+        }
+        else if (nums[mid] > target)
+        {
+            if (nums[mid] == nums[left] && nums[mid] == nums[right])
+            {
+                ++left;
+                --right;
+            }
+            else if (nums[mid] > nums[right] && target < nums[left])
+            {
+                left = mid + 1;
+            }
+            else
+            {
+                right = mid - 1;
+            }
+        }
+        else // if (nums[mid] == target)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+bool search2_2(vector<int>& nums, int target)
+{
+    for (int left = 0, right = nums.size() - 1; left <= right;)
+    {
+        const int mid = (left + right) / 2;
+        if (nums[mid] == target)
+        {
+            return true;
+        }
+
+        if (nums[left] == nums[mid] && nums[mid] == nums[right])
+        {
+            ++left;
+            --right;
+        }
+        else if (nums[left] <= nums[mid])   // mid is on left part.
+        {
+            if (target >= nums[left] && target < nums[mid]) // nums[left] <= target < nums[mid]
+            {
+                right = mid - 1;
+            }
+            else
+            {
+                left = mid + 1;
+            }
+        }
+        else if (nums[right] >= nums[mid]) // mid is on right part.
+        {
+            if (target > nums[mid] && target <= nums[right]) // nums[mid] < target <= nums[right]
+            {
+                left = mid + 1;
+            }
+            else
+            {
+                right = mid - 1;
+            }
+        }
+    }
+
+    return false;
+}
+
 
 // 144. Binary Tree Preorder Traversal
 vector<int> preorderTraversal(TreeNode* root)
