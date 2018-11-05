@@ -294,28 +294,27 @@ bool isMatch_Regex(string text, string pattern)
 // 11. Container With Most Water
 int maxArea(vector<int>& height)
 {
-    int max = 0;
-    for (int i = 0, j = height.size() - 1; i < j;)
+    int maxArea = 0;
+    for (int i = 0, j = height.size() - 1, currentArea; i < j;)
     {
-        int current;
         if (height[i] < height[j])
         {
-            current = (j - i) * height[i];
+            currentArea = (j - i) * height[i];
             ++i;
         }
         else
         {
-            current = (j - i)* height[j];
+            currentArea = (j - i) * height[j];
             --j;
         }
 
-        if (current > max)
+        if (currentArea > maxArea)
         {
-            max = current;
+            maxArea = currentArea;
         }
     }
 
-    return max;
+    return maxArea;
 }
 
 // 12. Integer to Roman
@@ -1513,19 +1512,19 @@ int firstMissingPositive(vector<int>& nums)
 
 // 42. Trapping Rain Water
 // Brute force is not the best solution but it is very important to show that how to think.
-// For this problem, DO NOT try to start thinking each hollow, that makes this problem looks complicated. Thinking 
-// each bar instead. Let's say every bar can trap some water (physically it is impossible), if we can get how much  
-// water each bar can trap, and add them together, we get the total trapped water.
-// Given a bar i, whose height is height[i], how much water it can trap? Drawing a chart 
-// helps to show that:
-// water bar i can trap = min(height of the highest bar on bar i's left, height of the highest bar on bar i's right) - height[i]
+// For this problem, DO NOT try to start thinking each hollow, that makes this problem looks complicated. Thinking each
+// bar individually instead. Let's assume a single bar can trap some water (of course physically it is impossible), if 
+// we can get how much water each bar can trap, and add them together, we get the total trapped water. So given a bar i,
+// whose height is height[i], how much water it can trap? Drawing a chart helps to show that:
+// water bar i trap = min(height of the highest bar on its left, height of the highest bar on its right) - height[i]
 //            ___
 //            | |               ___
 //            | |      ___      | |
 //            | |      | |      | |
 //     _______|_|______|_|______|_|____________________
 //                      i
-// So scan height array from left to right, for each bar, scan its left highest bar and right highest bar.
+// So scan height array from left to right, for each bar, scan its left highest bar and right highest bar and get the amount
+// of water it can trap, add to total, after all bars are calculated, total is the answer.
 int trapBruteForce(vector<int>& height)
 {
     int total = 0;
@@ -1558,12 +1557,12 @@ int trapBruteForce(vector<int>& height)
 
     return total;
 }
-// In brute force solution, for each bar we need to search its left highest bar and right highest bar, and how much water
-// it can trap is determined by the lower bar between its left highest bar and right highest bar, so time complexity is 
-// O(n2).
-// Let's think in a reversed way, given two bars i and j (i <= j), we compare their heights, without loss of generality,
-// let's say lower one is the left end i, we search its right side, before encounter a bar k has height[k] > height[i], 
-// for all bars on its right who are not higher than height[i], water they can trap is height[i] - height[m] (i < m < k).
+// In brute force solution, for each bar we search its left highest bar and right highest bar, how much water it can trap is
+// determined by the lower bar between its left highest bar and right highest bar, so time complexity is O(n^2).
+// To optimize it, let's think in a reversed way. Given two bars i and j (i <= j), we first compare their heights, without
+// loss of generality, let's assume lower bar is the left bar[i], we search its right side, until find a bar[k] that is higher
+// than bar[i], for all bars between bar[i] and bar[k], water every bar can trap is height[i] - height[m] (i < m < k).
+// Then we compare bar[k] and bar[j], choose the lower one, and repeat above process, until all bars are calculated.
 //                           ___
 //                           | |
 //                           | |                ___
@@ -1579,23 +1578,23 @@ int trapOptimized(vector<int>& height)
     int total = 0;
     for (int left = 0, right = height.size() - 1, probe; left <= right; )
     {
-        if (height[left] < height[right])
+        if (height[left] < height[right]) // if left bar is lower, search its right
         {
             for (probe = left; probe <= right && height[probe] <= height[left]; ++probe)
             {
                 total += height[left] - height[probe];
             }
 
-            left = probe;
+            left = probe; // now bar[probe] is the first bar on bar[left]'s right that higher than bar[left]
         }
-        else
+        else // if right bar is lower, search its left.
         {
             for (probe = right; probe >= left && height[probe] <= height[right]; --probe)
             {
                 total += height[right] - height[probe];
             }
 
-            right = probe;
+            right = probe; // now bar[probe] is the first bar on bar[right]'s left that higher than bar[right]
         }
     }
 
@@ -3653,6 +3652,36 @@ ListNode* deleteDuplicates2(ListNode* head)
 
     return dummy.next;
 }
+ListNode* deleteDuplicates2_2(ListNode* head)
+{
+    ListNode dummy(-1);
+    dummy.next = head;
+
+    // use two pointers, prev - track the node before the dup nodes; runner - to find the last node of duplications.
+    for (ListNode* prev = &dummy, *runner = head; runner != nullptr;)
+    {
+        for (; runner->next != nullptr && runner->val == runner->next->val; runner = runner->next);
+
+        if (prev->next != runner)
+        {
+            while (prev->next != runner->next)
+            {
+                ListNode* toBeDeleted = prev->next;
+                prev->next = toBeDeleted->next;
+                delete toBeDeleted;
+            }
+
+            runner = prev->next;
+        }
+        else
+        {
+            prev = prev->next;
+            runner = runner->next;
+        }
+    }
+
+    return dummy.next;
+}
 
 // 83. Remove Duplicates from Sorted List
 ListNode *deleteDuplicates(ListNode* head)
@@ -3672,6 +3701,92 @@ ListNode *deleteDuplicates(ListNode* head)
     }
 
     return head;
+}
+
+// 84. Largest Rectangle in Histogram
+// Given a bar, the max rectangle it can build is determined by the its left and right closest bars that lower than it.
+// For each bar, scan its left and right until encounter a bar that lower than it, then the max rectangle current bar
+// can build is (right - left - 1) * heights[i], wo do this for each bar, then we get the max rectangle. 
+// This is a brute force solution and its time complexity is O(n^2).
+int largestRectangleAreaUseBruteForce(vector<int>& heights)
+{
+    int maxRect = 0;
+    for (int i = 0, left, right; i < heights.size(); ++i)
+    {
+        // for each i, search its left and right until we saw a lower than i
+        for (left = i; left >= 0 && heights[left] >= heights[i]; --left);
+        for (right = i; right < heights.size() && heights[right] >= heights[i]; ++right);
+        const int currentRect = (right - left - 1) * heights[i];
+        if (currentRect > maxRect)
+        {
+            maxRect = currentRect;
+        }
+    }
+
+    return maxRect;
+}
+// As we analyzed, for each bar, its max rectangle is determined by left and right closest bars that lower than it (boundary).
+// The brute force solution is slow because for each bar we need to search left and right boundary, if for each bar we can 
+// get left and right boundaries' index in O(1) time then we can improve time complexity from O(n^2) to O(n), here comes the
+// stack solution:
+// We use an increasing stack, in anytime, the elements in stack are in ascending order, from bottom to top. If current bar is
+// higher than stack top, keep pushing, until we encounter a bar that lower than current stack top, we start to pop bars from
+// stack until stack top is no longer higher than current bar, and calculate the rectangle that popped bars can build, update 
+// the max rectangle. 
+// Obviously, when we encounter a bar lower than stack top, we can observe 2 facts:
+// (1) the current bar which is lower than stack top, is stack top bar's right boundary.
+// (2) the next stack top (after current top is popped) is the stack top bar's left boundary.
+// For example, let's say current stack is [1, 5, 6, 7] and now we encounter bar with height 3. So for stack top bar whose height
+// is 7, its left boundary is 6 and its right boundary is 1, so for stack top, its max rectangle area is 7 * 1 = 7, we pop 7, 6, 5
+// and finally 1 is smaller than 3, so 1 will be kept in stack and 3 now can be pushed.
+int largestRectangleAreaUseStack(vector<int>& heights)
+{
+    int maxRect = 0;
+    stack<int> stack;
+    for (unsigned i = 0; i < heights.size(); ++i)
+    {
+        if (stack.empty() || heights[i] >= heights[stack.top()])
+        {
+            stack.push(i);
+        }
+        else
+        {
+            // Pop and calculate. NOTE that popping stops when stack top no longer higher than current bar.
+            while (!stack.empty() && heights[stack.top()] > heights[i])
+            {
+                const int currentHeight = heights[stack.top()];
+                stack.pop();
+
+                // right boundary is i, left boundary is stack.top()
+                const int rect = currentHeight * (i - (stack.empty() ? -1 : stack.top()) - 1);
+                if (rect > maxRect)
+                {
+                    maxRect = rect;
+                }
+            }
+
+            stack.push(i);
+        }
+    }
+
+    while (!stack.empty())
+    {
+        const int currentHeight = heights[stack.top()];
+        stack.pop();
+
+        // right boundary is heights.size(), left boundary is stack.top()
+        const int rect = currentHeight * (heights.size() - (stack.empty() ? -1 : stack.top()) - 1);
+        if (rect > maxRect)
+        {
+            maxRect = rect;
+        }
+    }
+
+    return maxRect;
+}
+int largestRectangleArea(vector<int>& heights)
+{
+    return largestRectangleAreaUseStack(heights);
 }
 
 // 144. Binary Tree Preorder Traversal
@@ -3743,6 +3858,12 @@ TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
     }
 
     return r;
+}
+
+// 334. Increasing Triplet Subsequence
+bool increasingTriplet(vector<int>& nums)
+{
+    return false;
 }
 
 // 415. Add Strings

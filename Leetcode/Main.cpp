@@ -94,6 +94,7 @@ extern int removeDuplicates2(vector<int>& nums);
 extern bool search2(vector<int>& nums, int target);
 extern ListNode* deleteDuplicates2(ListNode* head);
 extern ListNode* deleteDuplicates(ListNode* head);
+extern int largestRectangleArea(vector<int>& heights);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 
@@ -101,14 +102,16 @@ extern TreeNode* invertTree(TreeNode* root);
 
 extern TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q);
 
+extern bool increasingTriplet(vector<int>& nums);
+
 extern string addStrings(string num1, string num2);
 
 void main()
 {
     const auto start = clock();
 
-    vector<int> v({ 4,5,6,7,0,1,2 });
-    search2(v, 0);
+    vector<int> v({ 2,1,5,6,2,3 });
+    largestRectangleArea(v);
 
     vector<vector<char>> sudoku({
         { '5', '3', '.', '.', '7', '.', '.', '.', '.' },
