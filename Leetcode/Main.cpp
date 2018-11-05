@@ -92,6 +92,8 @@ extern vector<vector<int>> subsets(vector<int>& nums);
 extern bool exist(vector<vector<char>>& board, string word);
 extern int removeDuplicates2(vector<int>& nums);
 extern bool search2(vector<int>& nums, int target);
+extern ListNode* deleteDuplicates2(ListNode* head);
+extern ListNode* deleteDuplicates(ListNode* head);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 

@@ -3620,6 +3620,59 @@ bool search2_2(vector<int>& nums, int target)
     return false;
 }
 
+// 82. Remove Duplicates from Sorted List II
+ListNode* deleteDuplicates2(ListNode* head)
+{
+    ListNode dummy(-1);
+    dummy.next = head;
+
+    for (ListNode* current = &dummy, *runner; current != nullptr;)
+    {
+        for (runner = current->next; runner != nullptr && runner->val == current->next->val; runner = runner->next);
+
+        // If current->next->next == runner, then current->next only appears 1 times, no need to delete it, otherwise
+        // we need to remove nodes from current->next to q->prev.
+        if (current->next != nullptr && current->next->next != runner)
+        {
+            // If no need to care about memory leak, we can just do current->next = runner;
+            // Otherwise, we need to delete nodes from current->next to q->prev.
+            // NOTE: In this algorithm, we always check if current->next has duplication, so don't 
+            // move current forward after following loop ends.
+            while (current->next != runner)
+            {
+                ListNode* toBeDeleted = current->next;
+                current->next = toBeDeleted->next;
+                delete toBeDeleted;
+            }
+        }
+        else
+        {
+            current = current->next;
+        }
+    }
+
+    return dummy.next;
+}
+
+// 83. Remove Duplicates from Sorted List
+ListNode *deleteDuplicates(ListNode* head)
+{
+    for (ListNode* p = head; p != nullptr;)
+    {
+        if (p->next != nullptr && p->next->val == p->val) // delete p->next
+        {
+            ListNode* toBeDeleted = p->next;
+            p->next = toBeDeleted->next;
+            delete toBeDeleted;
+        }
+        else
+        {
+            p = p->next;
+        }
+    }
+
+    return head;
+}
 
 // 144. Binary Tree Preorder Traversal
 vector<int> preorderTraversal(TreeNode* root)
