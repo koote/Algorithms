@@ -3743,42 +3743,23 @@ int largestRectangleAreaUseStack(vector<int>& heights)
 {
     int maxRect = 0;
     stack<int> stack;
-    for (unsigned i = 0; i < heights.size(); ++i)
+    for (unsigned i = 0; i <= heights.size(); )
     {
-        if (stack.empty() || heights[i] >= heights[stack.top()])
+        if (stack.empty() || i < heights.size() && heights[i] >= heights[stack.top()])
         {
-            stack.push(i);
+            stack.push(i++);
         }
-        else
+        else // not the push condition, then we do pop.
         {
-            // Pop and calculate. NOTE that popping stops when stack top no longer higher than current bar.
-            while (!stack.empty() && heights[stack.top()] > heights[i])
+            const int currentHeight = heights[stack.top()];
+            stack.pop();
+
+            // right boundary is i, left boundary is stack.top()
+            const int rect = currentHeight * (stack.empty() ? i : i - stack.top() - 1);
+            if (rect > maxRect)
             {
-                const int currentHeight = heights[stack.top()];
-                stack.pop();
-
-                // right boundary is i, left boundary is stack.top()
-                const int rect = currentHeight * (i - (stack.empty() ? -1 : stack.top()) - 1);
-                if (rect > maxRect)
-                {
-                    maxRect = rect;
-                }
+                maxRect = rect;
             }
-
-            stack.push(i);
-        }
-    }
-
-    while (!stack.empty())
-    {
-        const int currentHeight = heights[stack.top()];
-        stack.pop();
-
-        // right boundary is heights.size(), left boundary is stack.top()
-        const int rect = currentHeight * (heights.size() - (stack.empty() ? -1 : stack.top()) - 1);
-        if (rect > maxRect)
-        {
-            maxRect = rect;
         }
     }
 
