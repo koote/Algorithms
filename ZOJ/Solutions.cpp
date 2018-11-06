@@ -34,11 +34,11 @@ void maxSumSubMatrix()
     }
 
     int maxSum2d = INT_MIN;
-    for (unsigned i = 0; i < matrix.size(); ++i) // select up boundary row: 0 -> size-1
+    for (unsigned i = 0; i < matrix.size(); ++i) // select up boundary row(i): 0 -> size-1
     {
         vector<int> packed(matrix[0].size(), 0);
 
-        for (unsigned j = i; j< matrix.size(); ++j) // select bottom boundary row : i -> size-1.
+        for (unsigned j = i; j< matrix.size(); ++j) // select bottom boundary row(j) : i -> size-1.
         {
             // pack row(i) -> row(j) to one dimension array packed : packed = row(i) + row(i+1) + row(i+2) + ... + row(j)
             for (unsigned k = 0; k < matrix[j].size(); ++k)

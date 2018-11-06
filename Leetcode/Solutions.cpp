@@ -3771,6 +3771,42 @@ int largestRectangleArea(vector<int>& heights)
     return largestRectangleAreaUseStack(heights);
 }
 
+// 138. Copy List with Random Pointer
+RandomListNode *copyRandomList(RandomListNode *head)
+{
+    if (head == nullptr)
+    {
+        return nullptr;
+    }
+
+    for (RandomListNode* p = head; p != nullptr; )
+    {
+        RandomListNode* q = new RandomListNode(p->label);
+        q->next = p->next;
+        p->next = q;
+        p = q->next;
+    }
+
+    for (RandomListNode* p = head; p != nullptr; p = p->next->next)
+    {
+        if (p->random != nullptr)
+        {
+            p->next->random = p->random->next;
+        }
+    }
+
+    RandomListNode* newHead = head->next;
+    for (RandomListNode* p = head; p != nullptr;)
+    {
+        RandomListNode* q = p->next;
+        p->next = q->next;
+        p = p->next;
+        q->next = p == nullptr ? nullptr : p->next;
+    }
+
+    return newHead;
+}
+
 // 144. Binary Tree Preorder Traversal
 vector<int> preorderTraversal(TreeNode* root)
 {

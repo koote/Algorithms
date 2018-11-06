@@ -96,6 +96,8 @@ extern ListNode* deleteDuplicates2(ListNode* head);
 extern ListNode* deleteDuplicates(ListNode* head);
 extern int largestRectangleArea(vector<int>& heights);
 
+extern RandomListNode *copyRandomList(RandomListNode *head);
+
 extern vector<int> preorderTraversal(TreeNode* root);
 
 extern TreeNode* invertTree(TreeNode* root);

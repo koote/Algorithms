@@ -22,3 +22,11 @@ struct Interval
     Interval() : start(0), end(0) {}
     Interval(const int s, const int e) : start(s), end(e) {}
 };
+
+struct RandomListNode
+{
+    int label;
+    RandomListNode* next;
+    RandomListNode* random;
+    RandomListNode(int x) : label(x), next(nullptr), random(nullptr) {}
+};
