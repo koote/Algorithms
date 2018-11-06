@@ -2132,25 +2132,26 @@ int totalNQueens(int n)
 // Some thoughts:
 // This is a DP problem, at first I want to define dp[i] as: the maximum sum of subarray in range nums[0..i], 
 // so when i increases from 0 to n-1 (n is the length of nums array), we got the final answer at dp[n-1]. However
-// I soon realize this doesn't work. The reason is given an i, we only know the max subarray's sum in the range 
-// nums[0..i-1], but we don't know where the previous max subarray ends, it could end at nums[i-1], or before 
-// nums[i-1], this information is very important because we need to decide whether nums[i] is possible to join 
-// previous max subarray, or must become a start of new subarray. It is very like to the question 32 (longest
-// valid parentheses), which inspires me to change the definition of dp[i] to: given range nums[0..i], for all 
-// subarraies end at num[i], the maximum sum of those subarraies. With this new definition, given a dp[i], we 
-// know that the max subarray ends at nums[i], and the final answer is the maximum number in dp[0..n-1]. Why? 
+// this doesn't work. The reason is given an i, we only know the max subarray's sum in the range nums[0..i-1],
+// but we don't know where the previous max subarray ends, it could end at nums[i-1], or before nums[i-1], this
+// information is very important because we need to decide whether nums[i] is possible to join previous subarray,
+// or become a start of new subarray. It is very like to the question 32 (longest valid parentheses), which
+// inspires me to change the definition of dp[i] to:
+//      Given range nums[0..i], for all subarraies end at num[i], the maximum sum of those subarraies.
+// With this new definition, given a dp[i], we know that the max subarray
+// ends at nums[i], and the final answer is the maximum number in dp[0..n-1]. Why? 
 // Back to the original question, given an array nums[0..n-1], its max subarray must ends at a certain element
 // in nums, given that dp[0..n-1] stores the max subarray's sum ends at nums[0], nums[1], ... nums[n-1], so the 
 // max subarray's sum is the maximum element in dp[0..n-1].
 // Then next step is how to get the transition function. Let's starts from array has 3 element : 1, -2, 3
 // i = 0, max sum is 1, no doubt, dp[0] = 1.
-// i = 1, we are facing two choices, whether -2 should join previous max subarry or start a new subarray. If 
-//        joining previous max subarray, then the max subarray is [1, -2] and sum is 1-2 = -1; if we decide to 
-//        start a new subarray, the new subarray's sum is -2, -1 > -2, so -2 should join, and dp[1] = -1.
+// i = 1, we are facing two choices, whether -2 should join previous max subarray or start a new subarray. If 
+//        joining previous subarray, then the subarray becomes [1, -2] and sum is 1-2 = -1; if we decide to start
+//        a new subarray, the new subarray's sum is -2, -1 > -2, so -2 should join, and dp[1] = -1.
 // i = 2, because dp[1] = -1, if 3 join previous subarray, new sum is 3-1=2, if we start a new subarray from 3,
 //        the sum of new subarray is 3, 3>2 so we should start a new subarray.
 // From this we can see, actually it doesn't matter nums[i] is positive or negative, as long as dp[i-1] is positive,
-// nums[i] should always join previous subarry.
+// nums[i] should always join previous subarray other than start a new subarray.
 // Why? If nums[i] is positive, obviously joining the previous subarray can make its sum greater;
 // if nums[i] is negative, joining previous subarray is better than starting a new subarray from it if dp[i-1] is
 // positive. But if dp[i-1] is negative, we should choose to start a new subarray.
@@ -2162,7 +2163,7 @@ int maxSubArrayDP(vector<int>& nums)
 {
     int dp = nums[0];
     int maxSum = dp;
-    for (size_t i = 1; i < nums.size(); ++i)
+    for (unsigned i = 1; i < nums.size(); ++i)
     {
         dp = dp > 0 ? dp + nums[i] : nums[i];
 
@@ -2179,12 +2180,11 @@ int maxSubArrayDP(vector<int>& nums)
 // can make sum greater by comparing this two sums.
 int maxSubArrayStraightforward(vector<int>& nums)
 {
-    int sum = 0;
+    int sum = 0; // sum will be the maximum sum of subarries in nums[0..i] and ending at nums[i].
     int maxSum = INT_MIN;
     for (int num : nums)
     {
-        sum = sum + num > num ? sum + num : num;
-
+        sum = sum > 0 ? sum + num : num;
         if (sum > maxSum)
         {
             maxSum = sum;
@@ -2242,7 +2242,7 @@ bool canJumpUse45(vector<int>& nums)
     return jump(nums) != -1;
 }
 // Starting from nums[0], keep updating farthest which is the left most position we can reach so far.
-// When loop ends, check whether farthest beyonds the last elements of array.
+// When loop ends, check whether farthest beyond the last elements of array.
 bool canJump(vector<int>& nums)
 {
     unsigned farthest = 0;
@@ -2674,7 +2674,7 @@ int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid)
 
 // 64. Minimum Path Sum
 // Note that it asks for the smallest path sum, not the path itself, if we use DFS, we do unnecessary calculation which will 
-// get time exceeded, so it is still a DP problem. Thinking in this way, given a cell grid[i][j] (i >=1 and j >=1) , it can
+// get time exceeded, so it is still a DP problem. Thinking in this way, given a cell grid[i][j] (i >= 1 and j >= 1) , it can
 // only be entered either from top (grid[i-1][j]) or left (grid[i][j-1]), so the minimum path from grid[0][0] to grid[i][j] is
 // min (min path from grid[0][0] to grid[i-1][j], min path from grid[0][0] to grid[i][j-1]). Define dp[i][j] as the minimum path
 // sum that from grid[0][0] to grid[i][j], after all cells in grid have been iterated, last element of dp is the answer.
@@ -2810,7 +2810,7 @@ string addBinary(string a, string b)
     unsigned char carry = 0;
     for (string::const_reverse_iterator p = a.rbegin(), q = b.rbegin(); p != a.rend() || q != b.rend() || carry != 0; )
     {
-        unsigned char val = (p == a.rend() ? 0 : *p++ - '0') + (q == b.rend() ? 0 : *q++ - '0') + carry;
+        const unsigned char val = (p == a.rend() ? 0 : *p++ - '0') + (q == b.rend() ? 0 : *q++ - '0') + carry;
         result.insert(0, 1, (val & 1) + '0');
         carry = val >> 1;
     }
@@ -3488,7 +3488,7 @@ bool dfsSearchWord(vector<vector<char>>& board, const string& word, unsigned cur
         return true;
     }
 
-    char current = board[i][j];
+    const char current = board[i][j];
     board[i][j] = '*';
 
     if ((i > 0 && dfsSearchWord(board, word, currentIndex + 1, i - 1, j)) ||                    //top
@@ -3745,11 +3745,12 @@ int largestRectangleAreaUseStack(vector<int>& heights)
     stack<int> stack;
     for (unsigned i = 0; i <= heights.size(); )
     {
+        // This is all conditions that do pushing
         if (stack.empty() || i < heights.size() && heights[i] >= heights[stack.top()])
         {
             stack.push(i++);
         }
-        else // not the push condition, then we do pop.
+        else // If it is not the push condition, then we do pop. No need to add inner loop, just don't update i after pop.
         {
             const int currentHeight = heights[stack.top()];
             stack.pop();
