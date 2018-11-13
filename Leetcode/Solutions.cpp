@@ -39,17 +39,16 @@ vector<int> twoSum(vector<int>& nums, int target)
 // 2. Add Two Numbers
 ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
 {
-    ListNode* dummy = new ListNode(-1);
-    ListNode* c = dummy;
+    ListNode dummy(-1);
 
     unsigned char carry = 0;
-    for (ListNode *a = l1, *b = l2; a != nullptr || b != nullptr || carry != 0; )
+    for (ListNode *a = l1, *b = l2, *c = &dummy; a != nullptr || b != nullptr || carry != 0; )
     {
         int val = (a == nullptr ? 0 : a->val) + (b == nullptr ? 0 : b->val) + carry;
         carry = val / 10;
         val %= 10;
 
-        c->next = new ListNode(val);
+        c->next = new ListNode(val); // when loop ends, no need to seal list c since when ListNode is created, its next is set to nullptr.
         c = c->next;
 
         if (a != nullptr)
@@ -63,10 +62,7 @@ ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
         }
     }
 
-    c->next = nullptr; //close the result list
-    ListNode* result = dummy->next;
-    delete dummy;
-    return result;
+    return dummy.next;
 }
 
 // 3. Longest Substring Without Repeating Characters
@@ -100,10 +96,25 @@ int lengthOfLongestSubstring(string s)
 // 4. Median of Two Sorted Arrays
 double findKth(int a[], int m, int b[], int n, int k)
 {
-    if (m < n) { return findKth(b, n, a, m, k); }
-    if (n == 0) { return a[k - 1]; }
-    if (k == 1) { return min(a[0], b[0]); }
-    if (k == m + n) { return max(a[m - 1], b[n - 1]); }
+    if (m < n)
+    {
+        return findKth(b, n, a, m, k);
+    }
+
+    if (n == 0)
+    {
+        return a[k - 1];
+    }
+
+    if (k == 1)
+    {
+        return min(a[0], b[0]);
+    }
+
+    if (k == m + n)
+    {
+        return max(a[m - 1], b[n - 1]);
+    }
 
     // let k = i+j. Please note that we are sure n <= m here
     int j = min(n, k / 2);
@@ -785,8 +796,6 @@ void buildMinHeap(vector<ListNode*>& nodes)
 }
 ListNode* mergeKLists(vector<ListNode*>& lists)
 {
-    ListNode dummy(0);
-    ListNode* last = &dummy;
     vector<ListNode*> minHeap;
 
     // Build a min heap by pushing first element of every list into heap. Because each element
@@ -801,6 +810,8 @@ ListNode* mergeKLists(vector<ListNode*>& lists)
 
     buildMinHeap(minHeap);
 
+    ListNode dummy(0);
+    ListNode* last = &dummy;
     while (!minHeap.empty())
     {
         last->next = minHeap[0];
@@ -822,7 +833,7 @@ ListNode* mergeKLists(vector<ListNode*>& lists)
         minHeapify(minHeap, 0);
     }
 
-    last->next = nullptr;
+    last->next = nullptr; // seal the list
     return dummy.next;
 }
 
@@ -2585,7 +2596,7 @@ ListNode* rotateRight(ListNode* head, int k)
 
 // 62. Unique Paths
 // This can use DFS but it will get time exceed and DFS will actually get every route. DP is the correct way.
-int uniquePaths2D(int m, int n) // n is row count, m is column count.
+int uniquePaths2D(const int m, const int n) // n is row count, m is column count.
 {
     // Given a cell [i, j], robot can only get to it from above cell [i-1,j] or left cell [i, j-1]. So 
     // we define dp[i,j] as the count of unique paths from [0,0] => [i,j], so we can get this equation:
@@ -3529,8 +3540,8 @@ int removeDuplicates2(vector<int>& nums)
 
 // 81. Search in Rotated Sorted Array II
 // In problem 33, we use nums[mid] to compare with nums[left] or nums[right] to determine whether mid is fall in left part or right part.
-// Now when arry contains duplication, it no longer works, since it is possible that nums[mid] == nums[left] == nums[right], e.g.:
-// {1, 3, 1, 1, 1}, or {2, 2, 2, 1, 2}.
+// Now when array contains duplication, it no longer works, since it is possible that nums[mid] == nums[left] == nums[right], e.g.:
+// {1, 3, 1, 1, 1}, or {2, 2, 2, 1, 2}, in this case, we shrink left and right simultaneously.
 bool search2(vector<int>& nums, int target)
 {
     for (int left = 0, right = nums.size() - 1; left <= right; )
@@ -3725,32 +3736,29 @@ int largestRectangleAreaUseBruteForce(vector<int>& heights)
 
     return maxRect;
 }
-// As we analyzed, for each bar, its max rectangle is determined by left and right closest bars that lower than it (boundary).
-// The brute force solution is slow because for each bar we need to search left and right boundary, if for each bar we can 
-// get left and right boundaries' index in O(1) time then we can improve time complexity from O(n^2) to O(n), here comes the
-// stack solution:
+// As we analyzed, for each bar, its max rectangle is determined by left and right closest bars that lower than it (let's call
+// them left and right boundaries). The brute force solution is slow because for each bar we need to search for left and right
+// boundary, if for each bar we can get left and right boundaries' index in O(1) time then we can improve time complexity from
+// O(n^2) to O(n), here comes the increasing stack solution:
 // We use an increasing stack, in anytime, the elements in stack are in ascending order, from bottom to top. If current bar is
-// higher than stack top, keep pushing, until we encounter a bar that lower than current stack top, we start to pop bars from
-// stack until stack top is no longer higher than current bar, and calculate the rectangle that popped bars can build, update 
-// the max rectangle. 
-// Obviously, when we encounter a bar lower than stack top, we can observe 2 facts:
+// higher than stack top, push its index to stack, until we encounter a bar that lower than current stack top, we start to pop
+// bars until stack top is no longer higher than current bar. During popping we calculate the rectangle that every popped bar
+// can build, and update the max rectangle so far.
+// When we encounter a bar lower than stack's current top, there are 2 facts:
 // (1) the current bar which is lower than stack top, is stack top bar's right boundary.
-// (2) the next stack top (after current top is popped) is the stack top bar's left boundary.
-// For example, let's say current stack is [1, 5, 6, 7] and now we encounter bar with height 3. So for stack top bar whose height
-// is 7, its left boundary is 6 and its right boundary is 1, so for stack top, its max rectangle area is 7 * 1 = 7, we pop 7, 6, 5
-// and finally 1 is smaller than 3, so 1 will be kept in stack and 3 now can be pushed.
+// (2) the next stack top is the stack top bar's left boundary, if stack becomes empty after pop then the left boundary is -1.
 int largestRectangleAreaUseStack(vector<int>& heights)
 {
     int maxRect = 0;
     stack<int> stack;
     for (unsigned i = 0; i <= heights.size(); )
     {
-        // This is all conditions that do pushing
+        // This is all conditions that do pushing, either stack is empty or current bar is no shorter than stack top.
         if (stack.empty() || i < heights.size() && heights[i] >= heights[stack.top()])
         {
             stack.push(i++);
         }
-        else // If it is not the push condition, then we do pop. No need to add inner loop, just don't update i after pop.
+        else // If it is not the push condition, then we do pop. No need to add an inner loop, just don't update i after pop.
         {
             const int currentHeight = heights[stack.top()];
             stack.pop();
@@ -3771,6 +3779,96 @@ int largestRectangleArea(vector<int>& heights)
     return largestRectangleAreaUseStack(heights);
 }
 
+// 85. Maximal Rectangle
+int maximalRectangleUse84(vector<vector<char>>& matrix)
+{
+    int maxRect = 0;
+    vector<int> packed(matrix.empty() ? 0 : matrix[0].size(), 0);
+    for (vector<char>& row : matrix) // given row[i], packed[] = row[0] + row[1] + row[2] + ... + row[i]
+    {
+        // pack row[i] to packed[] array, if in current row we encounter a '0', then reset packed[j] to 0.
+        for (unsigned j = 0; j < row.size(); packed[j] = row[j] == '1' ? packed[j] + 1 : 0, ++j);
+
+        const int currentMaxRect = largestRectangleArea(packed);
+        if (currentMaxRect > maxRect)
+        {
+            maxRect = currentMaxRect;
+        }
+    }
+
+    return maxRect;
+}
+int maximalRectangleUseDP(vector<vector<char>>& matrix)
+{
+    int maxRect = 0;
+
+    if (!matrix.empty())
+    {
+        vector<vector<int>> dp(matrix.size(), vector<int>(matrix[0].size(), 0));
+        for (unsigned i = 0; i < matrix.size(); ++i)
+        {
+            for (unsigned j = 0; j < matrix[i].size(); ++j)
+            {
+                if (matrix[i][j] == '1')
+                {
+                    dp[i][j] = 1 + (j > 0 ? dp[i][j - 1] : 0);
+
+                    for (int width = dp[i][j], k = i; k >= 0 && dp[k][j] > 0; --k)
+                    {
+                        if (dp[k][j] < width)
+                        {
+                            width = dp[k][j];
+                        }
+
+                        const int rect = (i - k + 1) * width;
+                        if (rect > maxRect)
+                        {
+                            maxRect = rect;
+                        }
+                    }
+                }
+                else
+                {
+                    dp[i][j] = 0;
+                }
+            }
+        }
+    }
+
+    return maxRect;
+}
+int maximalRectangle(vector<vector<char>>& matrix)
+{
+    return maximalRectangleUseDP(matrix);
+}
+
+// 86. Partition List
+ListNode* partition(ListNode* head, int x)
+{
+    ListNode small(-1);
+    ListNode great(-1);
+    ListNode* p = &small;
+    ListNode* q = &great;
+    for (; head != nullptr; head = head->next)
+    {
+        if (head->val < x)
+        {
+            p->next = head;
+            p = p->next;
+        }
+        else
+        {
+            q->next = head;
+            q = q->next;
+        }
+    }
+
+    p->next = great.next; // splice small and great
+    q->next = nullptr; // seal the whole list.
+
+    return small.next;
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
 {
@@ -3779,6 +3877,7 @@ RandomListNode *copyRandomList(RandomListNode *head)
         return nullptr;
     }
 
+    // NOTE: to make code simple, actually no need to set new node's random.
     for (RandomListNode* p = head; p != nullptr; )
     {
         RandomListNode* q = new RandomListNode(p->label);
@@ -3858,29 +3957,31 @@ TreeNode* invertTree(TreeNode* root)
 //235. Lowest Common Ancestor of a Binary Search Tree
 TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
 {
-    TreeNode* r = root;
-    while (r != nullptr)
-    {
-        if (r->val > p->val && r->val > q->val)
-        {
-            r = r->left;
-        }
-        else if (r->val < p->val && r->val < q->val)
-        {
-            r = r->right;
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    return r;
+    for (; root->val > p->val && root->val > q->val || root->val < p->val && root->val < q->val; root = p->val < root->val ? root->left : root->right);
+    return root;
 }
 
 // 334. Increasing Triplet Subsequence
 bool increasingTriplet(vector<int>& nums)
 {
+    int smallest = INT_MAX;
+    int secondSmallest = INT_MAX;
+    for (int num : nums)
+    {
+        if (num <= smallest)
+        {
+            smallest = num;
+        }
+        else if (num <= secondSmallest)
+        {
+            secondSmallest = num;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     return false;
 }
 
@@ -3893,15 +3994,15 @@ string addStrings(string num1, string num2)
     {
         if (i >= 0 && j >= 0)
         {
-            r = (num1[i] - '0') + (num2[j] - '0') + (carry - '0');
+            r = num1[i] - '0' + (num2[j] - '0') + (carry - '0');
         }
         else if (i >= 0)
         {
-            r = (num1[i] - '0') + (carry - '0');
+            r = num1[i] - '0' + (carry - '0');
         }
         else if (j >= 0)
         {
-            r = (num2[j] - '0') + (carry - '0');
+            r = num2[j] - '0' + (carry - '0');
         }
 
         carry = r / 10 + '0';

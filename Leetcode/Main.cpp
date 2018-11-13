@@ -95,6 +95,8 @@ extern bool search2(vector<int>& nums, int target);
 extern ListNode* deleteDuplicates2(ListNode* head);
 extern ListNode* deleteDuplicates(ListNode* head);
 extern int largestRectangleArea(vector<int>& heights);
+extern int maximalRectangle(vector<vector<char>>& matrix);
+extern ListNode* partition(ListNode* head, int x);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 
@@ -112,8 +114,16 @@ void main()
 {
     const auto start = clock();
 
-    vector<int> v({ 2,1,5,6,2,3 });
-    largestRectangleArea(v);
+    vector<vector<char>> matrix({
+        {'0','1','1','0','1'},
+        {'1','1','0','1','0'},
+        {'0','1','1','1','0'},
+        {'1','1','1','1','0'},
+        {'1','1','1','1','1'},
+        {'0','0','0','0','0'}
+    });
+
+    maximalRectangle(matrix);
 
     vector<vector<char>> sudoku({
         { '5', '3', '.', '.', '7', '.', '.', '.', '.' },
