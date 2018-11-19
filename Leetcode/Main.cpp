@@ -97,6 +97,7 @@ extern ListNode* deleteDuplicates(ListNode* head);
 extern int largestRectangleArea(vector<int>& heights);
 extern int maximalRectangle(vector<vector<char>>& matrix);
 extern ListNode* partition(ListNode* head, int x);
+extern bool isScramble(string s1, string s2);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 
@@ -121,7 +122,7 @@ void main()
         {'1','1','1','1','0'},
         {'1','1','1','1','1'},
         {'0','0','0','0','0'}
-    });
+        });
 
     maximalRectangle(matrix);
 

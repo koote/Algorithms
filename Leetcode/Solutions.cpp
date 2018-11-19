@@ -3869,6 +3869,45 @@ ListNode* partition(ListNode* head, int x)
     return small.next;
 }
 
+// 87. Scramble String
+bool isScramble(const string& s1, const string& s2)
+{
+    if (s1 == s2)
+    {
+        return true;
+    }
+
+    unordered_map<char, int> occurance;
+    for (unsigned i = 0; i < s2.length(); ++i)
+    {
+        occurance[s1[i]]++;
+        occurance[s2[i]]--;
+    }
+
+    for (pair<char, int> kvp : occurance)
+    {
+        if (kvp.second != 0)
+        {
+            return false;
+        }
+    }
+
+    // split s2 to 2 parts, left part: s2[0..leftlen-1], right part: s2[leftlen..s2.length()-1].
+    for (unsigned leftlen = 1; leftlen < s2.length(); ++leftlen)
+    {
+        // there are 2 cases, left part and right part are not swapped, or swapped.
+        if (isScramble(s1.substr(0, leftlen), s2.substr(0, leftlen)) &&
+            isScramble(s1.substr(leftlen, s1.length() - leftlen), s2.substr(leftlen, s2.length() - leftlen)) ||
+            isScramble(s1.substr(s1.length() - leftlen, leftlen), s2.substr(0, leftlen)) &&
+            isScramble(s1.substr(0, s1.length() - leftlen), s2.substr(leftlen, s2.length() - leftlen)))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
 {
