@@ -97,7 +97,8 @@ extern ListNode* deleteDuplicates(ListNode* head);
 extern int largestRectangleArea(vector<int>& heights);
 extern int maximalRectangle(vector<vector<char>>& matrix);
 extern ListNode* partition(ListNode* head, int x);
-extern bool isScramble(string s1, string s2);
+extern bool isScramble(const string& s1, const string& s2);
+extern void merge(vector<int>& nums1, int m, vector<int>& nums2, int n);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 

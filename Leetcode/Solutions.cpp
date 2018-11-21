@@ -3877,6 +3877,8 @@ bool isScramble(const string& s1, const string& s2)
         return true;
     }
 
+    // make sure s1 and s2 have same character set and each char appears same times.
+    // this is an important optimization to avoid unnecessary recursion.
     unordered_map<char, int> occurance;
     for (unsigned i = 0; i < s2.length(); ++i)
     {
@@ -3884,7 +3886,7 @@ bool isScramble(const string& s1, const string& s2)
         occurance[s2[i]]--;
     }
 
-    for (pair<char, int> kvp : occurance)
+    for (const pair<char, int> kvp : occurance)
     {
         if (kvp.second != 0)
         {
@@ -3906,6 +3908,34 @@ bool isScramble(const string& s1, const string& s2)
     }
 
     return false;
+}
+
+// 88. Merge Sorted Array
+void merge(vector<int>& nums1, int m, vector<int>& nums2, int n)
+{
+    // to avoid copying/moving elements in nums1, let's start from location nums1[m+n-1].
+    for (int last = m-- + n-- - 1; last >= 0 && (m >= 0 || n >= 0); --last)
+    {
+        if (m >= 0 && n >= 0)
+        {
+            if (nums1[m] > nums2[n])
+            {
+                nums1[last] = nums1[m--];
+            }
+            else
+            {
+                nums1[last] = nums2[n--];
+            }
+        }
+        else if (m >= 0)
+        {
+            nums1[last] = nums1[m--];
+        }
+        else if (n >= 0)
+        {
+            nums1[last] = nums2[n--];
+        }
+    }
 }
 
 // 138. Copy List with Random Pointer
