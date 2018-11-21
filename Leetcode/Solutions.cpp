@@ -3938,6 +3938,55 @@ void merge(vector<int>& nums1, int m, vector<int>& nums2, int n)
     }
 }
 
+// 89. Gray Code
+// There are 2 easy ways to generate gray code. 
+// First is using recursion, based on grayCode(n-1) we can quick get grayCode(n). Looking at the gray codes when n == 3:
+// 000
+// 001
+// 011
+// 010
+// 110
+// 111
+// 101
+// 100
+// first 4 codes are 0 + {00, 01, 11, 10}, that are the gray codes when n == 2.
+// last 4 codes are 1 + {10, 11, 01, 00), that are the reverse order of gray codes when n == 2.
+// So, now we get the rule, first we get gray codes of n-1, then traverse the vector, prefix with 0; then reverse traverse
+// the vector, prefix with 1. 
+// In fact, because a number if we prefix it with 0, its value will not be changed, so we just need to do a reverse traverse
+// and for each number we prefix it with 1.
+vector<int> grayCodeUseRecursion(const int n)
+{
+    if (n == 0)
+    {
+        return { 0 };
+    }
+
+    vector<int> previousGrayCodes = grayCodeUseRecursion(n - 1);
+    for (int i = previousGrayCodes.size() - 1; i >= 0; --i)
+    {
+        previousGrayCodes.push_back(previousGrayCodes[i] | 1 << n - 1);
+    }
+
+    return previousGrayCodes;
+}
+// The second way is to use XOR to calculate gray code from binary, based on this formula: G(n) =  B(n) XOR B(n+1)
+vector<int> grayCodeUseXOR(const int n)
+{
+    vector<int> codes;
+    codes.reserve(1 << n);
+    for (int i = 0; i < 1 << n; ++i)
+    {
+        codes.push_back(i ^ i >> 1);
+    }
+
+    return codes;
+}
+vector<int> grayCode(int n)
+{
+    return grayCodeUseXOR(n);
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
 {
