@@ -100,6 +100,7 @@ extern ListNode* partition(ListNode* head, int x);
 extern bool isScramble(const string& s1, const string& s2);
 extern void merge(vector<int>& nums1, int m, vector<int>& nums2, int n);
 extern vector<int> grayCode(int n);
+extern vector<vector<int>> subsetsWithDup(vector<int>& nums);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 

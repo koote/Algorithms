@@ -3949,11 +3949,11 @@ void merge(vector<int>& nums1, int m, vector<int>& nums2, int n)
 // 111
 // 101
 // 100
-// first 4 codes are 0 + {00, 01, 11, 10}, that are the gray codes when n == 2.
-// last 4 codes are 1 + {10, 11, 01, 00), that are the reverse order of gray codes when n == 2.
-// So, now we get the rule, first we get gray codes of n-1, then traverse the vector, prefix with 0; then reverse traverse
-// the vector, prefix with 1. 
-// In fact, because a number if we prefix it with 0, its value will not be changed, so we just need to do a reverse traverse
+// first 4 codes are 0 + {00, 01, 11, 10}, that in bracket are the gray codes when n == 2.
+// last 4 codes are 1 + {10, 11, 01, 00), that in bracket are the reverse order of gray codes when n == 2.
+// So, here is the rule, first we get gray codes of n-1, then traverse the vector, prefix with 0; then reverse traverse the
+// vector, prefix with 1. 
+// In practical, because if we prefix a number with 0, its value will not change, so we just need to do a reverse traverse
 // and for each number we prefix it with 1.
 vector<int> grayCodeUseRecursion(const int n)
 {
@@ -3965,12 +3965,19 @@ vector<int> grayCodeUseRecursion(const int n)
     vector<int> previousGrayCodes = grayCodeUseRecursion(n - 1);
     for (int i = previousGrayCodes.size() - 1; i >= 0; --i)
     {
-        previousGrayCodes.push_back(previousGrayCodes[i] | 1 << n - 1);
+        previousGrayCodes.push_back(previousGrayCodes[i] | 1 << (n - 1));
     }
 
     return previousGrayCodes;
 }
-// The second way is to use XOR to calculate gray code from binary, based on this formula: G(n) =  B(n) XOR B(n+1)
+// The other solution is to calculate gray code directly, let's say a integer is represented in binary as b(n-1)b(n-2)...b(2)b(1)b(0),
+// its corresponding gray code is g(n-1)g(n-2)...g(2)g(1)g(0), the process is:
+// b(n-1) becomes g(n-1), then g(i) = b(i+1) XOR b(i).
+//         b(n-1) b(n-2) ... b(2) b(1) b(0)
+//   (XOR)   0    b(n-1)     b(3) b(2) b(1)
+//  ----------------------------------------
+//         g(n-1) g(n-2)     g(2) g(1) g(0)
+// So, given an unsigned integer i, we just let i XOR i>>1, then we get the corresponding gray code.
 vector<int> grayCodeUseXOR(const int n)
 {
     vector<int> codes;
@@ -3982,9 +3989,43 @@ vector<int> grayCodeUseXOR(const int n)
 
     return codes;
 }
-vector<int> grayCode(int n)
+vector<int> grayCode(const int n)
 {
     return grayCodeUseXOR(n);
+}
+
+// 90. Subsets II
+// All subsets of nums[0 .. nums.size()-1] can be grouped into:
+// subsets that nums[0] is the first element.
+// subsets that nums[1] is the first element.
+// ...
+// subsets that nums[i] (0 <= i <= nums.size()-1) is the first element.
+// ...
+// subsets that nums[nums.size()-1] is the first element.
+// For the group that has nums[i] is the first element, it can be generated in this way: nums[i] + { subsets of nums[i+1 .. nums.size()-1] }.
+// So it is a recursion problem, here this helper function recursively finds all subsets of nums[currentIndex .. nums.size()-1].
+void dfsSearchSubsetWithDup(vector<vector<int>>& subsets, vector<int>& currentSubset, vector<int>& nums, const unsigned currentIndex)
+{
+    subsets.push_back(currentSubset);
+    for (unsigned i = currentIndex; i < nums.size(); ++i) // Select nums[i] as the first element respectively
+    {
+        if (i == currentIndex || nums[i] != nums[i-1])
+        {
+            currentSubset.push_back(nums[i]);
+            dfsSearchSubsetWithDup(subsets, currentSubset, nums, i + 1);
+            currentSubset.pop_back();
+        }
+    }
+}
+vector<vector<int>> subsetsWithDup(vector<int>& nums)
+{
+    vector<vector<int>> subsets;
+    vector<int> currentSubset;
+
+    sort(nums.begin(), nums.end());
+    dfsSearchSubsetWithDup(subsets, currentSubset, nums, 0);
+
+    return subsets;
 }
 
 // 138. Copy List with Random Pointer
