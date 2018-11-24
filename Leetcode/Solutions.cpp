@@ -497,7 +497,7 @@ vector<vector<int>> threeSum(vector<int>& nums)
 int threeSumClosest(vector<int>& nums, int target)
 {
     int sum = 0;
-    int diff = INT_MAX; // Don't intialize sum to INT_MAX then calc difference = abs(sum - target), that could overflow.
+    int diff = INT_MAX; // Don't initialize sum to INT_MAX then calculate difference = abs(sum - target), that could overflow.
     sort(nums.begin(), nums.end());
 
     for (int i = 0; i < nums.size() - 2;)
@@ -4009,7 +4009,7 @@ void dfsSearchSubsetWithDup(vector<vector<int>>& subsets, vector<int>& currentSu
     subsets.push_back(currentSubset);
     for (unsigned i = currentIndex; i < nums.size(); ++i) // Select nums[i] as the first element respectively
     {
-        if (i == currentIndex || nums[i] != nums[i-1])
+        if (i == currentIndex || nums[i] != nums[i - 1])
         {
             currentSubset.push_back(nums[i]);
             dfsSearchSubsetWithDup(subsets, currentSubset, nums, i + 1);
@@ -4026,6 +4026,70 @@ vector<vector<int>> subsetsWithDup(vector<int>& nums)
     dfsSearchSubsetWithDup(subsets, currentSubset, nums, 0);
 
     return subsets;
+}
+
+// 91. Decode Ways
+int numDecodingsUseRecursion(const string& s)
+{
+    if (s.empty()) // Whole string has been decoded.
+    {
+        return 1;
+    }
+
+    if (s[0] == '0') // Means decoding cannot proceed.
+    {
+        return 0;
+    }
+
+    int ways = 0;
+    ways += numDecodingsUseRecursion(s.substr(1));
+
+    if (s.length() >= 2 && (s[0] - '0') * 10 + (s[1] - '0') <= 26)
+    {
+        ways += numDecodingsUseRecursion(s.substr(2));
+    }
+
+    return ways;
+}
+// We define DP[i] as decoding ways of substring starts from index i (which is s[i .. s.length()-1]), so dp[0] is final answer.
+// DP[i] = s[i] == '0' ? 0
+//                       DP[i+1] + s[i,i+2] <= 26 ? 0
+//                                                  DP[i+2]
+// Since anytime we just need DP[i+1] and DP[i+2] so the space complexity can be optimized to O(1), we use 2 integers to store
+// DP[i+1] and DP[i+2].
+int numDecodingsUseDP(const string& s)
+{
+    vector<int> dp(2, 0);
+    if (!s.empty())
+    {
+        dp[1] = 1; // store dp[i+2]
+        dp[0] = s[s.length() - 1] == '0' ? 0 : 1; // store dp[i+1]
+
+        for (int i = s.length() - 2; i >= 0; --i)
+        {
+            if (s[i] == '0')
+            {
+                dp[1] = dp[0];
+                dp[0] = 0;
+            }
+            else
+            {
+                const int dp0 = dp[0];
+                if ((s[i] - '0') * 10 + (s[i + 1] - '0') <= 26)
+                {
+                    dp[0] += dp[1];
+                }
+
+                dp[1] = dp0;
+            }
+        }
+    }
+
+    return dp[0];
+}
+int numDecodings(const string& s)
+{
+    return numDecodingsUseDP(s);
 }
 
 // 138. Copy List with Random Pointer
