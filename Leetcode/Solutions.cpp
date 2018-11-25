@@ -152,7 +152,7 @@ double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2)
 // 5. Longest Palindromic Substring
 string searchPalindrome(string s, int left, int right)
 {
-    // when loop ends, no matter it is because of out of bounds or s[left] and s[rigth] no longer equal, current palindrome is always s[left+1 .. right-1].
+    // when loop ends, no matter it is because of out of bounds or s[left] and s[right] no longer equal, current palindrome is always s[left+1 .. right-1].
     for (; left >= 0 && right < s.length() && s[left] == s[right]; left--, right++);
     return s.substr(left + 1, right - 1 - left);
 }
@@ -288,7 +288,7 @@ bool isPalindrome(int x)
 bool isMatch_Regex(string text, string pattern)
 {
     // Exit condition should be: when pattern is all processed, text must also be all processed,
-    // but not vice versa, because when text is empty, if pattern is a* or .*, they still match.
+    // but not vice versa, because when text is empty, if pattern is a * or .*, they still match.
     if (pattern.length() == 0)
     {
         return text.length() == 0;
@@ -297,7 +297,7 @@ bool isMatch_Regex(string text, string pattern)
     // If there is a * followed, there are 2 cases:
     // (1) the preceding character of * appears zero times, next match would be isRegexMatch(text, pattern.substr(2)).
     // (2) the preceding character of * appears >= 1 times, next match would be isRegexMatch(text.substr(1), pattern.substr(1)) if current character matches pattern.
-    return (pattern.length() > 1 && pattern[1] == '*') ?
+    return pattern.length() > 1 && pattern[1] == '*' ?
         isMatch_Regex(text, pattern.substr(2)) || (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isMatch_Regex(text.substr(1), pattern) :
         (text.length() > 0 && (pattern[0] == '.' || text[0] == pattern[0])) && isMatch_Regex(text.substr(1), pattern.substr(1));
 }
@@ -394,26 +394,17 @@ int romanToInt(string s)
 // 14. Longest Common Prefix
 string longestCommonPrefix(vector<string>& strs)
 {
-    if (strs.empty())
+    string prefix;
+    for (unsigned i = 0, j = 0; !strs.empty() && (i == 0 || j == strs.size()); prefix.append(1, strs[0][i++]))
     {
-        return "";
+        for (j = 0; j < strs.size() && i < strs[j].length() && strs[j][i] == strs[0][i]; ++j);
     }
 
-    int i;
-    bool flag = true;
-    for (i = 0; flag; ++i)
-    {
-        for (int j = 0; j < strs.size() && flag; ++j)
-        {
-            flag = i < strs[j].length() && strs[j][i] == strs[0][i];
-        }
-    }
-
-    return strs[0].substr(0, i - 1);
+    return prefix.empty() ? prefix : prefix.substr(0, prefix.length() - 1);
 }
 
 // 15. 3Sum
-vector<vector<int>> kSum(vector<int>& nums, unsigned int k, int sum) // nums must be sorted.
+vector<vector<int>> kSum(vector<int>& nums, unsigned int k, const int sum) // nums must be sorted.
 {
     vector<vector<int>> result(0);
 
@@ -539,22 +530,22 @@ int threeSumClosest(vector<int>& nums, int target)
 }
 
 // 17. Letter Combinations of a Phone Number
-vector<string> letterCombinationsTopDown(string digits)
+vector<string> letterCombinationsUseRecursion(const string& digits)
 {
     const string mapping[9] = { "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz" };
     vector<string> result;
-    if (digits.length() >= 1)
+    if (!digits.empty())
     {
-        vector<string> rest = letterCombinationsTopDown(digits.substr(1));
+        vector<string> rest = letterCombinationsUseRecursion(digits.substr(1));
         string first = mapping[digits[0] - '0' - 1];
-        for (int i = 0; i < first.length(); ++i)
+        for (unsigned i = 0; i < first.length(); ++i)
         {
             string s = first.substr(i, 1);
             if (!rest.empty())
             {
-                for (int j = 0; j < rest.size(); ++j)
+                for (unsigned j = 0; j < rest.size(); ++j)
                 {
-                    result.push_back(s + rest[i]);
+                    result.push_back(s + rest[j]);
                 }
             }
             else
@@ -566,7 +557,7 @@ vector<string> letterCombinationsTopDown(string digits)
 
     return result;
 }
-vector<string> letterCombinationsBottomUp(string digits)
+vector<string> letterCombinationsUseDP(const string& digits)
 {
     const string mapping[9] = { "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz" };
     vector<vector<string>> dp(digits.length() + 1);
@@ -575,17 +566,17 @@ vector<string> letterCombinationsBottomUp(string digits)
         string current = mapping[digits[i] - '0' - 1];
         if (dp[i + 1].empty())
         {
-            for (int j = 0; j < current.length(); ++j)
+            for (unsigned j = 0; j < current.length(); ++j)
             {
                 dp[i].push_back(current.substr(j, 1));
             }
         }
         else
         {
-            for (int j = 0; j < current.length(); ++j)
+            for (unsigned j = 0; j < current.length(); ++j)
             {
                 string s = current.substr(j, 1);
-                for (int k = 0; k < dp[i + 1].size(); ++k)
+                for (unsigned k = 0; k < dp[i + 1].size(); ++k)
                 {
                     dp[i].push_back(s + dp[i + 1][k]);
                 }
@@ -595,15 +586,13 @@ vector<string> letterCombinationsBottomUp(string digits)
 
     return dp[0];
 }
-vector<string> letterCombinations(string digits)
+vector<string> letterCombinations(const string& digits)
 {
-    vector<string> r1 = letterCombinationsTopDown(digits);
-    vector<string> r2 = letterCombinationsBottomUp(digits);
-    return r1;
+    return letterCombinationsUseDP(digits);
 }
 
 // 18. 4Sum
-vector<vector<int>> fourSum(vector<int>& nums, int target)
+vector<vector<int>> fourSum(vector<int>& nums, const int target)
 {
     sort(nums.begin(), nums.end());
     return kSum(nums, 4, target);
@@ -709,7 +698,7 @@ vector<string> generateParenthesisBottomUp(int n)
     {
         for (int j = 0; j < i; ++j)
         {
-            // For every string in dp[j] and dp[i-j-1], concat a new string (dp[j])+dp[i-j-1]
+            // For every string in dp[j] and dp[i-j-1], concatenate a new string (dp[j])+dp[i-j-1]
             for (const string& x : dp[j])
             {
                 for (const string& y : dp[i - j - 1])
@@ -732,7 +721,7 @@ vector<string> generateParenthesisBacktracking(const string trail, int remaining
         return results;
     }
 
-    // Solution space is a binary tree. But this problem is a little different from other similiar problems (e.g. letterCombinations),
+    // Solution space is a binary tree. But this problem is a little different from other similar problems (e.g. letterCombinations),
     // that is when searching in the solution tree, remaining left brackets must not be more than remaining right brackets.
     if (remainingLeftBrackets <= remainingRightBrackets)
     {
@@ -762,7 +751,7 @@ vector<string> generateParenthesis(int n)
 }
 
 // 23. Merge k Sorted Lists
-void minHeapify(vector<ListNode*>& nodes, int root)
+void minHeapify(vector<ListNode*>& nodes, const int root)
 {
     const int leftChild = root * 2 + 1;
     const int rightChild = root * 2 + 2;
@@ -903,13 +892,13 @@ ListNode* reverseKGroup(ListNode* head, int k)
 // k==2.
 // nums[0..last-1] is the range that have been packed. Back to the truth of array is sorted and a number is only allowed to
 // duplicate for k times, so we have two facts:
-// (1) When last < k, it is impossbile to have a number duplicated more than k times, just append num to end of packed range.
+// (1) When last < k, it is impossible to have a number duplicated more than k times, just append num to end of packed range.
 // (2) When last >= k, means packed range already has no less than k elements, need to check before appending num, here is
 //     the key point, since num[0 .. last-1] is also sorted, so we compare num[last-k] and num. if num[last-k] == num, it means
 //     if we put num on nums[last], nums[last-k .. last] are all equal to num, so num is duplicated k+1 times, which is not 
 //     allowed, so num should be skipped and last keeps unchanged; otherwise if num[last-k] < num, it is safe to append num.
 // At last since last always points to the next location of end of packed range, so last is the packed range length.
-int removeDuplicatesK(vector<int>& nums, int k)
+int removeDuplicatesK(vector<int>& nums, const int k)
 {
     int last = 0;
     for (int num : nums)
@@ -928,7 +917,7 @@ int removeDuplicates(vector<int>& nums)
 }
 
 // 27. Remove Element
-int removeElement(vector<int>& nums, int val)
+int removeElement(vector<int>& nums, const int val)
 {
     size_t last = 0;
     for (size_t probe = 0; probe < nums.size(); ++probe)
@@ -4103,14 +4092,62 @@ ListNode* reverseBetween(ListNode* head, int m, int n)
     ListNode* p = &dummy;
     for (n -= m; m > 1; --m, p = p->next); // find the node precedes node m and update n relative to m.
 
-    ListNode* q = p->next;
+    ListNode* q = p->next; // q points to node m.
     ListNode* r = q->next;
-    for (ListNode* t; n > 0; --n, t = r->next, r->next = q, q = r, r = t);
+    for (ListNode* t; n > 0; --n, t = r->next, r->next = q, q = r, r = t); // when this loop ends, n==0, so it executes n+1 times, q points to node n, r points to node n's next node.
 
     p->next->next = r;
     p->next = q;
 
     return dummy.next;
+}
+
+// 93. Restore IP Addresses
+void dfsSearchIPAddresses(vector<string>& ips, vector<string>& currentOctets, const string& s, unsigned currentIndex)
+{
+    // the longest IP address like 255.255.255.255 contains 12 digits.
+    if (s.length() > 12)
+    {
+        return;
+    }
+
+    if (s.length() == currentIndex && currentOctets.size() == 4)
+    {
+        ips.push_back(currentOctets[0] + '.' + currentOctets[1] + '.' + currentOctets[2] + '.' + currentOctets[3]);
+        return;
+    }
+
+    // There are 3 cases, current ip octet can be 1, 2 or 3 digits (<= 255), and when octet is 2 or 3 digits, it cannot start with 0
+    if (currentIndex + 1 <= s.length())
+    {
+        currentOctets.push_back(s.substr(currentIndex, 1));
+        dfsSearchIPAddresses(ips, currentOctets, s, currentIndex + 1);
+        currentOctets.pop_back();
+    }
+
+    if (s[currentIndex] != '0')
+    {
+        if (currentIndex + 2 <= s.length())
+        {
+            currentOctets.push_back(s.substr(currentIndex, 2));
+            dfsSearchIPAddresses(ips, currentOctets, s, currentIndex + 2);
+            currentOctets.pop_back();
+        }
+
+        if (currentIndex + 3 <= s.length() && (s[currentIndex] - '0') * 100 + (s[currentIndex + 1] - '0') * 10 + (s[currentIndex + 2] - '0') <= 255)
+        {
+            currentOctets.push_back(s.substr(currentIndex, 3));
+            dfsSearchIPAddresses(ips, currentOctets, s, currentIndex + 3);
+            currentOctets.pop_back();
+        }
+    }
+}
+vector<string> restoreIpAddresses(const string& s)
+{
+    vector<string> ips;
+    vector<string> currentOctets;
+    dfsSearchIPAddresses(ips, currentOctets, s, 0);
+    return ips;
 }
 
 // 138. Copy List with Random Pointer

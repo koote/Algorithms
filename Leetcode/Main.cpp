@@ -103,6 +103,7 @@ extern vector<int> grayCode(int n);
 extern vector<vector<int>> subsetsWithDup(vector<int>& nums);
 extern int numDecodings(const string& s);
 extern ListNode* reverseBetween(ListNode* head, int m, int n);
+extern vector<string> restoreIpAddresses(string s);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 
