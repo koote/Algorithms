@@ -102,6 +102,7 @@ extern void merge(vector<int>& nums1, int m, vector<int>& nums2, int n);
 extern vector<int> grayCode(int n);
 extern vector<vector<int>> subsetsWithDup(vector<int>& nums);
 extern int numDecodings(const string& s);
+extern ListNode* reverseBetween(ListNode* head, int m, int n);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 

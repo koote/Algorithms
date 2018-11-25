@@ -4041,8 +4041,7 @@ int numDecodingsUseRecursion(const string& s)
         return 0;
     }
 
-    int ways = 0;
-    ways += numDecodingsUseRecursion(s.substr(1));
+    int ways = numDecodingsUseRecursion(s.substr(1));
 
     if (s.length() >= 2 && (s[0] - '0') * 10 + (s[1] - '0') <= 26)
     {
@@ -4074,6 +4073,8 @@ int numDecodingsUseDP(const string& s)
             }
             else
             {
+                // For single digit, dp[i] = dp[i+1], so no need to update dp[0]'s value. Just when 2 digits are possible,
+                // we need to add dp[1] to dp[0] to get new dp[0].
                 const int dp0 = dp[0];
                 if ((s[i] - '0') * 10 + (s[i + 1] - '0') <= 26)
                 {
@@ -4090,6 +4091,26 @@ int numDecodingsUseDP(const string& s)
 int numDecodings(const string& s)
 {
     return numDecodingsUseDP(s);
+}
+
+// 92. Reverse Linked List II
+// Note, since it is guaranteed that 1 <= m <= n < list length, so no needs to check m and n, node m and node n are always valid.
+ListNode* reverseBetween(ListNode* head, int m, int n)
+{
+    ListNode dummy(0);
+    dummy.next = head;
+
+    ListNode* p = &dummy;
+    for (n -= m; m > 1; --m, p = p->next); // find the node precedes node m and update n relative to m.
+
+    ListNode* q = p->next;
+    ListNode* r = q->next;
+    for (ListNode* t; n > 0; --n, t = r->next, r->next = q, q = r, r = t);
+
+    p->next->next = r;
+    p->next = q;
+
+    return dummy.next;
 }
 
 // 138. Copy List with Random Pointer
