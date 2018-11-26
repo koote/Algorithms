@@ -27,7 +27,7 @@ extern int romanToInt(string s);
 extern string longestCommonPrefix(vector<string>& strs);
 extern vector<vector<int>> threeSum(vector<int>& nums);
 extern int threeSumClosest(vector<int>& nums, int target);
-extern vector<string> letterCombinations(string digits);
+extern vector<string> letterCombinations(const string& digits);
 extern vector<vector<int>> fourSum(vector<int>& nums, int target);
 extern ListNode* removeNthFromEnd(ListNode* head, int n);
 extern bool isValid(string s);
@@ -103,7 +103,8 @@ extern vector<int> grayCode(int n);
 extern vector<vector<int>> subsetsWithDup(vector<int>& nums);
 extern int numDecodings(const string& s);
 extern ListNode* reverseBetween(ListNode* head, int m, int n);
-extern vector<string> restoreIpAddresses(string s);
+extern vector<string> restoreIpAddresses(const string& s);
+extern vector<int> inorderTraversal(TreeNode* root);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 
@@ -115,7 +116,7 @@ extern TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q);
 
 extern bool increasingTriplet(vector<int>& nums);
 
-extern string addStrings(string num1, string num2);
+extern string addStrings(const string& num1, const string& num2);
 
 void main()
 {

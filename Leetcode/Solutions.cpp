@@ -626,21 +626,21 @@ ListNode* removeNthFromEnd(ListNode* head, int n)
 // 20. Valid Parentheses
 bool isValid(string s)
 {
-    stack<char> stk;
+    stack<char> stack;
     for (char i : s)
     {
         if (s[i] == '{' || s[i] == '[' || s[i] == '(')
         {
-            stk.push(s[i]);
+            stack.push(s[i]);
         }
         else
         {
-            if (!stk.empty())
+            if (!stack.empty())
             {
-                const char top = stk.top();
+                const char top = stack.top();
                 if ((s[i] == ')' && top == '(') || (s[i] == ']'&&top == '[') || (s[i] == '}' && top == '{'))
                 {
-                    stk.pop();
+                    stack.pop();
                     continue;
                 }
             }
@@ -649,7 +649,7 @@ bool isValid(string s)
         }
     }
 
-    return stk.empty();
+    return stack.empty();
 }
 
 // 21. Merge Two Sorted Lists
@@ -1607,7 +1607,7 @@ int trap(vector<int>& height)
 
 // 43. Multiply Strings
 // O(n1 *n2), O(1)
-string addStrings(string num1, string num2);
+string addStrings(const string& num1, const string& num2);
 string multiplyUseAddStrings(string num1, string num2)
 {
     if (num1 == "0" || num2 == "0")
@@ -4090,7 +4090,7 @@ ListNode* reverseBetween(ListNode* head, int m, int n)
     dummy.next = head;
 
     ListNode* p = &dummy;
-    for (n -= m; m > 1; --m, p = p->next); // find the node precedes node m and update n relative to m.
+    for (n -= m; m > 1; --m, p = p->next); // find the predecessor of node m and update n relative to m.
 
     ListNode* q = p->next; // q points to node m.
     ListNode* r = q->next;
@@ -4150,6 +4150,70 @@ vector<string> restoreIpAddresses(const string& s)
     return ips;
 }
 
+// 94. Binary Tree Inorder Traversal
+vector<int> inorderTraversalUseStack(TreeNode* root)
+{
+    vector<int> result;
+    stack<TreeNode*> stack;
+
+    for (; root != nullptr; stack.push(root), root = root->left);
+
+    while (!stack.empty())
+    {
+        root = stack.top();
+        result.push_back(root->val);
+        stack.pop();
+        if (root->right != nullptr)
+        {
+            root = root->right;
+            for (; root != nullptr; stack.push(root), root = root->left);
+        }
+    }
+
+    return result;
+}
+vector<int> inorderMorrisTraversal(TreeNode* root)
+{
+    vector<int> result;
+    for (TreeNode* current = root; current != nullptr;)
+    {
+        if (current->left != nullptr)
+        {
+            // Before exploring into the left child tree, find the in-order predecessor of current node and borrow its unused right field
+            // to point to current node, so we can return to current node after left child tree has been visited. The predecessor is the
+            // right most node in the left child tree.
+            TreeNode* predecessor = current->left;
+            for (; predecessor->right != nullptr && predecessor->right != current; predecessor = predecessor->right);
+
+            if (predecessor->right == nullptr) // create a thread, then proceed to left child tree.
+            {
+                predecessor->right = current;
+                current = current->left;
+            }
+            else
+            {
+                // We found a already connected thread, it means current node's left child tree has been visited, so we need to do:
+                // (1) revert the thread, (2) visit current node (according to in-order, after left tree has been visited, we should 
+                // visit the root which is current node, (3) proceed to visit current node's right child tree.
+                predecessor->right = nullptr;
+                result.push_back(current->val);
+                current = current->right;
+            }
+        }
+        else
+        {
+            result.push_back(current->val);
+            current = current->right; // here right could point to real right child, or it is used as thread, so don't revert thread here.
+        }
+    }
+
+    return result;
+}
+vector<int> inorderTraversal(TreeNode* root)
+{
+    return inorderMorrisTraversal(root);
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
 {
@@ -4191,26 +4255,18 @@ RandomListNode *copyRandomList(RandomListNode *head)
 vector<int> preorderTraversal(TreeNode* root)
 {
     vector<int> result;
-    stack<TreeNode*> stk;
-    stk.push(root);
-    while (!stk.empty())
+    stack<TreeNode*> stack;
+    stack.push(root);
+    while (!stack.empty()) // note in this solution we allow pushing nullptr to stack.
     {
-        root = stk.top(); // reuse root
-        stk.pop();
+        root = stack.top();
+        stack.pop();
 
         if (root != nullptr)
         {
             result.push_back(root->val);
-
-            if (root->right != nullptr)
-            {
-                stk.push(root->right);
-            }
-
-            if (root->left != nullptr)
-            {
-                stk.push(root->left);
-            }
+            stack.push(root->right); //since we allow nullptr to be pushed to stack so no need to check left and right.
+            stack.push(root->left);
         }
     }
 
@@ -4267,32 +4323,13 @@ bool increasingTriplet(vector<int>& nums)
 }
 
 // 415. Add Strings
-string addStrings(string num1, string num2)
+string addStrings(const string& num1, const string& num2)
 {
     string sum;
-    char carry = '0';
-    for (int i = num1.length() - 1, j = num2.length() - 1, r; i >= 0 || j >= 0; --i, --j)
+    for (int i = num1.length() - 1, j = num2.length() - 1, r, carry = 0; i >= 0 || j >= 0 || carry != 0; --i, --j, carry = r / 10)
     {
-        if (i >= 0 && j >= 0)
-        {
-            r = num1[i] - '0' + (num2[j] - '0') + (carry - '0');
-        }
-        else if (i >= 0)
-        {
-            r = num1[i] - '0' + (carry - '0');
-        }
-        else if (j >= 0)
-        {
-            r = num2[j] - '0' + (carry - '0');
-        }
-
-        carry = r / 10 + '0';
-        sum.insert(0, 1, static_cast<char>((r % 10) + '0'));
-    }
-
-    if (carry - '0' > 0)
-    {
-        sum.insert(0, 1, carry);
+        r = (i >= 0 ? num1[i] - '0' : 0) + (j >= 0 ? num2[j] - '0' : 0) + carry;
+        sum.insert(0, 1, static_cast<char>(r % 10 + '0'));
     }
 
     return sum;
