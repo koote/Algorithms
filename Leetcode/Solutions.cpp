@@ -4214,6 +4214,57 @@ vector<int> inorderTraversal(TreeNode* root)
     return inorderMorrisTraversal(root);
 }
 
+// 95. Unique Binary Search Trees II
+vector<TreeNode*> generateTreesUseRecursion(const int start, const int end)
+{
+    if (start > end)
+    {
+        return { nullptr };
+    }
+
+    vector<TreeNode*> trees;
+    for (int i = start; i <= end; ++i)
+    {
+        for (TreeNode* leftRoot : generateTreesUseRecursion(start, i - 1)) // left child, low..i - 1
+        {
+            for (TreeNode* rightRoot : generateTreesUseRecursion(i + 1, end)) // right child i+1..high
+            {
+                TreeNode* root = new TreeNode(i);
+                root->left = leftRoot;
+                root->right = rightRoot;
+                trees.push_back(root);
+            }
+        }
+    }
+
+    return trees;
+}
+vector<TreeNode*> generateTrees(const int n)
+{
+    return generateTreesUseRecursion(1, n);
+}
+
+// 96. Unique Binary Search Trees
+// Thinking in this way, let's say there are i nodes, since one node is used for root so there are i-1 nodes remaining.
+// So left subtree can has 0, 1, 2, ... , i-1 nodes, accordingly right subtree can has i-1, i-2, ..., 1, 0 nodes.
+// Use F(i) is the total count of unique binary trees that have i nodes, then:
+// F(i) = F(0)F(i-1) + F(1)F(i-2) + F(2)F(i-3) + ... + F(i-1)F(0).
+int numTrees(int n)
+{
+    vector<int> dp(n + 1, 0);
+    dp[0] = 1;
+    dp[1] = 1;
+    for (int i = 2; i <= n; ++i)
+    {
+        for (int j = 0; j <= i - 1; ++j)
+        {
+            dp[i] += dp[j] * dp[i - 1 - j];
+        }
+    }
+
+    return dp.back();
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
 {

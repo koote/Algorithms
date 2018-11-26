@@ -105,6 +105,8 @@ extern int numDecodings(const string& s);
 extern ListNode* reverseBetween(ListNode* head, int m, int n);
 extern vector<string> restoreIpAddresses(const string& s);
 extern vector<int> inorderTraversal(TreeNode* root);
+extern vector<TreeNode*> generateTrees(int n);
+extern int numTrees(int n);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 
@@ -122,6 +124,7 @@ void main()
 {
     const auto start = clock();
 
+    auto k = generateTrees(0);
     vector<vector<char>> matrix({
         {'0','1','1','0','1'},
         {'1','1','0','1','0'},
