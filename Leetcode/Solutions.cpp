@@ -849,7 +849,7 @@ ListNode* swapPairs(ListNode* head)
 }
 
 //25. Reverse Nodes in k-Group
-ListNode* reverseKGroup(ListNode* head, int k)
+ListNode* reverseKGroup(ListNode* head, const int k)
 {
     ListNode dummy(0);
     dummy.next = head;
@@ -947,7 +947,7 @@ int strStr(string text, string pattern)
 }
 
 // 29. Divide Two Integers
-int divide2(int dividend, int divisor)
+int divide2(const int dividend, const int divisor)
 {
     unsigned int quotient = 0;
 
@@ -1110,7 +1110,7 @@ int longestValidParentheses(string s)
 }
 
 // 33. Search in Rotated Sorted Array
-int search(vector<int>& nums, int target)
+int search(vector<int>& nums, const int target)
 {
     for (int left = 0, right = nums.size() - 1; left <= right;)
     {
@@ -1150,7 +1150,7 @@ int search(vector<int>& nums, int target)
 
     return -1;
 }
-int search1_2(vector<int>& nums, int target)
+int search1_2(vector<int>& nums, const int target)
 {
     for (int left = 0, right = nums.size() - 1; left <= right;)
     {
@@ -1189,7 +1189,7 @@ int search1_2(vector<int>& nums, int target)
 }
 
 // 34. Search for a Range
-vector<int> searchRange(vector<int>& nums, int target)
+vector<int> searchRange(vector<int>& nums, const int target)
 {
     vector<int> result(2, -1);
     for (int left = 0, right = nums.size() - 1; left <= right;)
@@ -1246,7 +1246,7 @@ vector<int> searchRange(vector<int>& nums, int target)
 }
 
 // 35. Search Insert Position
-int searchInsert(vector<int>& nums, int target)
+int searchInsert(vector<int>& nums, const int target)
 {
     int left, right;
     for (left = 0, right = nums.size() - 1; left <= right;)
@@ -1328,7 +1328,7 @@ bool solveSudokuUse36(vector<vector<char>>& board)
     return true;
 }
 
-bool isValidCandidate(const vector<vector<char>>& board, size_t row, size_t col)
+bool isValidCandidate(const vector<vector<char>>& board, const size_t row, const size_t col)
 {
     for (size_t r = 0; r < board.size(); ++r)
     {
@@ -1409,7 +1409,7 @@ string countAndSay(int n)
 }
 
 // 39. Combination Sum
-void dfsCombinationSum(vector<int>& candidates, size_t currentIndex, int target, vector<int>& path, vector<vector<int>>& solutions)
+void dfsCombinationSum(vector<int>& candidates, const size_t currentIndex, const int target, vector<int>& path, vector<vector<int>>& solutions)
 {
     // In this problem, because allow choosing element multiple times, so whether checking target == 0 
     // first or checking currentIndex out of boundary first doesn't matter, won't miss valid combination.
@@ -1443,7 +1443,7 @@ vector<vector<int>> combinationSum(vector<int>& candidates, int target)
 }
 
 // 40. Combination Sum II
-void dfsCombinationSum2(vector<int>& candidates, size_t currentIndex, int target, vector<int>& path, vector<vector<int>>& solutions)
+void dfsCombinationSum2(vector<int>& candidates, size_t currentIndex, const int target, vector<int>& path, vector<vector<int>>& solutions)
 {
     // Doesn't like problem 39, we must check target == 0 first, otherwise we could miss valid combination.
     // Still using test case: [10,1,2,7,6,5] and target == 8, when currentIndex == 5, next recursion function
@@ -3883,7 +3883,7 @@ bool isScramble(const string& s1, const string& s2)
         }
     }
 
-    // split s2 to 2 parts, left part: s2[0..leftlen-1], right part: s2[leftlen..s2.length()-1].
+    // split s2 into 2 parts, left part: s2[0..leftlen-1], right part: s2[leftlen..s2.length()-1].
     for (unsigned leftlen = 1; leftlen < s2.length(); ++leftlen)
     {
         // there are 2 cases, left part and right part are not swapped, or swapped.
@@ -4245,10 +4245,9 @@ vector<TreeNode*> generateTrees(const int n)
 }
 
 // 96. Unique Binary Search Trees
-// Thinking in this way, let's say there are i nodes, since one node is used for root so there are i-1 nodes remaining.
-// So left subtree can has 0, 1, 2, ... , i-1 nodes, accordingly right subtree can has i-1, i-2, ..., 1, 0 nodes.
-// Use F(i) is the total count of unique binary trees that have i nodes, then:
-// F(i) = F(0)F(i-1) + F(1)F(i-2) + F(2)F(i-3) + ... + F(i-1)F(0).
+// Thinking in this way, let's say there are i nodes, since one node is used as root so there are i-1 nodes remaining. Left subtree 
+// can has 0, 1, 2, ... , i-1 nodes, accordingly right subtree can has i-1, i-2, ..., 1, 0 nodes. Assume F(i) is the count  of unique
+// binary trees that have i nodes, then F(i) = F(0)*F(i-1) + F(1)*F(i-2) + F(2)*F(i-3) + ... + F(i-1)*F(0).
 int numTrees(int n)
 {
     vector<int> dp(n + 1, 0);
@@ -4263,6 +4262,100 @@ int numTrees(int n)
     }
 
     return dp.back();
+}
+
+// 97. Interleaving String
+// How to think this problem? It makes it seems complicated if we start from s1 and s2 and think the combinations can get from s1
+// and s2, let's thinking in a reversed way. Assume s3 is formed by interleaving s1 and s2, then s3's substring : s3.substr(0, k)
+// should also be formed by interleaving s1's substring and s2's substring, let's say they are s1.substr(0, i) and s2.substr(0, j)
+// (obviously i+j=k), then let's move one step further, think about s3.substr(0, k+1), actually we only need to think about the 
+// new added element s3[k], if s3[k] == s1[i], we can say s3.substr(0, k+1) is formed by s1.substr(0, i+1) and s2.substr(0, j); if
+// s[3] == s2[j], we can say s3.substr(0, k+1) is formed by s1.substr(0, i) and s2(0, j+1). Now it is more clear, let's define the
+// DP[i][j] == whether s3.substr(0, i+j) is formed by interleaving of s1.substr(0, i) and s2.substr(0, j), so, 
+// DP[i][j] = (whether s3.substr(0, i+j-1) is formed by interleaving of s1.substr(0, i) and s2.substr(0, j-1)) && s3[i+j] == s1[i]
+//            ||
+//            (whether s3.substr(0, i+j-1) is formed by interleaving of s1.substr(0, i-1) and s2.substr(0, j)) && s3[i+j] == s2[j]
+//          = (DP[i][j-1] && s3[i+j] == s1[i]) || (DP[i-1][j] && s3[i+j] == s2[j])
+bool isInterleaveUseDP(const string& s1, const string& s2, const string& s3)
+{
+    if (s1.length() + s2.length() != s3.length())
+    {
+        return false;
+    }
+
+    // Note we start from substr(0,0), so DP[][] has additional column and row, when i==0 and j==0, substrings are empty string, 
+    // so DP[0][0] means empty string is formed by interleaving empty strings, obviously it is true.
+    vector<vector<bool>> dp(s1.length() + 1, vector<bool>(s2.length() + 1, false));
+    dp[0][0] = true;
+
+    // Initialize first row and first column. For first row and first column, they mean, when s1 is empty or s2 is empty, whether
+    // s3.substr(0,i) is formed by interleaving of the other string, but since s1 or s2 is empty, so actually no interleaving, just
+    // string compare, DP[i][0] == whether s3.substr(0,i) == s1.substr(0,i); DP[0][j] == whether s3.substr(0,j)==s2.substr(0,j).
+    for (unsigned i = 1; i <= s1.length(); ++i) // remember, i and j here means the substring length, so last element index is i-1 and j-1.
+    {
+        dp[i][0] = dp[i - 1][0] && s1[i - 1] == s3[i - 1];
+    }
+
+    for (unsigned j = 1; j <= s2.length(); ++j)
+    {
+        dp[0][j] = dp[0][j - 1] && s2[j - 1] == s3[j - 1];
+    }
+
+    for (unsigned i = 1; i <= s1.length(); ++i)
+    {
+        for (unsigned j = 1; j <= s2.length(); ++j)
+        {
+            dp[i][j] = (dp[i - 1][j] && s3[i + j - 1] == s1[i - 1]) || (dp[i][j - 1] && s3[i + j - 1] == s2[j - 1]);
+        }
+    }
+
+    return dp.back().back();
+}
+// Imaging that in each step, we pick up a character from s1 or s2, after all characters in s1 and s2 have been used, we get an 
+// interleaving string, if s3 is formed by interleaving s1 and s2, we should be able to construct s3 in this recursive way, this
+// process is recursive so can be solved by recursion.
+// The only problem is pure DFS will timeout, because it tries too many branches and most of branches we already know that cannot
+// success, the basic idea is caching the pair (i,j) when we know that s1[i..s1.length()-1] and s2[j..s2.length()-1] cannot form 
+// s3[k..s3.length()-1] via interleaving. This solution we call it cached DFS.
+bool dfsSearchInterleavingString(unordered_set<string>& knownFailures, const string& s1, const unsigned i, const string& s2, const unsigned j, const string& s3, const unsigned k)
+{
+    if (knownFailures.find(to_string(i) + "," + to_string(j)) != knownFailures.end())
+    {
+        return false;
+    }
+
+    if (i == s1.length())
+    {
+        return s2.substr(j) == s3.substr(k);
+    }
+
+    if (j == s2.length())
+    {
+        return s1.substr(i) == s3.substr(k);
+    }
+
+    if (s1[i] == s3[k] && dfsSearchInterleavingString(knownFailures, s1, i + 1, s2, j, s3, k + 1))
+    {
+        return true;
+    }
+
+    if (s2[j] == s3[k] && dfsSearchInterleavingString(knownFailures, s1, i, s2, j + 1, s3, k + 1))
+    {
+        return true;
+    }
+
+    knownFailures.insert(to_string(i) + "," + to_string(j));
+    return false;
+}
+bool isInterleave(const string& s1, const string& s2, const string& s3)
+{
+    if (s1.length() + s2.length() != s3.length())
+    {
+        return false;
+    }
+
+    unordered_set<string> knownFailures;
+    return dfsSearchInterleavingString(knownFailures, s1, 0, s2, 0, s3, 0);
 }
 
 // 138. Copy List with Random Pointer
