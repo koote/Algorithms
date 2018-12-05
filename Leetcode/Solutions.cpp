@@ -4311,6 +4311,45 @@ bool isInterleaveUseDP(const string& s1, const string& s2, const string& s3)
 
     return dp.back().back();
 }
+bool bfsSearchInterleavingString(const string& s1, const string& s2, const string& s3)
+{
+    if (s1.length() + s2.length() != s3.length())
+    {
+        return false;
+    }
+
+    unordered_set<string> visited;
+    queue<pair<unsigned, unsigned>> queue;
+    queue.push(make_pair(0, 0));
+    for (unsigned k = 0; !queue.empty(); ++k)
+    {
+        if (k == s3.length())
+        {
+            return true;
+        }
+
+        for (unsigned l = 0, currenQueueLength = queue.size(), i, j; l < currenQueueLength; ++l, queue.pop())
+        {
+            const pair<unsigned, unsigned> current = queue.front();
+            i = current.first;
+            j = current.second;
+
+            if (i < s1.length() && s1[i] == s3[k] && visited.find(to_string(i + 1) + "," + to_string(j)) == visited.end())
+            {
+                visited.insert(to_string(i + 1) + "," + to_string(j));
+                queue.push(make_pair(i + 1, j));
+            }
+
+            if (j < s2.length() && s2[j] == s3[k] && visited.find(to_string(i) + "," + to_string(j + 1)) == visited.end())
+            {
+                visited.insert(to_string(i) + "," + to_string(j + 1));
+                queue.push(make_pair(i, j + 1));
+            }
+        }
+    }
+
+    return false;
+}
 // Imaging that in each step, we pick up a character from s1 or s2, after all characters in s1 and s2 have been used, we get an 
 // interleaving string, if s3 is formed by interleaving s1 and s2, we should be able to construct s3 in this recursive way, this
 // process is recursive so can be solved by recursion.
@@ -4356,6 +4395,26 @@ bool isInterleave(const string& s1, const string& s2, const string& s3)
 
     unordered_set<string> knownFailures;
     return dfsSearchInterleavingString(knownFailures, s1, 0, s2, 0, s3, 0);
+}
+
+// 98. Validate Binary Search Tree
+bool isValidBSTHelper(TreeNode* root, TreeNode* lowerBound, TreeNode* upperBound)
+{
+    if (root == nullptr)
+    {
+        return true;
+    }
+
+    if ((lowerBound == nullptr || root->val > lowerBound->val) && (upperBound == nullptr || root->val < upperBound->val))
+    {
+        return isValidBSTHelper(root->left, lowerBound, root) && isValidBSTHelper(root->right, root, upperBound);
+    }
+
+    return false;
+}
+bool isValidBST(TreeNode* root)
+{
+    return isValidBSTHelper(root, nullptr, nullptr);
 }
 
 // 138. Copy List with Random Pointer

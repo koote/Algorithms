@@ -108,6 +108,7 @@ extern vector<int> inorderTraversal(TreeNode* root);
 extern vector<TreeNode*> generateTrees(int n);
 extern int numTrees(int n);
 extern bool isInterleave(const string& s1, const string& s2, const string& s3);
+extern bool isValidBST(TreeNode* root);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 
