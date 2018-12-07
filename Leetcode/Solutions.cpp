@@ -4508,6 +4508,17 @@ void recoverTree(TreeNode* root)
     swap(a->val, b->val);
 }
 
+// 100. Same Tree
+bool isSameTree(TreeNode* p, TreeNode* q)
+{
+    if (p == nullptr || q == nullptr)
+    {
+        return p == q;
+    }
+
+    return p->val == q->val && isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
 {
