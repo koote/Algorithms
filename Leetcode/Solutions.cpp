@@ -4417,6 +4417,97 @@ bool isValidBST(TreeNode* root)
     return isValidBSTHelper(root, nullptr, nullptr);
 }
 
+// 99. Recover Binary Search Tree
+// This problem doesn't need to consider the possible location of swapped nodes, we know that for BST its inorder is sorted,
+// so if there are 2 nodes are swapped, that will reflect in its inorder, there will be a pair of values that are also swapped.
+// So first O(n) solution is, we get inorder series first, then search for pairs that are not in ascending order. Note that
+// the swapped pair could be adjacent or not, e.g.: let's say the inorder is [1, 3, 2, 4, 5, 6], the swapped pair are [3, 2],
+// but for inorder [1, 5, 3, 4, 2, 6], the swapped pair is [5, 2], not the first swapped pair [5, 3]. So, to deal with such a
+// case, we let swapped pair = the first swapped pair encounter, which is [5, 3] here, if we encounter another reversed order 
+// pair [4, 2], we just update the second value in pair, that is [5, 2].
+void getInorder(TreeNode* root, vector<TreeNode*>& inorder)
+{
+    if (root != nullptr)
+    {
+        getInorder(root->left, inorder);
+        inorder.push_back(root);
+        getInorder(root->right, inorder);
+    }
+}
+void recoverTreeN(TreeNode* root)
+{
+    vector<TreeNode*> inorder;
+    getInorder(root, inorder);
+    TreeNode* a = nullptr;
+    TreeNode* b = nullptr;
+    for (unsigned i = 0; i < inorder.size() - 1; ++i)
+    {
+        if (inorder[i]->val > inorder[i + 1]->val)
+        {
+            if (a == nullptr)
+            {
+                a = inorder[i];
+                b = inorder[i + 1];
+            }
+            else
+            {
+                b = inorder[i + 1];
+            }
+        }
+    }
+
+    swap(a->val, b->val);
+}
+// The O(1) time complexity solution is an optimization of O(n) solution, it is obviously that to check the swapped pair
+// in inorder series, it is unnecessary to save whole inorder series, we can do this while traversing inorder. If we use
+// stack, it is still O(n) space complexity (worst case, BST is a linked list), so Morris inorder traverse is the answer.
+void recoverTree(TreeNode* root)
+{
+    TreeNode* a = nullptr;
+    TreeNode* b = nullptr;
+    for (TreeNode* previous = nullptr; root != nullptr;) // reuse root
+    {
+        bool visitCurrent = true;
+        if (root->left != nullptr)
+        {
+            TreeNode* predecessor = root->left;
+            for (; predecessor->right != nullptr && predecessor->right != root; predecessor = predecessor->right);
+
+            if (predecessor->right == nullptr) // setup thread
+            {
+                predecessor->right = root;
+                root = root->left;
+                visitCurrent = false;
+            }
+            else if (predecessor->right == root) // left child tree has been visited, disconnect thread
+            {
+                predecessor->right = nullptr;
+            }
+        }
+
+        if (visitCurrent)
+        {
+            if (previous != nullptr && previous->val > root->val)
+            {
+                if (a == nullptr)
+                {
+                    a = previous;
+                    b = root;
+                }
+                else
+                {
+                    b = root;
+                }
+            }
+
+            previous = root;
+            root = root->right;
+        }
+    }
+
+    swap(a->val, b->val);
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
 {
