@@ -4691,6 +4691,42 @@ vector<vector<int>> zigzagLevelOrderUseRecursion(TreeNode* root)
     preOrderWithLevelAndOrder(results, root, 0, true);
     return results;
 }
+vector<vector<int>> zigzagLevelOrder(TreeNode* root)
+{
+    return zigzagLevelOrderUseQueue(root);
+}
+
+// 104. Maximum Depth of Binary Tree
+int maxDepth(TreeNode* root)
+{
+    return root == nullptr ? 0 : max(maxDepth(root->left), maxDepth(root->right)) + 1;
+}
+
+// 105. Construct Binary Tree from Preorder and Inorder Traversal
+// this helper function's purpose is to avoid sub array allocation and copy.
+TreeNode* buildTreeHelper(vector<int>& preorder, int ps, int pe, vector<int>& inorder, int is, int ie)
+{
+    if (pe < ps || ie < is)
+    {
+        return nullptr;
+    }
+
+    TreeNode* root = new TreeNode(preorder[ps]);
+    int split;
+    for (split = is; split <= ie && inorder[split] != preorder[ps]; ++split);
+
+    // left child: inorder[is .. split-1], preorder[ps+1..ps+split-is]
+    root->left = buildTreeHelper(preorder, ps + 1, ps + split - is, inorder, is, split - 1);
+
+    // right child: inorder[split+1 .. ie], preorder[ps+split-is+1 .. pe]
+    root->right = buildTreeHelper(preorder, ps + split - is + 1, pe, inorder, split + 1, ie);
+
+    return root;
+}
+TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder)
+{
+    return buildTreeHelper(preorder, 0, preorder.size() - 1, inorder, 0, inorder.size() - 1);
+}
 
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
