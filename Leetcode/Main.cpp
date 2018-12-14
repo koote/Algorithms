@@ -112,6 +112,8 @@ extern bool isValidBST(TreeNode* root);
 extern void recoverTree(TreeNode* root);
 extern bool isSameTree(TreeNode* p, TreeNode* q);
 extern bool isSymmetric(TreeNode* root);
+extern vector<vector<int>> levelOrder(TreeNode* root);
+extern vector<vector<int>> zigzagLevelOrder(TreeNode* root);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 

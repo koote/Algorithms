@@ -4579,6 +4579,119 @@ bool isSymmetricIterative(TreeNode* root)
     return true;
 }
 
+// 102. Binary Tree Level Order Traversal
+vector<vector<int>> levelOrderUseQueue(TreeNode* root)
+{
+    vector<vector<int>> results;
+    queue<TreeNode*> queue;
+    queue.push(root);
+    while (!queue.empty())
+    {
+        vector<int> currentLevel;
+        for (unsigned i = 0, len = queue.size(); i < len; ++i, queue.pop())
+        {
+            if (queue.front() != nullptr)
+            {
+                currentLevel.push_back(queue.front()->val);
+                queue.push(queue.front()->left);
+                queue.push(queue.front()->right);
+            }
+        }
+
+        if (!currentLevel.empty())
+        {
+            results.push_back(currentLevel);
+        }
+    }
+
+    return results;
+}
+// The recursive solution is based on per order traverse, we pass level as a parameter, when encounter level i, push
+// current node value to results[i]. Since pre order is left to right, so we get each level in left to right order
+void preOrderWithLevel(vector<vector<int>>& results, TreeNode* root, const unsigned level)
+{
+    if (root == nullptr)
+    {
+        return;
+    }
+
+    if (level == results.size())
+    {
+        results.emplace_back();
+    }
+
+    results[level].push_back(root->val);
+
+    preOrderWithLevel(results, root->left, level + 1);
+    preOrderWithLevel(results, root->right, level + 1);
+}
+vector<vector<int>> levelOrderUseRecursion(TreeNode* root)
+{
+    vector<vector<int>> results;
+    preOrderWithLevel(results, root, 0);
+    return results;
+}
+vector<vector<int>> levelOrder(TreeNode* root)
+{
+    return levelOrderUseQueue(root);
+}
+
+// 103. Binary Tree Zigzag Level Order Traversal
+vector<vector<int>> zigzagLevelOrderUseQueue(TreeNode* root)
+{
+    vector<vector<int>> results;
+    if (root != nullptr)
+    {
+        queue<TreeNode*> queue;
+        queue.push(root);
+        for (bool leftToRight = true; !queue.empty(); leftToRight = !leftToRight)
+        {
+            const unsigned len = queue.size();
+            vector<int> currentLevel(len);
+            for (unsigned i = 0; i < len; ++i, queue.pop())
+            {
+                currentLevel[leftToRight ? i : len - i - 1] = queue.front()->val;
+
+                if (queue.front()->left != nullptr)
+                {
+                    queue.push(queue.front()->left);
+                }
+
+                if (queue.front()->right != nullptr)
+                {
+                    queue.push(queue.front()->right);
+                }
+            }
+
+            results.push_back(currentLevel);
+        }
+    }
+
+    return results;
+}
+void preOrderWithLevelAndOrder(vector<vector<int>>& results, TreeNode* root, const unsigned level, const bool leftToRight)
+{
+    if (root == nullptr)
+    {
+        return;
+    }
+
+    if (level == results.size())
+    {
+        results.emplace_back();
+    }
+
+    results[level].insert(leftToRight ? results[level].end() : results[level].begin(), root->val);
+    preOrderWithLevelAndOrder(results, root->left, level + 1, !leftToRight);
+    preOrderWithLevelAndOrder(results, root->right, level + 1, !leftToRight);
+}
+vector<vector<int>> zigzagLevelOrderUseRecursion(TreeNode* root)
+{
+    vector<vector<int>> results;
+    preOrderWithLevelAndOrder(results, root, 0, true);
+    return results;
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
 {
