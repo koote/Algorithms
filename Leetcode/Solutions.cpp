@@ -4423,7 +4423,7 @@ bool isValidBST(TreeNode* root)
 // So first O(n) solution is, we get inorder series first, then search for pairs that are not in ascending order. Note that
 // the swapped pair could be adjacent or not, e.g.: let's say the inorder is [1, 3, 2, 4, 5, 6], the swapped pair are [3, 2],
 // but for inorder [1, 5, 3, 4, 2, 6], the swapped pair is [5, 2], not the first swapped pair [5, 3]. So, to deal with such a
-// case, we let swapped pair = the first swapped pair encounter, which is [5, 3] here, if we encounter another reversed order 
+// case, we let swapped pair = the first swapped pair encounter, which is [5, 3] here, if we encounter another reversed order
 // pair [4, 2], we just update the second value in pair, that is [5, 2].
 void getInorder(TreeNode* root, vector<TreeNode*>& inorder)
 {
@@ -4434,7 +4434,7 @@ void getInorder(TreeNode* root, vector<TreeNode*>& inorder)
         getInorder(root->right, inorder);
     }
 }
-void recoverTreeN(TreeNode* root)
+void recoverTreeNSpace(TreeNode* root)
 {
     vector<TreeNode*> inorder;
     getInorder(root, inorder);
@@ -4517,6 +4517,66 @@ bool isSameTree(TreeNode* p, TreeNode* q)
     }
 
     return p->val == q->val && isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+}
+
+// 101. Symmetric Tree
+bool isSymmetricUseRecursion(TreeNode* p, TreeNode* q)
+{
+    if (p == nullptr || q == nullptr)
+    {
+        return p == q;
+    }
+
+    return p->val == q->val && isSymmetricUseRecursion(p->left, q->right) && isSymmetricUseRecursion(p->right, q->left);
+}
+bool isSymmetric(TreeNode* root)
+{
+    if (root == nullptr)
+    {
+        return true;
+    }
+
+    return isSymmetricUseRecursion(root->left, root->right);
+}
+// The iterative solution is based on BFS. DFS will not work since we compare nodes from top to bottom, level by level.
+// Instead of checking whether current level is a palindrome, we change the enqueue order to make two symmetric nodes
+// are neighbors in queue. And since we always push a node's left child and right child to queue no matter it is null or
+// not, so queue length keeps even, no need to check queue length parity.
+bool isSymmetricIterative(TreeNode* root)
+{
+    if (root == nullptr)
+    {
+        return true;
+    }
+
+    queue<TreeNode*> queue;
+    queue.push(root->left);
+    queue.push(root->right);
+    while (!queue.empty())
+    {
+        TreeNode* left = queue.front();
+        queue.pop();
+        TreeNode* right = queue.front();
+        queue.pop();
+
+        if (left == nullptr && right == nullptr)
+        {
+            continue;
+        }
+
+        if (left == nullptr || right == nullptr || left->val != right->val)
+        {
+            return false;
+        }
+
+        queue.push(left->left);
+        queue.push(right->right);
+
+        queue.push(left->right);
+        queue.push(right->left);
+    }
+
+    return true;
 }
 
 // 138. Copy List with Random Pointer

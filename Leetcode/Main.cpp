@@ -111,6 +111,7 @@ extern bool isInterleave(const string& s1, const string& s2, const string& s3);
 extern bool isValidBST(TreeNode* root);
 extern void recoverTree(TreeNode* root);
 extern bool isSameTree(TreeNode* p, TreeNode* q);
+extern bool isSymmetric(TreeNode* root);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 
