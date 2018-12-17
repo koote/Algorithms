@@ -117,6 +117,7 @@ extern vector<vector<int>> zigzagLevelOrder(TreeNode* root);
 extern int maxDepth(TreeNode* root);
 extern TreeNode* buildTree105(vector<int>& preorder, vector<int>& inorder);
 extern TreeNode* buildTree106(vector<int>& inorder, vector<int>& postorder);
+extern vector<vector<int>> levelOrderBottom(TreeNode* root);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 

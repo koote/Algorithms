@@ -4741,10 +4741,10 @@ TreeNode* buildTree106Helper(vector<int>& inorder, const int is, const int ie, v
     for (r = is; r <= ie && inorder[r] != postorder[pe]; ++r);
 
     // left child tree: inorder[is, r-1], postorder[ps, ps+r-is-1]
-    root->left = buildTree106Helper(inorder, is, r-1, postorder, ps, ps + r - is - 1);
+    root->left = buildTree106Helper(inorder, is, r - 1, postorder, ps, ps + r - is - 1);
 
     // right child tree: inorder[r+1, ie], postorder[pe-ie+r, pe-1]
-    root->right = buildTree106Helper(inorder, r + 1, ie, postorder, pe - ie + r, pe-1);
+    root->right = buildTree106Helper(inorder, r + 1, ie, postorder, pe - ie + r, pe - 1);
 
     return root;
 }
@@ -4752,6 +4752,75 @@ TreeNode* buildTree106(vector<int>& inorder, vector<int>& postorder)
 {
     return buildTree106Helper(inorder, 0, inorder.size() - 1, postorder, 0, postorder.size() - 1);
 }
+
+// 107. Binary Tree Level Order Traversal II
+void levelOrderBottomDFS(vector<vector<int>>& results, TreeNode* root, const unsigned level)
+{
+    if (root == nullptr)
+    {
+        return;
+    }
+
+    if (level == results.size())
+    {
+        // this is a tricky part, we should not use emplace_back but always add new vector to the
+        // beginning. the reason is when value is being pushed to vector, our code always assumes
+        // that results.size() implies tree height, which is not correct. e.g.: for this tree:
+        //               1
+        //              / \
+        //             2   3
+        //                / \
+        //               4   5
+        // when we reach 2, since it is a leaf, so it needs to be pushed to results vector, but 
+        // current results.size() is 2, so it will be pushed to results[2-1-1] = results[0], that
+        // is not correct, in final results [[4,5], [2,3], [1]], 2 actually should be pushed to 
+        // results[1]. How to fix it?, when we go to right child tree, we will see a new height 2
+        // it means we need to add a new vector for this new level, if we append new vector to end
+        // of results, then previous pushed 2 will stay in results[0], if we insert the new vector
+        // to the beginning of results, then 2 get corrected, it now in results[1].
+        results.insert(results.begin(), vector<int>());
+    }
+
+    levelOrderBottomDFS(results, root->left, level + 1);
+    levelOrderBottomDFS(results, root->right, level + 1);
+
+    // results.size() is the tree's current height (not the whole tree's height).
+    results[results.size() - 1 - level].push_back(root->val);
+}
+vector<vector<int>> levelOrderBottom(TreeNode* root)
+{
+    vector<vector<int>> results;
+    levelOrderBottomDFS(results, root, 0);
+    return results;
+}
+vector<vector<int>> levelOrderBottomBFS(TreeNode* root)
+{
+    vector<vector<int>> results;
+    queue<TreeNode*> queue;
+    queue.push(root);
+
+    while (!queue.empty())
+    {
+        vector<int> level;
+        for (unsigned i = 0, len = queue.size(); i < len; ++i, queue.pop())
+        {
+            if (queue.front() != nullptr)
+            {
+                level.push_back(queue.front()->val);
+                queue.push(queue.front()->left);
+                queue.push(queue.front()->right);
+            }
+        }
+
+        if (!level.empty())
+        {
+            results.insert(results.begin(), level);
+        }
+    }
+
+    return results;
+}
+
 
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
