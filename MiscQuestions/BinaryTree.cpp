@@ -55,7 +55,7 @@ BTNODE* BST2DLL(BTNODE* root)
 // 给定二叉树,求二叉树最大的宽度
 struct QNODE
 {
-    QNODE(BTNODE* p, int l) {pTreeNode = p, nLevel = l;}
+    QNODE(BTNODE* p, int l) { pTreeNode = p, nLevel = l; }
     BTNODE* pTreeNode;
     int nLevel;
 };
@@ -71,7 +71,7 @@ unsigned int GetBTreeMaxWidth(BTNODE* root)
     QNODE* r = new QNODE(root, 0);
     q.push(r);
     unsigned int uMaxDepth = 1;
-    while(!q.empty())
+    while (!q.empty())
     {
         // dequeue all elements that on the same level, and enqueue their children.
         QNODE* pFront = q.front();
@@ -95,7 +95,7 @@ unsigned int GetBTreeMaxWidth(BTNODE* root)
 
         // After the while loop is finished, the queue only contains next level elements.
         // So let's check the length of the queue.
-        if(uMaxDepth < q.size())
+        if (uMaxDepth < q.size())
         {
             uMaxDepth = q.size();
         }
@@ -135,7 +135,7 @@ BTNODE* BuildBinaryTree(int preorder[], int ps, int pe, int inorder[], int is, i
         int r; // r是根在中序数组中的下标位置
         for (r = is; r <= ie; ++r)
         {
-            if(inorder[r] == preorder[ps])
+            if (inorder[r] == preorder[ps])
             {
                 break;
             }
@@ -150,12 +150,12 @@ BTNODE* BuildBinaryTree(int preorder[], int ps, int pe, int inorder[], int is, i
 
         if (r - is > 0) // have left subtree.
         {
-            root->lchild = BuildBinaryTree(preorder, ps+1, ps+(r-is), inorder, is, r-1);
+            root->lchild = BuildBinaryTree(preorder, ps + 1, ps + (r - is), inorder, is, r - 1);
         }
 
         if (ie - r > 0) // have right subtree
         {
-            root->rchild = BuildBinaryTree(preorder, ps+(r-is)+1, pe, inorder, r+1, ie);
+            root->rchild = BuildBinaryTree(preorder, ps + (r - is) + 1, pe, inorder, r + 1, ie);
         }
     }
 
@@ -177,7 +177,7 @@ void PostOrder(BTNODE* root)
 // 递归前序遍历二叉树
 void PreOrder(BTNODE* root)
 {
-    if(root != nullptr) 
+    if (root != nullptr)
     {
         printf("%d ", root->val);
         PreOrder(root->lchild);
@@ -287,10 +287,10 @@ void FindKthMax(BTNODE* root, int k)
 
 void TreeTest()
 {
-    int preorder[] = {11, 8, 3, 1, 4, 9, 17, 13, 12, 14, 19};
-    int inorder[] = {1, 3, 4, 8, 9, 11, 12, 13, 14, 17, 19};
+    int preorder[] = { 11, 8, 3, 1, 4, 9, 17, 13, 12, 14, 19 };
+    int inorder[] = { 1, 3, 4, 8, 9, 11, 12, 13, 14, 17, 19 };
 
-    BTNODE* root = BuildBinaryTree(preorder, 0, countof(preorder)-1, inorder, 0, countof(inorder)-1);
+    BTNODE* root = BuildBinaryTree(preorder, 0, countof(preorder) - 1, inorder, 0, countof(inorder) - 1);
 
     printf("Pre order: ");
     PreOrder(root);

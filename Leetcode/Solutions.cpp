@@ -4704,28 +4704,53 @@ int maxDepth(TreeNode* root)
 
 // 105. Construct Binary Tree from Preorder and Inorder Traversal
 // this helper function's purpose is to avoid sub array allocation and copy.
-TreeNode* buildTreeHelper(vector<int>& preorder, int ps, int pe, vector<int>& inorder, int is, int ie)
+TreeNode* buildTree105Helper(vector<int>& preorder, const int ps, const int pe, vector<int>& inorder, const int is, const int ie)
 {
     if (pe < ps || ie < is)
     {
         return nullptr;
     }
 
-    TreeNode* root = new TreeNode(preorder[ps]);
-    int split;
-    for (split = is; split <= ie && inorder[split] != preorder[ps]; ++split);
+    TreeNode* root = new TreeNode(preorder[ps]); // first element in preorder is the root.
+    int r;
+    for (r = is; r <= ie && inorder[r] != preorder[ps]; ++r);
 
-    // left child: inorder[is .. split-1], preorder[ps+1..ps+split-is]
-    root->left = buildTreeHelper(preorder, ps + 1, ps + split - is, inorder, is, split - 1);
+    // left child tree: inorder[is .. r-1], preorder[ps+1..ps+r-is]
+    root->left = buildTree105Helper(preorder, ps + 1, ps + r - is, inorder, is, r - 1);
 
-    // right child: inorder[split+1 .. ie], preorder[ps+split-is+1 .. pe]
-    root->right = buildTreeHelper(preorder, ps + split - is + 1, pe, inorder, split + 1, ie);
+    // right child tree: inorder[r+1 .. ie], preorder[ps+r-is+1 .. pe]
+    root->right = buildTree105Helper(preorder, ps + r - is + 1, pe, inorder, r + 1, ie);
 
     return root;
 }
-TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder)
+TreeNode* buildTree105(vector<int>& preorder, vector<int>& inorder)
 {
-    return buildTreeHelper(preorder, 0, preorder.size() - 1, inorder, 0, inorder.size() - 1);
+    return buildTree105Helper(preorder, 0, preorder.size() - 1, inorder, 0, inorder.size() - 1);
+}
+
+// 106. Construct Binary Tree from Inorder and Postorder Traversal
+TreeNode* buildTree106Helper(vector<int>& inorder, const int is, const int ie, vector<int>& postorder, const int ps, const int pe)
+{
+    if (is > ie || ps > pe)
+    {
+        return nullptr;
+    }
+
+    TreeNode* root = new TreeNode(postorder[pe]); // last element in postorder is the root
+    int r;
+    for (r = is; r <= ie && inorder[r] != postorder[pe]; ++r);
+
+    // left child tree: inorder[is, r-1], postorder[ps, ps+r-is-1]
+    root->left = buildTree106Helper(inorder, is, r-1, postorder, ps, ps + r - is - 1);
+
+    // right child tree: inorder[r+1, ie], postorder[pe-ie+r, pe-1]
+    root->right = buildTree106Helper(inorder, r + 1, ie, postorder, pe - ie + r, pe-1);
+
+    return root;
+}
+TreeNode* buildTree106(vector<int>& inorder, vector<int>& postorder)
+{
+    return buildTree106Helper(inorder, 0, inorder.size() - 1, postorder, 0, postorder.size() - 1);
 }
 
 // 138. Copy List with Random Pointer

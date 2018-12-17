@@ -115,7 +115,8 @@ extern bool isSymmetric(TreeNode* root);
 extern vector<vector<int>> levelOrder(TreeNode* root);
 extern vector<vector<int>> zigzagLevelOrder(TreeNode* root);
 extern int maxDepth(TreeNode* root);
-extern TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder);
+extern TreeNode* buildTree105(vector<int>& preorder, vector<int>& inorder);
+extern TreeNode* buildTree106(vector<int>& inorder, vector<int>& postorder);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 
