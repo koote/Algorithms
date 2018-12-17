@@ -4821,6 +4821,24 @@ vector<vector<int>> levelOrderBottomBFS(TreeNode* root)
     return results;
 }
 
+// 108. Convert Sorted Array to Binary Search Tree
+TreeNode* sortedArrayToBSTHelper(vector<int>& nums, const int start, const int end)
+{
+    if (start > end)
+    {
+        return nullptr;
+    }
+
+    const int mid = (start + end) / 2;
+    TreeNode* root = new TreeNode(nums[mid]);
+    root->left = sortedArrayToBSTHelper(nums, start, mid - 1);
+    root->right = sortedArrayToBSTHelper(nums, mid + 1, end);
+    return root;
+}
+TreeNode* sortedArrayToBST(vector<int>& nums)
+{
+    return sortedArrayToBSTHelper(nums, 0, nums.size() - 1);
+}
 
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
