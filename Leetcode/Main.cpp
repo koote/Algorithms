@@ -120,6 +120,8 @@ extern TreeNode* buildTree106(vector<int>& inorder, vector<int>& postorder);
 extern vector<vector<int>> levelOrderBottom(TreeNode* root);
 extern TreeNode* sortedArrayToBST(vector<int>& nums);
 extern TreeNode* sortedListToBST(ListNode* head);
+extern bool isBalanced(TreeNode* root);
+extern int minDepth(TreeNode* root);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 

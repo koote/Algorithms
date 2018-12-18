@@ -4861,6 +4861,32 @@ TreeNode* sortedListToBST(ListNode* head)
     return sortedListToBSTHelper(head, nullptr);
 }
 
+// 110. Balanced Binary Tree
+bool isBalanced(TreeNode* root)
+{
+    if (root == nullptr)
+    {
+        return true;
+    }
+
+    return isBalanced(root->left) && isBalanced(root->right) && abs(maxDepth(root->left) - maxDepth(root->right)) <= 1;
+}
+
+// 111. Minimum Depth of Binary Tree
+int minDepth(TreeNode* root)
+{
+    if (root == nullptr)
+    {
+        return 0;
+    }
+
+    const int leftHeight = minDepth(root->left);
+    const int rightHeight = minDepth(root->right);
+
+    // note that the min depth is root to nearest leaf, so if root only has left child or right child, min depth is not 0.
+    return 1 + (leftHeight > 0 && rightHeight > 0 ? min(leftHeight, rightHeight) : leftHeight + rightHeight);
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
 {
