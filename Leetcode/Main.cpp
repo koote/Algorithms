@@ -119,6 +119,7 @@ extern TreeNode* buildTree105(vector<int>& preorder, vector<int>& inorder);
 extern TreeNode* buildTree106(vector<int>& inorder, vector<int>& postorder);
 extern vector<vector<int>> levelOrderBottom(TreeNode* root);
 extern TreeNode* sortedArrayToBST(vector<int>& nums);
+extern TreeNode* sortedListToBST(ListNode* head);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 

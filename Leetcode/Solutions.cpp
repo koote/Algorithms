@@ -4840,6 +4840,27 @@ TreeNode* sortedArrayToBST(vector<int>& nums)
     return sortedArrayToBSTHelper(nums, 0, nums.size() - 1);
 }
 
+// 109. Convert Sorted List to Binary Search Tree
+TreeNode* sortedListToBSTHelper(ListNode* start, ListNode* end) // Note [start .. end) is a right open interval, means end is the node should not be used.
+{
+    if (start == end)
+    {
+        return nullptr;
+    }
+
+    ListNode* slow = start;
+    for (ListNode* fast = start; fast != end && fast->next != end; slow = slow->next, fast = fast->next->next);
+
+    TreeNode* root = new TreeNode(slow->val);
+    root->left = sortedListToBSTHelper(start, slow);
+    root->right = sortedListToBSTHelper(slow->next, end);
+    return root;
+}
+TreeNode* sortedListToBST(ListNode* head)
+{
+    return sortedListToBSTHelper(head, nullptr);
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
 {
