@@ -4937,6 +4937,76 @@ vector<vector<int>> pathSum(TreeNode* root, int sum)
     return paths;
 }
 
+// 114. Flatten Binary Tree to Linked List
+void flattenUseStack(TreeNode* root)
+{
+    TreeNode dummy(0);
+    stack<TreeNode*> stack;
+
+    stack.push(root);
+    for (TreeNode* last = &dummy; !stack.empty(); )
+    {
+        TreeNode* current = stack.top();
+        stack.pop();
+
+        if (current != nullptr)
+        {
+            stack.push(current->right);
+            stack.push(current->left);
+
+            last->right = current;
+            current->left = nullptr; // since we are building single linked list, so only use right as next, set left to null.
+            last = current;
+        }
+    }
+}
+void flattenUseRecursion(TreeNode* root)
+{
+    if (root != nullptr)
+    {
+        flattenUseRecursion(root->left);
+        flattenUseRecursion(root->right);
+
+        TreeNode* right = root->right;
+        root->right = root->left;
+        root->left = nullptr;
+
+        TreeNode* last;
+        for (last = root; last->right != nullptr; last = last->right);
+        last->right = right;
+    }
+}
+void flattenUseIteration(TreeNode* root)
+{
+    for (TreeNode* current = root; current != nullptr; current = current->right)
+    {
+        //                 r                     r
+        //              /    \                    \
+        //             x      y   =>               x
+        //            / \    / \                  / \
+        //           z   v  a   b                z   v
+        //          / \                         / \   \
+        //         j   k                       j   k   y
+        //                                            / \
+        //                                           a   b
+        // pre order remains : r x z j k v y a b
+        // if current has left child tree, make current right child tree become the right child tree of right most leaf node
+        // in left child tree, then change left child tree to right child tree, this will not change the pre order.
+        if (current->left != nullptr)
+        {
+            TreeNode* temp;
+            for (temp = current->left; temp->right != nullptr; temp = temp->right);
+            temp->right = current->right;
+            current->right = current->left;
+            current->left = nullptr;
+        }
+    }
+}
+void flatten(TreeNode* root)
+{
+    flattenUseIteration(root);
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
 {
