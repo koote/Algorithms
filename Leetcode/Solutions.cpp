@@ -4887,6 +4887,56 @@ int minDepth(TreeNode* root)
     return 1 + (leftHeight > 0 && rightHeight > 0 ? min(leftHeight, rightHeight) : leftHeight + rightHeight);
 }
 
+// 112. Path Sum
+bool hasPathSum(TreeNode* root, int sum)
+{
+    if (root == nullptr)
+    {
+        return false;
+    }
+
+    if (root->left == nullptr && root->right == nullptr)
+    {
+        return root->val == sum;
+    }
+
+    return hasPathSum(root->left, sum - root->val) || hasPathSum(root->right, sum - root->val);
+}
+
+// 113. Path Sum II
+void dfsSearchPathSum(vector<vector<int>>& paths, vector<int>& path, TreeNode* root, const int sum)
+{
+    if (root == nullptr)
+    {
+        return;
+    }
+
+    // add current root to path
+    path.push_back(root->val);
+
+    // problem says path is from root to leaf, so we only check when encounter a leaf.
+    if (sum == root->val && root->left == nullptr && root->right == nullptr)
+    {
+        paths.push_back(path);
+
+        // remember to pop the current leaf. If not doing it here, we can delete this line and the return statement,
+        // since it is a leaf so next 2 recursive calls do nothing, finally pop current root, same effect.
+        path.pop_back();
+        return;
+    }
+
+    dfsSearchPathSum(paths, path, root->left, sum - root->val);
+    dfsSearchPathSum(paths, path, root->right, sum - root->val);
+    path.pop_back();
+}
+vector<vector<int>> pathSum(TreeNode* root, int sum)
+{
+    vector<vector<int>> paths;
+    vector<int> path;
+    dfsSearchPathSum(paths, path, root, sum);
+    return paths;
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode *copyRandomList(RandomListNode *head)
 {
