@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "DataStructure.h"
+#include <iostream>
 
 using namespace std;
 
@@ -404,7 +405,7 @@ string longestCommonPrefix(vector<string>& strs)
 }
 
 // 15. 3Sum
-vector<vector<int>> kSum(vector<int>& nums, unsigned int k, const int sum) // nums must be sorted.
+vector<vector<int>> kSum(vector<int>& nums, const unsigned int k, const int sum) // nums must be sorted.
 {
     vector<vector<int>> result(0);
 
@@ -415,7 +416,7 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, const int sum) // nu
 
     if (k == 2)
     {
-        for (size_t i = 0, j = nums.size() - 1; i < j;)
+        for (unsigned i = 0, j = nums.size() - 1; i < j;)
         {
             if (nums[i] + nums[j] > sum)
             {
@@ -438,14 +439,14 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, const int sum) // nu
         return result;
     }
 
-    for (int i = 0; i < static_cast<int>(nums.size()) - k + 1;)
+    for (int i = 0; i < nums.size() - k + 1;)
     {
         /*
         // Because nums are sorted, so nums[i+1..i+k-1] are smallest in nums[i+1..size-1].
         // if SUM(nums[i] + nums[i+1] + ... + nums[i+k-1]) > sum, we can give up, because
         // we cannot find answer, that sum is the smallest we can produce.
         int s = nums[i];
-        for (size_t j = i + 1, p = k - 1; j < nums.size() && p > 0; s += nums[j++], --p);
+        for (unsigned j = i + 1, p = k - 1; j < nums.size() && p > 0; s += nums[j++], --p);
         if (s > sum)
         {
             for (++i; i < nums.size() && nums[i - 1] == nums[i]; ++i);
@@ -456,7 +457,7 @@ vector<vector<int>> kSum(vector<int>& nums, unsigned int k, const int sum) // nu
         // if SUM(nums[i] + nums[size-k+1] + ... + nums[size-1]) < sum, we can ignore current loop (jump over nums[i])
         // because that sum is the largest we can produce in current loop.
         s = nums[i];
-        for (size_t j = nums.size() - 1, p = k - 1; j > 0 && p > 0; s += nums[j--], --p);
+        for (unsigned j = nums.size() - 1, p = k - 1; j > 0 && p > 0; s += nums[j--], --p);
         if (s < sum)
         {
             for (++i; i < nums.size() && nums[i - 1] == nums[i]; ++i);
@@ -919,8 +920,8 @@ int removeDuplicates(vector<int>& nums)
 // 27. Remove Element
 int removeElement(vector<int>& nums, const int val)
 {
-    size_t last = 0;
-    for (size_t probe = 0; probe < nums.size(); ++probe)
+    unsigned last = 0;
+    for (unsigned probe = 0; probe < nums.size(); ++probe)
     {
         if (nums[probe] != val)
         {
@@ -934,7 +935,7 @@ int removeElement(vector<int>& nums, const int val)
 // 28. Implement strStr()
 int strStr(string text, string pattern)
 {
-    for (size_t i = 0, j; text.length() >= pattern.length() && i <= text.length() - pattern.length(); ++i)
+    for (unsigned i = 0, j; text.length() >= pattern.length() && i <= text.length() - pattern.length(); ++i)
     {
         for (j = 0; j < pattern.length() && text[j + i] == pattern[j]; ++j);
         if (j == pattern.length())
@@ -989,7 +990,7 @@ vector<int> findSubstring(const string& s, vector<string>& words)
         return result;
     }
 
-    const size_t patternLen = words[0].length() * words.size();
+    const unsigned patternLen = words[0].length() * words.size();
 
     if (patternLen > s.length())
     {
@@ -1003,7 +1004,7 @@ vector<int> findSubstring(const string& s, vector<string>& words)
         ++wordCount[word];
     }
 
-    for (size_t i = 0; i <= s.length() - patternLen; ++i)
+    for (unsigned i = 0; i <= s.length() - patternLen; ++i)
     {
         unordered_map<string, int> unusedWords(wordCount);
 
@@ -1011,7 +1012,7 @@ vector<int> findSubstring(const string& s, vector<string>& words)
         // Slice it to words.size() slices, for each slice, use the unusedWords
         // hash table to quick check if it is a word, if yes, decrease value in
         // hash table, means it has been used.
-        for (size_t j = 0; j < patternLen; j += words[0].length())
+        for (unsigned j = 0; j < patternLen; j += words[0].length())
         {
             const string word = s.substr(i + j, words[0].length());
             if (unusedWords.find(word) == unusedWords.end())
@@ -1039,12 +1040,12 @@ void nextPermutation(vector<int>& nums)
 {
     // As we know that the greatest permutation is all numbers are in descending order.
     // So search from end to begin check if all elements are in descending order.
-    size_t i;
+    unsigned i;
     for (i = nums.size() - 1; i >= 1 && nums[i] <= nums[i - 1]; --i);
 
     // When previous loop ends, it could be (1) i == 0, or (2) i > 0, it doesn't matter, sort this segment first.
     // Please note that starts from i, all elements are in descending order, so sorting is straightforward, just reverse them.
-    for (size_t j = i, k = nums.size() - 1; j < k; ++j, --k)
+    for (unsigned j = i, k = nums.size() - 1; j < k; ++j, --k)
     {
         const int temp = nums[j];
         nums[j] = nums[k];
@@ -1054,7 +1055,7 @@ void nextPermutation(vector<int>& nums)
     // Now lets handle if we really find an i > 0, if yes, swap nums[i-1] with the smallest element that greater than nums[i-1].
     if (i > 0)
     {
-        size_t l;
+        unsigned l;
         for (l = i; l < nums.size() && nums[l] <= nums[i - 1]; ++l);
 
         const int temp = nums[l];
@@ -1077,7 +1078,7 @@ int longestValidParentheses(string s)
     // lets say dp[i] is the length of longest valid parentheses ends at position i. 
     // If s[0..i] has valid parentheses however it doesn't end at position i, then dp[i] = 0.
     dp[0] = 0;
-    for (size_t i = 1; i < s.length(); ++i)
+    for (unsigned i = 1; i < s.length(); ++i)
     {
         // Two key thought: 
         // (1) If a substring s is a valid parentheses string, then "(" + s + ")" is also valid parentheses string.
@@ -1275,9 +1276,9 @@ int searchInsert(vector<int>& nums, const int target)
 bool isValidSudoku(vector<vector<char>>& board)
 {
     unordered_set<string> occurrence;
-    for (size_t i = 0; i < board.size(); ++i)
+    for (unsigned i = 0; i < board.size(); ++i)
     {
-        for (size_t j = 0; j < board[0].size(); ++j)
+        for (unsigned j = 0; j < board[0].size(); ++j)
         {
             if (board[i][j] != '.')
             {
@@ -1303,9 +1304,9 @@ bool isValidSudoku(vector<vector<char>>& board)
 // 37. Sudoku Solver
 bool solveSudokuUse36(vector<vector<char>>& board)
 {
-    for (size_t i = 0; i < board.size(); ++i)
+    for (unsigned i = 0; i < board.size(); ++i)
     {
-        for (size_t j = 0; j < board[0].size(); ++j)
+        for (unsigned j = 0; j < board[0].size(); ++j)
         {
             if (board[i][j] == '.')
             {
@@ -1328,9 +1329,9 @@ bool solveSudokuUse36(vector<vector<char>>& board)
     return true;
 }
 
-bool isValidCandidate(const vector<vector<char>>& board, const size_t row, const size_t col)
+bool isValidCandidate(const vector<vector<char>>& board, const unsigned row, const unsigned col)
 {
-    for (size_t r = 0; r < board.size(); ++r)
+    for (unsigned r = 0; r < board.size(); ++r)
     {
         if (r != row && board[r][col] == board[row][col])
         {
@@ -1338,7 +1339,7 @@ bool isValidCandidate(const vector<vector<char>>& board, const size_t row, const
         }
     }
 
-    for (size_t c = 0; c < board[0].size(); ++c)
+    for (unsigned c = 0; c < board[0].size(); ++c)
     {
         if (c != col && board[row][c] == board[row][col])
         {
@@ -1346,9 +1347,9 @@ bool isValidCandidate(const vector<vector<char>>& board, const size_t row, const
         }
     }
 
-    for (size_t r = 3 * (row / 3); r < 3 * (row / 3 + 1); ++r)
+    for (unsigned r = 3 * (row / 3); r < 3 * (row / 3 + 1); ++r)
     {
-        for (size_t c = 3 * (col / 3); c < 3 * (col / 3 + 1); ++c)
+        for (unsigned c = 3 * (col / 3); c < 3 * (col / 3 + 1); ++c)
         {
             if (r != row && c != col && board[r][c] == board[row][col])
             {
@@ -1359,7 +1360,7 @@ bool isValidCandidate(const vector<vector<char>>& board, const size_t row, const
 
     return true;
 }
-bool dfsSearchSudoku(vector<vector<char>>& board, size_t row, size_t col)
+bool dfsSearchSudoku(vector<vector<char>>& board, unsigned row, unsigned col)
 {
     for (; row < board.size(); ++row, col = 0)
     {
@@ -1396,7 +1397,7 @@ string countAndSay(int n)
     for (; n > 1; --n)
     {
         string temp;
-        for (size_t i = 0, j; i < result.length(); i = j)
+        for (unsigned i = 0, j; i < result.length(); i = j)
         {
             for (j = i; j < result.length() && result[j] == result[i]; ++j);
             temp += string("") + static_cast<char>(j - i + '0') + result[i];
@@ -1409,7 +1410,7 @@ string countAndSay(int n)
 }
 
 // 39. Combination Sum
-void dfsCombinationSum(vector<int>& candidates, const size_t currentIndex, const int target, vector<int>& path, vector<vector<int>>& solutions)
+void dfsCombinationSum(vector<int>& candidates, const unsigned currentIndex, const int target, vector<int>& path, vector<vector<int>>& solutions)
 {
     // In this problem, because allow choosing element multiple times, so whether checking target == 0 
     // first or checking currentIndex out of boundary first doesn't matter, won't miss valid combination.
@@ -1443,7 +1444,7 @@ vector<vector<int>> combinationSum(vector<int>& candidates, int target)
 }
 
 // 40. Combination Sum II
-void dfsCombinationSum2(vector<int>& candidates, size_t currentIndex, const int target, vector<int>& path, vector<vector<int>>& solutions)
+void dfsCombinationSum2(vector<int>& candidates, unsigned currentIndex, const int target, vector<int>& path, vector<vector<int>>& solutions)
 {
     // Doesn't like problem 39, we must check target == 0 first, otherwise we could miss valid combination.
     // Still using test case: [10,1,2,7,6,5] and target == 8, when currentIndex == 5, next recursion function
@@ -1483,7 +1484,7 @@ int firstMissingPositive(vector<int>& nums)
 {
     // For each positive numbers nums[i] that greater than 0 and smaller than nums.size(), put it on nums[nums[i]-1].
     // For numbers not in that range, can be left on their current position.
-    for (size_t i = 0; i < nums.size();)
+    for (unsigned i = 0; i < nums.size();)
     {
         // Put 1 in nums[0], put 2 in num[1], etc.
         if (nums[i] > 0 && nums[i] < static_cast<int>(nums.size()) && nums[i] != nums[nums[i] - 1])
@@ -1499,7 +1500,7 @@ int firstMissingPositive(vector<int>& nums)
     }
 
     // Now scan the array again, each index i, its element should be i + 1, if not, then we find the missing positive.
-    for (size_t i = 0; i < nums.size(); ++i)
+    for (unsigned i = 0; i < nums.size(); ++i)
     {
         if (nums[i] != static_cast<int>(i + 1))
         {
@@ -1761,7 +1762,7 @@ all possible branches of nearest '*' but cannot match, we can say the whole patt
 bool isMatch_Wildcard_Iterative(string text, string pattern)
 {
     // keep tracking index of nearest '*' in pattern and the index of its initial corresponding element in text.
-    size_t j = 0;
+    unsigned j = 0;
     for (int i = 0, matchStartPosition = -1, lastAsteriskPosition = -1; i < text.length();)
     {
         // Every time we see a '*', update indices and keep moving forward. This also solve the continuous '*' case.
@@ -1904,7 +1905,7 @@ vector<vector<int>> permute(vector<int>& nums)
 }
 
 // 47. Permutations II
-void dfsPermuteUniqueImpl(vector<int>& nums, size_t currentIndex, vector<vector<int>>& results)
+void dfsPermuteUniqueImpl(vector<int>& nums, unsigned currentIndex, vector<vector<int>>& results)
 {
     if (currentIndex == nums.size() - 1)
     {
@@ -1912,7 +1913,7 @@ void dfsPermuteUniqueImpl(vector<int>& nums, size_t currentIndex, vector<vector<
         return;
     }
 
-    for (size_t i = currentIndex, j; i < nums.size(); ++i)
+    for (unsigned i = currentIndex, j; i < nums.size(); ++i)
     {
         // As we did in problem 46, we are going to exchange nums[i] with nums[currentIndex], but we need to make sure that we 
         // haven't chosen nums[i] before, we check if there is a duplication of nums[i] within range num[currentIndex .. i-1], 
@@ -1943,9 +1944,9 @@ void clockwiseRotateByCoil(vector<vector<int>>& matrix)
 {
     // Generally, for element matrix[i][j], it will be moved to matrix[j][n-i-1] after rotation, oppositely, for location
     // matrix[i][j], after rotation, the element on it will be matrix[n-j-1][i].
-    for (size_t i = 0, n = matrix[i].size(); i < matrix.size() / 2; ++i)
+    for (unsigned i = 0, n = matrix[i].size(); i < matrix.size() / 2; ++i)
     {
-        for (size_t j = i; j < n - 1 - i; ++j)
+        for (unsigned j = i; j < n - 1 - i; ++j)
         {
             const int temp = matrix[i][j];
             matrix[i][j] = matrix[n - j - 1][i];
@@ -1967,9 +1968,9 @@ void clockwiseRotateByCoil(vector<vector<int>>& matrix)
 // 7 8 9     3 6 9    1 4 7
 void clockwiseRotateByFlipping(vector<vector<int>>& matrix)
 {
-    for (size_t i = 0; i < matrix.size(); ++i)
+    for (unsigned i = 0; i < matrix.size(); ++i)
     {
-        for (size_t j = i + 1; j < matrix[i].size(); ++j) // Do swap for top half only!
+        for (unsigned j = i + 1; j < matrix[i].size(); ++j) // Do swap for top half only!
         {
             const int temp = matrix[i][j];
             matrix[i][j] = matrix[j][i];
@@ -1977,9 +1978,9 @@ void clockwiseRotateByFlipping(vector<vector<int>>& matrix)
         }
     }
 
-    for (size_t i = 0; i < matrix.size(); ++i)
+    for (unsigned i = 0; i < matrix.size(); ++i)
     {
-        for (size_t j = 0; j < matrix[i].size() / 2; ++j)
+        for (unsigned j = 0; j < matrix[i].size() / 2; ++j)
         {
             const int temp = matrix[i][j];
             matrix[i][j] = matrix[i][matrix[i].size() - 1 - j];
@@ -4978,20 +4979,21 @@ void flattenUseRecursion(TreeNode* root)
 }
 void flattenUseIteration(TreeNode* root)
 {
+    // As hint said, the linked list is in preorder, so we just need to keep preorder unchanged during conversion.
     for (TreeNode* current = root; current != nullptr; current = current->right)
     {
-        //                 r                     r
-        //              /    \                    \
-        //             x      y   =>               x
-        //            / \    / \                  / \
-        //           z   v  a   b                z   v
-        //          / \                         / \   \
-        //         j   k                       j   k   y
-        //                                            / \
-        //                                           a   b
-        // pre order remains : r x z j k v y a b
+        //                r                     r
+        //              /   \                    \
+        //             x     y   =>               x
+        //            / \   / \                  / \
+        //           z   v a   b                z   v
+        //          / \                        / \   \
+        //         j   k                      j   k   y
+        //                                           / \
+        //                                          a   b
+        // preorder remains unchanged after conversion : r x z j k v y a b
         // if current has left child tree, make current right child tree become the right child tree of right most leaf node
-        // in left child tree, then change left child tree to right child tree, this will not change the pre order.
+        // in left child tree, then change left child tree to right child tree, this will not change the preorder.
         if (current->left != nullptr)
         {
             TreeNode* temp;
@@ -5005,6 +5007,86 @@ void flattenUseIteration(TreeNode* root)
 void flatten(TreeNode* root)
 {
     flattenUseIteration(root);
+}
+
+// 115. Distinct Subsequences
+void dfsSearchDistinct(int& num, string& path, unsigned currentIndex, const string& s, const string& t)
+{
+    if (path.length() == t.length())
+    {
+        num += path == t ? 1 : 0;
+        return;
+    }
+
+    // From currentIndex, let's try to pick up one character one time.
+    // We may have a question, for every character in s, there are always two choices, choosing it, or not choosing it,
+    // seems in this solution we always choose a character? That is because not choosing a character is implicit here,
+    // when currentIndex = currentIndex + 1, that is actually means s[currentIndex] is not chosen.
+    // If prefer the instinct solution, please refer to function dfsSearchDistinct2
+    for (; currentIndex < s.length(); ++currentIndex)
+    {
+        path += s[currentIndex];
+        dfsSearchDistinct(num, path, currentIndex + 1, s, t);
+        path.pop_back();
+    }
+}
+void dfsSearchDistinct2(int& num, string& path, const unsigned currentIndex, const string& s, const string& t)
+{
+    if (path.length() == t.length())
+    {
+        num += path == t ? 1 : 0;
+        return;
+    }
+
+    if (currentIndex < s.length())
+    {
+        // Not choosing s[currentIndex]
+        dfsSearchDistinct2(num, path, currentIndex + 1, s, t);
+
+        // Choosing s[currentIndex].
+        path += s[currentIndex];
+        dfsSearchDistinct2(num, path, currentIndex + 1, s, t);
+        path.pop_back();
+    }
+}
+int numDistinctUseDP(const string& s, const string& t)
+{
+    // Define dp[i][j] as the count of distinct sub-sequences of s[0..i-1] (first i characters from s) equals
+    // to t[0..j-1] (first j characters from t)
+    vector<vector<int>> dp(s.length() + 1, vector<int>(t.length() + 1));
+
+    // First column dp[][0] means, when t is empty string, s will only has 1 distinct subsequence equals to t.
+    for (unsigned i = 0; i < dp.size(); ++i)
+    {
+        dp[i][0] = 1;
+    }
+
+    // First row dp[0][] means, when s is empty string and t is not empty string, s has 0 distinct subsequence equals to t.
+    for (unsigned j = 1; j < dp[0].size(); ++j)
+    {
+        dp[0][j] = 0;
+    }
+
+    for (unsigned i = 1; i < dp.size(); ++i)
+    {
+        for (unsigned j = 1; j < dp[i].size(); ++j)
+        {
+            if (s[i - 1] != t[j - 1])
+            {
+                dp[i][j] = dp[i - 1][j];
+            }
+            else
+            {
+                dp[i][j] = dp[i - 1][j] + dp[i - 1][j - 1];
+            }
+        }
+    }
+
+    return dp.back().back();
+}
+int numDistinct(const string s, const string t)
+{
+    return numDistinctUseDP(s, t);
 }
 
 // 138. Copy List with Random Pointer

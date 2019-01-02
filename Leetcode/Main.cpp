@@ -125,6 +125,7 @@ extern int minDepth(TreeNode* root);
 extern bool hasPathSum(TreeNode* root, int sum);
 extern vector<vector<int>> pathSum(TreeNode* root, int sum);
 extern void flatten(TreeNode* root);
+extern int numDistinct(string s, string t);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 
@@ -142,7 +143,8 @@ void main()
 {
     const auto start = clock();
 
-    auto k = generateTrees(0);
+    auto k = numDistinct("babgbag", "bag");
+
     vector<vector<char>> matrix({
         {'0','1','1','0','1'},
         {'1','1','0','1','0'},
