@@ -125,7 +125,8 @@ extern int minDepth(TreeNode* root);
 extern bool hasPathSum(TreeNode* root, int sum);
 extern vector<vector<int>> pathSum(TreeNode* root, int sum);
 extern void flatten(TreeNode* root);
-extern int numDistinct(string s, string t);
+extern int numDistinct(const string& s, const string& t);
+extern void connect(TreeLinkNode *root);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 

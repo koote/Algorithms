@@ -5084,9 +5084,23 @@ int numDistinctUseDP(const string& s, const string& t)
 
     return dp.back().back();
 }
-int numDistinct(const string s, const string t)
+int numDistinct(const string& s, const string& t)
 {
     return numDistinctUseDP(s, t);
+}
+
+// 116. Populating Next Right Pointers in Each Node
+void connect(TreeLinkNode *root)
+{
+    if (root == nullptr)
+    {
+        return;
+    }
+
+    // Setup next links between left child tree and right child tree.
+    for (TreeLinkNode *p = root->left, *q = root->right; p != nullptr && q != nullptr; p->next = q, p = p->right, q = q->left);
+    connect(root->left);
+    connect(root->right);
 }
 
 // 138. Copy List with Random Pointer

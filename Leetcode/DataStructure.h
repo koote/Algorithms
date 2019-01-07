@@ -15,6 +15,15 @@ struct TreeNode
     explicit TreeNode(const int x) : val(x), left(nullptr), right(nullptr) {}
 };
 
+struct TreeLinkNode
+{
+    int val;
+    TreeLinkNode *left;
+    TreeLinkNode *right;
+    TreeLinkNode *next;
+    explicit TreeLinkNode(const int x) : val(x), left(nullptr), right(nullptr), next(nullptr) {}
+};
+
 struct Interval
 {
     int start;
