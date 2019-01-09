@@ -5090,17 +5090,53 @@ int numDistinct(const string& s, const string& t)
 }
 
 // 116. Populating Next Right Pointers in Each Node
-void connect(TreeLinkNode *root)
+// 117. Populating Next Right Pointers in Each Node II
+void connect(TreeLinkNode* root)
+{
+    for (TreeLinkNode dummyHead(0); root != nullptr; root = dummyHead.next, dummyHead.next = nullptr)
+    {
+        for (TreeLinkNode *level = root, *last = &dummyHead; level != nullptr; level = level->next)
+        {
+            if (level->left != nullptr)
+            {
+                last->next = level->left;
+                last = last->next;
+            }
+
+            if (level->right != nullptr)
+            {
+                last->next = level->right;
+                last = last->next;
+            }
+        }
+    }
+}
+// Following are the solutions only for 116. 117 is more generic case.
+void connectUseRecursionOnlyFor116(TreeLinkNode *root)
 {
     if (root == nullptr)
     {
         return;
     }
 
-    // Setup next links between left child tree and right child tree.
+    // Setup next links between left child tree and right child tree, including left child and right child.
     for (TreeLinkNode *p = root->left, *q = root->right; p != nullptr && q != nullptr; p->next = q, p = p->right, q = q->left);
-    connect(root->left);
-    connect(root->right);
+    connectUseRecursionOnlyFor116(root->left);
+    connectUseRecursionOnlyFor116(root->right);
+}
+// Reuse the next pointer setup in above level is the key here.
+// The solution is we go through the left most branch, from root to last non-leaf; in every iteration we go through
+// every level, connect all nodes on same level.
+void connectUseIterationOnlyFor116(TreeLinkNode* root)
+{
+    for (; root != nullptr && root->left != nullptr &&root->right != nullptr; root = root->left) // From root to last non-leaf
+    {
+        for (TreeLinkNode* level = root; level != nullptr; level = level->next)
+        {
+            level->left->next = level->right;
+            level->right->next = level->next != nullptr ? level->next->left : nullptr;
+        }
+    }
 }
 
 // 138. Copy List with Random Pointer
