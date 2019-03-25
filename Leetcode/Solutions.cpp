@@ -3,30 +3,29 @@
 #include <string>
 #include <vector>
 #include <cassert>
-#include <cstddef>
 #include <numeric>
 #include <algorithm>
+#include <iostream>
 #include <unordered_map>
 #include <unordered_set>
 #include "DataStructure.h"
-#include <iostream>
 
 using namespace std;
 
 // 1. Two Sum
-vector<int> twoSum(vector<int>& nums, int target)
+vector<int> twoSum(vector<int>& nums, const int target)
 {
     vector<int> result;
     unordered_map<int, int> map; // <value, original_index>
-    unordered_map<int, int>::iterator iterator;
+    unordered_map<int, int>::iterator found;
 
-    for (int i = 0; i < nums.size(); ++i)
+    for (unsigned i = 0; i < nums.size(); ++i)
     {
-        int new_target = target - nums[i];
-        if ((iterator = map.find(new_target)) != map.end())
+        int newTarget = target - nums[i];
+        if ((found = map.find(newTarget)) != map.end())
         {
             result.push_back(i);
-            result.push_back(iterator->second);
+            result.push_back(found->second);
 
             return result;
         }
@@ -40,10 +39,9 @@ vector<int> twoSum(vector<int>& nums, int target)
 // 2. Add Two Numbers
 ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
 {
-    ListNode dummy(-1);
-
+    ListNode dummyHead(-1);
     unsigned char carry = 0;
-    for (ListNode *a = l1, *b = l2, *c = &dummy; a != nullptr || b != nullptr || carry != 0; )
+    for (ListNode *a = l1, *b = l2, *c = &dummyHead; a != nullptr || b != nullptr || carry != 0; )
     {
         int val = (a == nullptr ? 0 : a->val) + (b == nullptr ? 0 : b->val) + carry;
         carry = val / 10;
@@ -63,7 +61,7 @@ ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
         }
     }
 
-    return dummy.next;
+    return dummyHead.next;
 }
 
 // 3. Longest Substring Without Repeating Characters
@@ -4608,7 +4606,7 @@ vector<vector<int>> levelOrderUseQueue(TreeNode* root)
     return results;
 }
 // The recursive solution is based on per order traverse, we pass level as a parameter, when encounter level i, push
-// current node value to results[i]. Since pre order is left to right, so we get each level in left to right order
+// current node value to results[i]. Since preorder is left to right, so we get each level in left to right order
 void preOrderWithLevel(vector<vector<int>>& results, TreeNode* root, const unsigned level)
 {
     if (root == nullptr)
@@ -4782,11 +4780,11 @@ void levelOrderBottomDFS(vector<vector<int>>& results, TreeNode* root, const uns
         results.insert(results.begin(), vector<int>());
     }
 
-    levelOrderBottomDFS(results, root->left, level + 1);
-    levelOrderBottomDFS(results, root->right, level + 1);
-
     // results.size() is the tree's current height (not the whole tree's height).
     results[results.size() - 1 - level].push_back(root->val);
+
+    levelOrderBottomDFS(results, root->left, level + 1);
+    levelOrderBottomDFS(results, root->right, level + 1);
 }
 vector<vector<int>> levelOrderBottom(TreeNode* root)
 {
@@ -5095,17 +5093,17 @@ void connect(TreeLinkNode* root)
 {
     for (TreeLinkNode dummyHead(0); root != nullptr; root = dummyHead.next, dummyHead.next = nullptr)
     {
-        for (TreeLinkNode *level = root, *last = &dummyHead; level != nullptr; level = level->next)
+        for (TreeLinkNode* last = &dummyHead; root != nullptr; root = root->next)
         {
-            if (level->left != nullptr)
+            if (root->left != nullptr)
             {
-                last->next = level->left;
+                last->next = root->left;
                 last = last->next;
             }
 
-            if (level->right != nullptr)
+            if (root->right != nullptr)
             {
-                last->next = level->right;
+                last->next = root->right;
                 last = last->next;
             }
         }
@@ -5139,14 +5137,36 @@ void connectUseIterationOnlyFor116(TreeLinkNode* root)
     }
 }
 
+// 118. Pascal's Triangle
+vector<vector<int>> generate(const int numRows)
+{
+    vector<vector<int>> triangle;
+    for (int i = 0; i < numRows; ++i)
+    {
+        // for triangle[i] it has i+1 elements.
+        vector<int> row(i + 1, 1);
+
+        // only calculate row[1 .. i-1], first and last elements are always 1, no need to calculate.
+        for (int j = 1; j < i; ++j)
+        {
+            row[j] = triangle[i - 1][j - 1] + triangle[i - 1][j];
+        }
+
+        triangle.push_back(row);
+    }
+
+    return triangle;
+}
+
 // 138. Copy List with Random Pointer
-RandomListNode *copyRandomList(RandomListNode *head)
+RandomListNode* copyRandomList(RandomListNode* head)
 {
     if (head == nullptr)
     {
         return nullptr;
     }
 
+    // First, insert a duplicate node after each original node.
     // NOTE: to make code simple, actually no need to set new node's random.
     for (RandomListNode* p = head; p != nullptr; )
     {
@@ -5156,6 +5176,7 @@ RandomListNode *copyRandomList(RandomListNode *head)
         p = q->next;
     }
 
+    // Second, traverse each original node, and set duplicated node's random link.
     for (RandomListNode* p = head; p != nullptr; p = p->next->next)
     {
         if (p->random != nullptr)
@@ -5164,6 +5185,7 @@ RandomListNode *copyRandomList(RandomListNode *head)
         }
     }
 
+    // Final, decouple the duplicated list from original list.
     RandomListNode* newHead = head->next;
     for (RandomListNode* p = head; p != nullptr;)
     {
@@ -5177,12 +5199,12 @@ RandomListNode *copyRandomList(RandomListNode *head)
 }
 
 // 144. Binary Tree Preorder Traversal
-vector<int> preorderTraversal(TreeNode* root)
+vector<int> preorderTraversalUseStack(TreeNode* root)
 {
     vector<int> result;
     stack<TreeNode*> stack;
-    stack.push(root);
-    while (!stack.empty()) // note in this solution we allow pushing nullptr to stack.
+
+    for (stack.push(root); !stack.empty();) // note in this solution we allow pushing nullptr to stack.
     {
         root = stack.top();
         stack.pop();
@@ -5190,12 +5212,54 @@ vector<int> preorderTraversal(TreeNode* root)
         if (root != nullptr)
         {
             result.push_back(root->val);
-            stack.push(root->right); //since we allow nullptr to be pushed to stack so no need to check left and right.
+            stack.push(root->right); // since we allow nullptr to be pushed to stack so no need to check left and right.
             stack.push(root->left);
         }
     }
 
     return result;
+}
+vector<int> preorderTraversal(TreeNode* root)
+{
+    return preorderTraversalUseStack(root);
+}
+
+// 145. Binary Tree Postorder Traversal
+vector<int> postorderTraversal(TreeNode* root)
+{
+    vector<int> postorder;
+    if (root == nullptr)
+    {
+        return postorder;
+    }
+
+    stack<TreeNode*> stack;
+    stack.push(root);
+    TreeNode* lastVisited = root;
+    while (!stack.empty())
+    {
+        while (stack.top()->left != nullptr)
+        {
+            stack.push(stack.top()->left);
+            lastVisited = stack.top()->left;
+        }
+
+        postorder.push_back(stack.top()->val);
+        stack.pop();
+
+        if (stack.top()->right != nullptr && lastVisited != stack.top()->right)
+        {
+            stack.push(stack.top()->right);
+            lastVisited = stack.top()->right;
+        }
+        else
+        {
+            postorder.push_back(stack.top()->val);
+            stack.pop();
+        }
+    }
+
+    return postorder;
 }
 
 // 226. Invert Binary Tree

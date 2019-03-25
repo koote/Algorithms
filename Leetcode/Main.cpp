@@ -127,10 +127,12 @@ extern vector<vector<int>> pathSum(TreeNode* root, int sum);
 extern void flatten(TreeNode* root);
 extern int numDistinct(const string& s, const string& t);
 extern void connect(TreeLinkNode *root);
+extern vector<vector<int>> generate(int numRows);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 
 extern vector<int> preorderTraversal(TreeNode* root);
+extern vector<int> postorderTraversal(TreeNode* root);
 
 extern TreeNode* invertTree(TreeNode* root);
 
