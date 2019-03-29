@@ -5158,6 +5158,67 @@ vector<vector<int>> generate(const int numRows)
     return triangle;
 }
 
+// 119. Pascal's Triangle II
+vector<int> getRow(const int rowIndex)
+{
+    vector<int> row(rowIndex + 1, 1); // k-th row has k+1 elements
+    for (int i = 1; i <= rowIndex; ++i)
+    {
+        // Note: calculate from tail to head, so no need to save original value on each index.
+        for (int j = i - 1; j >= 1; --j)
+        {
+            row[j] += row[j - 1];
+        }
+    }
+
+    return row;
+}
+
+// 120. Triangle
+int minimumTotalTopDown(vector<vector<int>>& triangle)
+{
+    vector<int> pathSum(triangle.back().size());
+    pathSum[0] = triangle[0][0]; //root to root, min path is root itself.
+
+    // calculate the min path from root to every element on i-th level, store in dp[].
+    for (unsigned i = 1; i < triangle.size(); ++i)
+    {
+        // We calculate from last element on i-th level to the first element, so no need to introduce temporary variable.
+        // the last element can only be reached from the last element of above level.
+        int j = triangle[i].size() - 1; // Actually we can let j = i, since in triangle, i-th level has i+1 elements, so i == triangle[i].size() - 1, the last element on i-th level is triangle[i][i].
+        pathSum[j] = pathSum[j - 1] + triangle[i][j];
+
+        for (j = triangle[i].size() - 2; j > 0; --j) // compare and get min path for triangle[i][i-1] to triangle[i][1] (i-th level elements exclude the first and last)
+        {
+            pathSum[j] = min(pathSum[j - 1] + triangle[i][j], pathSum[j] + triangle[i][j]);
+        }
+
+        // the first element can only be reached from the first element of above level.
+        pathSum[0] += triangle[i][0];
+    }
+
+    // After we reached the last level, we have computed the min path from root to every element on last level, the smallest one is the
+    // minimum path sum of whole triangle.
+    return *min_element(pathSum.begin(), pathSum.end());
+}
+int minimumTotalBottomUp(vector<vector<int>>& triangle)
+{
+    vector<int> pathSum(triangle.back());
+    for (int i = triangle.size() - 2; i >= 0; --i)
+    {
+        for (unsigned j = 0; j < triangle[i].size(); ++j) // Note triangle[i].size() == i+1
+        {
+            pathSum[j] = min(pathSum[j], pathSum[j + 1]) + triangle[i][j];
+        }
+    }
+
+    return pathSum[0];
+}
+int minimumTotal(vector<vector<int>>& triangle)
+{
+    return minimumTotalBottomUp(triangle);
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode* copyRandomList(RandomListNode* head)
 {

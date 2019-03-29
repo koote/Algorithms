@@ -128,6 +128,8 @@ extern void flatten(TreeNode* root);
 extern int numDistinct(const string& s, const string& t);
 extern void connect(TreeLinkNode *root);
 extern vector<vector<int>> generate(int numRows);
+extern vector<int> getRow(int rowIndex);
+extern int minimumTotal(vector<vector<int>>& triangle);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 
