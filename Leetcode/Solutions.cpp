@@ -15,50 +15,32 @@ using namespace std;
 // 1. Two Sum
 vector<int> twoSum(vector<int>& nums, const int target)
 {
-    vector<int> result;
-    unordered_map<int, int> map; // <value, original_index>
+    unordered_map<int, int> dict; // <value, index>.
     unordered_map<int, int>::iterator found;
 
     for (unsigned i = 0; i < nums.size(); ++i)
     {
-        int newTarget = target - nums[i];
-        if ((found = map.find(newTarget)) != map.end())
+        if ((found = dict.find(target - nums[i])) != dict.end())
         {
-            result.push_back(i);
-            result.push_back(found->second);
-
-            return result;
+            return { static_cast<int>(i), found->second };
         }
 
-        map.insert(std::make_pair(nums[i], i)); // unordered_map search first element of pair, so have to make pair in this way.
+        dict.insert(make_pair(nums[i], i)); // use value as dictionary key, so we can quick find if a value exists
     }
 
-    return result;
+    return {};
 }
 
 // 2. Add Two Numbers
 ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
 {
-    ListNode dummyHead(-1);
-    unsigned char carry = 0;
-    for (ListNode *a = l1, *b = l2, *c = &dummyHead; a != nullptr || b != nullptr || carry != 0; )
+    ListNode dummyHead(0);
+    int carry = 0;
+    for (ListNode *a = l1, *b = l2, *last = &dummyHead; a != nullptr || b != nullptr || carry != 0; a = a == nullptr ? a : a->next, b = b == nullptr ? b : b->next, last = last->next)
     {
-        int val = (a == nullptr ? 0 : a->val) + (b == nullptr ? 0 : b->val) + carry;
+        const int val = (a == nullptr ? 0 : a->val) + (b == nullptr ? 0 : b->val) + carry;
+        last->next = new ListNode(val % 10); // when loop ends, no need to seal list since when ListNode is created, its next is set to nullptr.
         carry = val / 10;
-        val %= 10;
-
-        c->next = new ListNode(val); // when loop ends, no need to seal list c since when ListNode is created, its next is set to nullptr.
-        c = c->next;
-
-        if (a != nullptr)
-        {
-            a = a->next;
-        }
-
-        if (b != nullptr)
-        {
-            b = b->next;
-        }
     }
 
     return dummyHead.next;
@@ -93,59 +75,74 @@ int lengthOfLongestSubstring(string s)
 }
 
 // 4. Median of Two Sorted Arrays
-double findKth(int a[], int m, int b[], int n, int k)
+double findKthSortedArrays(vector<int>& nums1, vector<int>& nums2, const unsigned k) // Note k starts from 1.
 {
-    if (m < n)
+    // we assume that nums1 is longer than nums2.
+    if (nums1.size() < nums2.size())
     {
-        return findKth(b, n, a, m, k);
+        return findKthSortedArrays(nums2, nums1, k);
     }
 
-    if (n == 0)
+    if (nums2.empty())
     {
-        return a[k - 1];
+        return nums1[k - 1];
     }
 
     if (k == 1)
     {
-        return min(a[0], b[0]);
+        return min(nums1.front(), nums2.front());
     }
 
-    if (k == m + n)
+    if (k == nums1.size() + nums2.size())
     {
-        return max(a[m - 1], b[n - 1]);
+        return max(nums1.back(), nums2.back());
     }
 
-    // let k = i+j. Please note that we are sure n <= m here
-    int j = min(n, k / 2);
-    const int i = k - j;
+    // Ideally every step we reduce k by half, however since we assume that nums1.size() >= nums2.size(), so
+    // it is possible that k/2 > nums2.size(), to ensure that it doesn't cause out of boundary exception, we
+    // compare k/2 and nums2.size().
+    const unsigned j = min(k / 2, nums2.size());
+    const unsigned i = k - j;
 
-    if (a[i - 1] > b[j - 1])
+    // now we get an index i in nums1 and index j in nums2. So we can compare nums1[i-1] and nums2[j-1] (Note that k is
+    // one based, so i and j are also 1 based). There are 3 cases:
+    // (1) nums1[i-1] < nums2[j-1]. It means nums1[0..i-1] < nums2[j..nums2.size()-1], and k-th element cannot be in
+    //     these 2 ranges, according to k-th element's definition, its left side has (i+j)-1 elements and its right side
+    //     has nums1.size()+nums2.size()-(i+j) elements, it is obvious that nums1[0..i-1] has i elements and nums2[j..nums2.size()-1]
+    //     has nums2.size()-j elements. So we can discard nums1's first range and nums2's second range, then continue searching.
+    //     Must note that next time we are searching for (k-i)-th element.
+    // (2) nums1[i-1] > nums2[j-1]. It means nums1[i..nums1.size()-1] > nums2[0..j-1], similarly, we can discard nums1's 
+    //     second part and nums2's first part, and continue searching (k-j)-th element.
+    // (3) nums1[i-1] == nums2[j-1], it means they have k-2 elements left and m+n-k elements right, so either is the k-th.
+    if (nums1[i - 1] < nums2[j - 1])
     {
-        return findKth(a, i, b + j, n - j, k - j);
+        vector<int> subnums1(nums1.begin() + i, nums1.end());
+        vector<int> subnums2(nums2.begin(), nums2.begin() + j);
+        return findKthSortedArrays(subnums1, subnums2, k - i);
     }
-    else if (a[i - 1] < b[j - 1])
+
+    if (nums1[i - 1] > nums2[j - 1])
     {
-        return findKth(a + i, m - i, b, j, k - i);
+        vector<int> subnums1(nums1.begin(), nums1.begin() + i);
+        vector<int> subnums2(nums2.begin() + j, nums2.end());
+        return findKthSortedArrays(subnums1, subnums2, k - j);
     }
-    else
-    {
-        // When a[i-1] == b[j-1], they have k-2 elements left and m+n-k elements right, so either is the kth.
-        return a[i - 1];
-    }
+
+    return nums1[i - 1];
 }
 double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2)
 {
     const int m = nums1.size();
     const int n = nums2.size();
 
-    if ((m + n) & 1) // odd
+    // Note median index starts from 1, not 0.
+    if (m + n & 1) // odd
     {
-        return findKth(nums1.data(), m, nums2.data(), n, (m + n) / 2 + 1);
+        return findKthSortedArrays(nums1, nums2, (m + n) / 2 + 1);
     }
-    else //even
-    {
-        return (findKth(nums1.data(), m, nums2.data(), n, (m + n) / 2) + findKth(nums1.data(), m, nums2.data(), n, (m + n) / 2 + 1)) / 2.0;
-    }
+
+    // even, return arithmetic average of two medians.
+    return (findKthSortedArrays(nums1, nums2, (m + n) / 2) + findKthSortedArrays(nums1, nums2, (m + n) / 2 + 1)) / 2.0;
 }
 
 // 5. Longest Palindromic Substring
@@ -178,7 +175,7 @@ string longestPalindrome(string s)
 }
 
 // 6. ZigZag Conversion
-string zigzagConvert(string s, int numRows)
+string zigzagConvert(string s, const int numRows)
 {
     // We can also handle condition here when numRows>=s.length(), return s directly, but it has been covered in following loop.
     // For condition numRows == 1, because 2*numRows-2=0, if we let distance = 1 when, then it could also be handled by following loop.
@@ -213,7 +210,7 @@ int reverseInteger(int x)
     int result = 0;
     for (; x > 0; x /= 10)
     {
-        int digit = x % 10;
+        const int digit = x % 10;
         if (result > INT_MAX / 10 ||
             (result == INT_MAX / 10 && digit > INT_MAX % 10 && sign == 1) ||
             (result == INT_MAX / 10 && digit > INT_MAX % 10 + 1 && sign == -1))
