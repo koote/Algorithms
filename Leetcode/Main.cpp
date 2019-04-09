@@ -130,6 +130,7 @@ extern void connect(TreeLinkNode *root);
 extern vector<vector<int>> generate(int numRows);
 extern vector<int> getRow(int rowIndex);
 extern int minimumTotal(vector<vector<int>>& triangle);
+extern int maxProfit(vector<int>& prices);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 
@@ -143,6 +144,8 @@ extern TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q);
 extern bool increasingTriplet(vector<int>& nums);
 
 extern string addStrings(const string& num1, const string& num2);
+
+extern int findLengthOfLCIS(vector<int>& nums);
 
 void main()
 {

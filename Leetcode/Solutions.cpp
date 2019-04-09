@@ -4760,7 +4760,7 @@ void levelOrderBottomDFS(vector<vector<int>>& results, TreeNode* root, const uns
     if (level == results.size())
     {
         // this is a tricky part, we should not use emplace_back but always add new vector to the
-        // beginning. the reason is when value is being pushed to vector, our code always assumes
+        // beginning, the reason is when value is being pushed to vector, our code always assumes
         // that results.size() implies tree height, which is not correct. e.g.: for this tree:
         //               1
         //              / \
@@ -4808,7 +4808,7 @@ vector<vector<int>> levelOrderBottomBFS(TreeNode* root)
             }
         }
 
-        if (!level.empty())
+        if (!level.empty()) // every time we insert current level to begin of result array so we get a bottom up level order.
         {
             results.insert(results.begin(), level);
         }
@@ -5216,6 +5216,35 @@ int minimumTotal(vector<vector<int>>& triangle)
     return minimumTotalBottomUp(triangle);
 }
 
+// 121. Best Time to Buy and Sell Stock
+int maxProfit(vector<int>& prices)
+{
+    int maxProfit = 0;
+    int lowestPrice = INT_MAX;
+    for (int price : prices)
+    {
+        // search prices array from begin to end, if we find a price lower than the lowest price we know so far,
+        // update the lowest price; if we find a price greater than lowest price, recalculate the profit and if
+        // it is greater than max profit so far, update the max profit. 
+        // we use the truth that stock must be bought before sell, so only need to care the high price that appears
+        // after lowest price.
+        if (price < lowestPrice)
+        {
+            lowestPrice = price;
+        }
+        else if (price > lowestPrice)
+        {
+            const int curProfit = price - lowestPrice;
+            if (curProfit > maxProfit)
+            {
+                maxProfit = curProfit;
+            }
+        }
+    }
+
+    return maxProfit;
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode* copyRandomList(RandomListNode* head)
 {
@@ -5380,4 +5409,27 @@ string addStrings(const string& num1, const string& num2)
     }
 
     return sum;
+}
+
+// 674. Longest Continuous Increasing Subsequence
+int findLengthOfLCIS(vector<int>& nums)
+{
+    int maxIncreaingLength = 0;
+    int currrentIncreasingLength = 0;
+    for (unsigned i = 0; i < nums.size(); ++i)
+    {
+        if (i == 0 || nums[i] > nums[i - 1])
+        {
+            if (++currrentIncreasingLength > maxIncreaingLength)
+            {
+                maxIncreaingLength = currrentIncreasingLength;
+            }
+        }
+        else
+        {
+            currrentIncreasingLength = 1;
+        }
+    }
+
+    return maxIncreaingLength;
 }
