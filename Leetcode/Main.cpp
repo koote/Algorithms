@@ -131,6 +131,7 @@ extern vector<vector<int>> generate(int numRows);
 extern vector<int> getRow(int rowIndex);
 extern int minimumTotal(vector<vector<int>>& triangle);
 extern int maxProfit(vector<int>& prices);
+extern int maxProfit2(vector<int>& prices);
 
 extern RandomListNode *copyRandomList(RandomListNode *head);
 
@@ -149,9 +150,8 @@ extern int findLengthOfLCIS(vector<int>& nums);
 
 void main()
 {
+    int a[] = { 1,1 };
     const auto start = clock();
-
-    auto k = numDistinct("babgbag", "bag");
 
     vector<vector<char>> matrix({
         {'0','1','1','0','1'},
@@ -175,8 +175,6 @@ void main()
         { '.', '.', '.', '4', '1', '9', '.', '.', '5' },
         { '.', '.', '.', '.', '8', '.', '.', '7', '9' }
         });
-
-    solveSudoku(sudoku);
 
     const auto duration = (clock() - start) / static_cast<double>(CLOCKS_PER_SEC);
     cout << duration << endl;

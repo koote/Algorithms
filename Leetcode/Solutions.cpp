@@ -1382,7 +1382,7 @@ bool dfsSearchSudoku(vector<vector<char>>& board, unsigned row, unsigned col)
 }
 void solveSudoku(vector<vector<char>>& board)
 {
-    dfsSearchSudoku(board, 0, 0);
+    solveSudokuUse36(board);
 }
 
 // 38. Count and Say
@@ -5239,6 +5239,43 @@ int maxProfit(vector<int>& prices)
             {
                 maxProfit = curProfit;
             }
+        }
+    }
+
+    return maxProfit;
+}
+int maxProfitUseDP(vector<int>& prices)
+{
+    // Define profits[i] = the maximum profit can get if sell stock at prices[i].
+    // This array can be optimized to one variable, only need to save previous day's profit.
+    vector<int> profits(prices.size(), 0);
+    int maxProfit = 0;
+    for (unsigned i = 1; i < prices.size(); ++i)
+    {
+        // For every prices[i] we have two choices, sell or not sell.
+        // if sell at prices[i], profits[i] = profits[i - 1] + (prices[i] - prices[i - 1]), note prices[i] - prices[i - 1] can be negative.
+        // if profits[i] becomes negative, we should not sell.
+        profits[i] = max(profits[i - 1] + prices[i] - prices[i - 1], 0);
+
+        if (profits[i] > maxProfit)
+        {
+            maxProfit = profits[i];
+        }
+    }
+
+    return maxProfit;
+}
+
+// 122. Best Time to Buy and Sell Stock II
+int maxProfit2(vector<int>& prices)
+{
+    unsigned maxProfit = 0;
+    for (unsigned i = 1, currentProfit = 0; i < prices.size(); ++i)
+    {
+        currentProfit = prices[i] > prices[i - 1] ? currentProfit + prices[i] - prices[i - 1] : currentProfit;
+        if (currentProfit > maxProfit)
+        {
+            maxProfit = currentProfit;
         }
     }
 
