@@ -132,11 +132,14 @@ extern vector<int> getRow(int rowIndex);
 extern int minimumTotal(vector<vector<int>>& triangle);
 extern int maxProfit(vector<int>& prices);
 extern int maxProfit2(vector<int>& prices);
+extern int maxProfit3(vector<int>& prices);
 
-extern RandomListNode *copyRandomList(RandomListNode *head);
+extern RandomListNode* copyRandomList(RandomListNode *head);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 extern vector<int> postorderTraversal(TreeNode* root);
+
+extern int maxProfit4(int k, vector<int>& prices);
 
 extern TreeNode* invertTree(TreeNode* root);
 
@@ -148,9 +151,10 @@ extern string addStrings(const string& num1, const string& num2);
 
 extern int findLengthOfLCIS(vector<int>& nums);
 
+extern vector<vector<int>> kClosest(vector<vector<int>>& points, int k);
+
 void main()
 {
-    int a[] = { 1,1 };
     const auto start = clock();
 
     vector<vector<char>> matrix({

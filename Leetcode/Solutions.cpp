@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "DataStructure.h"
+#include <functional>
 
 using namespace std;
 
@@ -3292,7 +3293,7 @@ bool searchMatrix(vector<vector<int>>& matrix, int target)
 
 // 75. Sort Colors
 // partitionByPivot is a generic helper function, given a pivot value, partitioning nums[] into 3 partitions: <pivot, ==pivot, >pivot.
-void partitionByPivot(vector<int>& nums, int pivot)
+void partitionByPivot(vector<int>& nums, const int pivot)
 {
     // Our goal is to partition nums[] into 3 partitions, less, equal and greater. Initially they are all empty except a temporary 
     // partition called unprocessed which starts from 0 and ends at nums.size()-1. We keep taking element from unprocessed partition
@@ -5270,16 +5271,71 @@ int maxProfitUseDP(vector<int>& prices)
 int maxProfit2(vector<int>& prices)
 {
     unsigned maxProfit = 0;
-    for (unsigned i = 1, currentProfit = 0; i < prices.size(); ++i)
+    for (unsigned i = 1; i < prices.size(); ++i)
     {
-        currentProfit = prices[i] > prices[i - 1] ? currentProfit + prices[i] - prices[i - 1] : currentProfit;
-        if (currentProfit > maxProfit)
+        // as long as today's price is higher than yesterday, add the difference to profit. it is a greedy algorithms.
+        if (prices[i] > prices[i - 1])
         {
-            maxProfit = currentProfit;
+            maxProfit += prices[i] - prices[i - 1];
         }
     }
 
     return maxProfit;
+}
+
+// 123. Best Time to Buy and Sell Stock III
+// Since we must sell then buy again, so it means there is an index i (0 <= i < prices.size()) which splits
+// prices[] into 2 ranges: prices[0..i] and prices[i..prices.size()-1], the sum of maximum profits in each
+// range is also the maximum (among all possible values of i). So it can be done in 3 steps:
+// 1. Scan prices[] from begin to end, calculate and store the maximum profit of every range prices[0..i] in
+//    profits[].
+// 2. Scan prices[] from end to begin, calculate the the maximum profit of every range prices[i..prices.end()-1] 
+//    and update profits[].
+// 3. Get the maximum element of profits[].
+// In practical, we can combine 2 and 3 in one loop and no need to update the profits[] in 2nd loop.
+int maxProfit3UseTwoPassScan(vector<int>& prices)
+{
+    vector<int> profits(prices.size(), 0);
+
+    if (prices.size() <= 1)
+    {
+        return 0;
+    }
+
+    // First scan from begin to end to calculate: profits[i] = the maximum profit of prices[0..i].
+    for (int i = 1, lowest = prices[0]; i < prices.size(); ++i)
+    {
+        if (prices[i] < lowest)
+        {
+            lowest = prices[i];
+        }
+
+        profits[i] = max(prices[i] - lowest, profits[i - 1]);
+    }
+
+    // Now scan from end to begin, get maximum profit of prices[i..prices.size()-1], and maintain the maxp profit.
+    int maxProfit = profits.back();
+    for (int i = prices.size() - 2, highest = prices.back(), previousProfit = 0; i >= 0; --i)
+    {
+        if (prices[i] > highest)
+        {
+            highest = prices[i];
+        }
+
+        previousProfit = max(highest - prices[i], previousProfit);
+        maxProfit = max(maxProfit, profits[i] + previousProfit);
+    }
+
+    return maxProfit;
+}
+int maxProfit4(int k, vector<int>& prices);
+int maxProfit3UseDP(vector<int>& prices)
+{
+    return maxProfit4(2, prices);
+}
+int maxProfit3(vector<int>& prices)
+{
+    return maxProfit3UseDP(prices);
 }
 
 // 138. Copy List with Random Pointer
@@ -5386,6 +5442,12 @@ vector<int> postorderTraversal(TreeNode* root)
     return postorder;
 }
 
+// 188. Best Time to Buy and Sell Stock IV
+int maxProfit4(int k, vector<int>& prices)
+{
+    return 0;
+}
+
 // 226. Invert Binary Tree
 TreeNode* invertTree(TreeNode* root)
 {
@@ -5469,4 +5531,75 @@ int findLengthOfLCIS(vector<int>& nums)
     }
 
     return maxIncreaingLength;
+}
+
+// 973. K Closest Points to Origin
+// Max heap is not the most efficient solution, but it can be used in streaming calculation as it does not have to know the size
+// of the data previously.
+vector<vector<int>> kClosestUseMaxHeap(const vector<vector<int>>& points, const int k)
+{
+    // can also use priority_queue here, declare as:
+    // priority_queue<vector<int>, vector<vector<int>>, decltype(distanceComparer)> pq(distanceComparer);
+    // but priority_queue cannot be converted into vector, has to pop all elements out to a vector.
+
+    vector<vector<int>> maxHeap;
+    const function<bool(const vector<int>&, const vector<int>&)> distanceComparer = [](const vector<int>& a, const vector<int>& b)
+    {
+        return a[0] * a[0] + a[1] * a[1] < b[0] * b[0] + b[1] * b[1];
+    };
+
+    for (const vector<int>& point : points)
+    {
+        if (maxHeap.size() < k || distanceComparer(point, maxHeap.front())) // true means point is closer than heap top
+        {
+            maxHeap.push_back(point);
+            push_heap(maxHeap.begin(), maxHeap.end(), distanceComparer); // adjust
+
+            if (maxHeap.size() > k)
+            {
+                pop_heap(maxHeap.begin(), maxHeap.end(), distanceComparer);
+                maxHeap.pop_back();
+            }
+        }
+    }
+
+    return maxHeap;
+}
+// Similar to quick sort, we can choose a pivot element and partition vector into 2 ranges, all elements in left range are 
+// smaller than right range, if left range's size == k, then we found the answer.
+vector<vector<int>> kClosestUsePartitioning(vector<vector<int>>& points, int k)
+{
+    const function<bool(const vector<int>&, const vector<int>&)> distanceComparer = [](const vector<int>& a, const vector<int>& b)
+    {
+        return a[0] * a[0] + a[1] * a[1] < b[0] * b[0] + b[1] * b[1];
+    };
+
+    for (int start = 0, end = points.size() - 1, left = - 1; left + 1 != k; )
+    {
+        left = start - 1;
+        for (int i = start; i < end; ++i) // Should not modify original start, use a local variable.
+        {
+            if (distanceComparer(points[i], points[end])) // use points[end] as pivot, so loop is start < end.
+            {
+                swap(points[++left], points[i]);
+            }
+        }
+
+        swap(points[end], points[++left]); //place the pivot element on correct index.
+
+        if (left + 1 < k) // go right range
+        {
+            start = left + 1;
+        }
+        else if (left + 1 > k) //go left range
+        {
+            end = left - 1;
+        }
+    }
+
+    return vector<vector<int>>(points.begin(), points.begin() + k);
+}
+vector<vector<int>> kClosest(vector<vector<int>>& points, const int k)
+{
+    return kClosestUsePartitioning(points, k);
 }
