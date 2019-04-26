@@ -5443,9 +5443,123 @@ vector<int> postorderTraversal(TreeNode* root)
 }
 
 // 188. Best Time to Buy and Sell Stock IV
+// Let profits[k][j] represent the max profit when we only trade from prices[0] to prices[j] (inclusive) using at most k
+// transactions.
+// Consider prices[j], we may ignore it, thus downgrading to f[k][j - 1], or sell at prices[j]. If we sell at prices[j],
+// we have to buy at some price before prices[j], assume buy at prices[i], i ¡Ê[0, j); between prices[i..j] no other trade
+// can happen (required by the problem statement).
+// We earn prices[j] - prices[i] in this trade, and at most k - 1 trades are allowed at and before prices[i], which is 
+// profits[k - 1][i], so the max profit of prices[0..j] is:
+// profits[k][j] = max(profits[k][j - 1], prices[j] - prices[i] + profits[k - 1][i]), i ¡Ê[0, j).
+// Initial conditions:
+// first row profits[0][] = 0; 0 trade makes 0 profit
+// first column profits[][0] = 0; if there is only one price data point no profit no matter how many times you can trade.
+int maxProfit4UseDPWithoutOptimization(const int k, vector<int>& prices)
+{
+    if (prices.size() <= 1 || k == 0)
+    {
+        return 0;
+    }
+
+    // Here profits[][] array is initialized to 0 to simplify initialization code.
+    vector<vector<int>> profits(k + 1, vector<int>(prices.size(), 0));
+
+    for (int t = 1; t <= k; ++t)
+    {
+        for (unsigned j = 1; j < prices.size(); ++j)
+        {
+            int maxProfit = profits[t][j - 1];
+            for (unsigned i = 0; i < j; ++i)
+            {
+                maxProfit = max(maxProfit, prices[j] - prices[i] + profits[t - 1][i]);
+            }
+
+            profits[t][j] = maxProfit;
+        }
+    }
+
+    return profits.back().back();
+}
+int maxProfit4WithSpaceOptimization(int k, vector<int>& prices)
+{
+    if (prices.size() <= 1 || k == 0)
+    {
+        return 0;
+    }
+
+    // When k >= prices.size(), it degenerates to problem 122, which is, you can transact as many times as want.
+    if (k > static_cast<int>(prices.size()))
+    {
+        return maxProfit2(prices);
+    }
+
+    // Here is the first optimization. From transition function we know that to calculate current
+    // state, only need previous state, so we can optimize profits array from k+1 rows to 2 rows.
+    vector<vector<int>> profits(2, vector<int>(prices.size(), 0)); // first row is 0
+    for (; k > 0; --k) // loop k times not k+1 times since we are starting from k==0 (initialize profits[0]=={0}).
+    {
+        for (unsigned j = 1; j < prices.size(); ++j)
+        {
+            int maxProfit = profits[1][j - 1];
+            for (unsigned i = 0; i < j; ++i)
+            {
+                maxProfit = max(maxProfit, prices[j] - prices[i] + profits[0][i]);
+            }
+
+            profits[1][j] = maxProfit;
+        }
+
+        // copy profits[1][] to profits[0][], make sure profit[0] always contains previous row.
+        profits[0] = profits[1];
+    }
+
+    return profits[1].back();
+}
 int maxProfit4(int k, vector<int>& prices)
 {
-    return 0;
+    if (prices.size() <= 1 || k == 0)
+    {
+        return 0;
+    }
+
+    // When k >= prices.size(), it degenerates to problem 122 (you can transact as many times as you want).
+    if (k >= prices.size())
+    {
+        return maxProfit2(prices); // greedy
+    }
+
+    vector<vector<int>> profits(2, vector<int>(prices.size(), 0));
+    for (; k > 0; --k) // loop k times not k+1 times since we are starting from k==0 (initialize profits[0]=={0}).
+    {
+        /* Here is the second optimization. To figure out how to optimize the 3rd loop to make it downgrade from O(n^3) to O(n^2),
+           let's write some samples:
+        j == 1      profits[1][1] = max(prices[1] + (profits[0][0] - prices[0]))
+                                                                                      = prices[1] + max(profits[0][0] - prices[0])
+        j == 2      profits[1][2] = max(prices[2] + (profits[0][0] - prices[0]),
+                                        prices[2] + (profits[0][1] - prices[1]))
+                                                                                      = prices[2] + max(profits[0][0] - prices[0],
+                                                                                                        profits[0][1] - prices[1])
+        j == 3      profits[1][3] = max(prices[3] + (profits[0][0] - prices[0]),
+                                        prices[3] + (profits[0][1] - prices[1]),
+                                        prices[3] + (profits[0][2] - prices[2]))
+                                                                                      = prices[3] + max(profits[0][0] - prices[0],
+                                                                                                        profits[0][1] - prices[1],
+                                                                                                        profits[0][2] - prices[2])
+        As we can see, for every j, we add prices[j] to max(profits[0][i] - prices[i]), i ¡Ê[0, j), the purpose of 3rd loop is
+        actually trying to find max(profits[0][i] - prices[i]), we can maintain the maximum value of profits[0][i] - prices[i]
+        so far, then we don't need the 3rd loop.
+        */
+        for (int j = 1, innerMax = profits[0][0] - prices[0]; j < prices.size(); ++j)
+        {
+            profits[1][j] = max(profits[1][j - 1], prices[j] + innerMax);
+            innerMax = max(innerMax, profits[0][j] - prices[j]);
+        }
+
+        // copy profits[1][] to profits[0][], make sure profit[0] always contains previous state.
+        profits[0] = profits[1];
+    }
+
+    return profits[1].back();
 }
 
 // 226. Invert Binary Tree
@@ -5574,10 +5688,10 @@ vector<vector<int>> kClosestUsePartitioning(vector<vector<int>>& points, int k)
         return a[0] * a[0] + a[1] * a[1] < b[0] * b[0] + b[1] * b[1];
     };
 
-    for (int start = 0, end = points.size() - 1, left = - 1; left + 1 != k; )
+    for (int start = 0, end = points.size() - 1, left = -1; start <= end && left + 1 != k; )
     {
         left = start - 1;
-        for (int i = start; i < end; ++i) // Should not modify original start, use a local variable.
+        for (int i = start; i < end; ++i) // Need to protect start, so use a local variable i.
         {
             if (distanceComparer(points[i], points[end])) // use points[end] as pivot, so loop is start < end.
             {
@@ -5585,7 +5699,7 @@ vector<vector<int>> kClosestUsePartitioning(vector<vector<int>>& points, int k)
             }
         }
 
-        swap(points[end], points[++left]); //place the pivot element on correct index.
+        swap(points[end], points[++left]); // place the pivot element on correct index.
 
         if (left + 1 < k) // go right range
         {
