@@ -4,29 +4,29 @@
 #include <vector>
 #include <cassert>
 #include <numeric>
-#include <algorithm>
 #include <iostream>
+#include <algorithm>
+#include <functional>
 #include <unordered_map>
 #include <unordered_set>
 #include "DataStructure.h"
-#include <functional>
 
 using namespace std;
 
 // 1. Two Sum
 vector<int> twoSum(vector<int>& nums, const int target)
 {
-    unordered_map<int, int> dict; // <value, index>.
+    unordered_map<int, int> dictionary; // <value, index>
     unordered_map<int, int>::iterator found;
 
     for (unsigned i = 0; i < nums.size(); ++i)
     {
-        if ((found = dict.find(target - nums[i])) != dict.end())
+        if ((found = dictionary.find(target - nums[i])) != dictionary.end())
         {
             return { static_cast<int>(i), found->second };
         }
 
-        dict.insert(make_pair(nums[i], i)); // use value as dictionary key, so we can quick find if a value exists
+        dictionary.insert(make_pair(nums[i], i)); // use value as dictionary key, so we can quick find if a value exists
     }
 
     return {};
@@ -37,7 +37,7 @@ ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
 {
     ListNode dummyHead(0);
     int carry = 0;
-    for (ListNode *a = l1, *b = l2, *last = &dummyHead; a != nullptr || b != nullptr || carry != 0; a = a == nullptr ? a : a->next, b = b == nullptr ? b : b->next, last = last->next)
+    for (ListNode* a = l1, *b = l2, *last = &dummyHead; a != nullptr || b != nullptr || carry != 0; a = a == nullptr ? a : a->next, b = b == nullptr ? b : b->next, last = last->next)
     {
         const int val = (a == nullptr ? 0 : a->val) + (b == nullptr ? 0 : b->val) + carry;
         last->next = new ListNode(val % 10); // when loop ends, no need to seal list since when ListNode is created, its next is set to nullptr.
@@ -598,8 +598,8 @@ vector<vector<int>> fourSum(vector<int>& nums, const int target)
 // 19. Remove Nth Node From End of List
 ListNode* removeNthFromEnd(ListNode* head, int n)
 {
-    ListNode dummy(-1);
-    dummy.next = head;
+    ListNode dummyHead(0);
+    dummyHead.next = head;
 
     // The algorithms is to use two pointers and let distance between first and last is n+1, when first reaches 
     // end of list, last->next is the one needs to be deleted.
@@ -607,17 +607,17 @@ ListNode* removeNthFromEnd(ListNode* head, int n)
     // n == 1, pointer first stops at real head, pointer last points to dummy head, no special handling is needed.
     // If we start counting from real head, then when first loop ends, first is null.
     ListNode* first;
-    for (first = &dummy; n > 0 && first != nullptr; first = first->next, --n);
+    for (first = &dummyHead; n > 0 && first != nullptr; first = first->next, --n);
 
     ListNode* last;
-    for (last = &dummy; first->next != nullptr; first = first->next, last = last->next);
+    for (last = &dummyHead; first->next != nullptr; first = first->next, last = last->next);
 
     // last->next is what needs to be removed.
     ListNode* target = last->next;
     last->next = target->next;
     delete target;
 
-    return dummy.next;
+    return dummyHead.next;
 }
 
 // 20. Valid Parentheses
@@ -635,7 +635,7 @@ bool isValid(string s)
             if (!stack.empty())
             {
                 const char top = stack.top();
-                if ((s[i] == ')' && top == '(') || (s[i] == ']'&&top == '[') || (s[i] == '}' && top == '{'))
+                if ((s[i] == ')' && top == '(') || (s[i] == ']' && top == '[') || (s[i] == '}' && top == '{'))
                 {
                     stack.pop();
                     continue;
@@ -652,9 +652,8 @@ bool isValid(string s)
 // 21. Merge Two Sorted Lists
 ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
 {
-    ListNode dummy(-1);
-    ListNode* last = &dummy;
-    while (l1 != nullptr || l2 != nullptr)
+    ListNode dummyHead(0);
+    for (ListNode* last = &dummyHead; l1 != nullptr || l2 != nullptr;)
     {
         if (l1 != nullptr && l2 != nullptr)
         {
@@ -683,7 +682,7 @@ ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
         }
     }
 
-    return dummy.next;
+    return dummyHead.next;
 }
 
 // 22. Generate Parentheses
@@ -796,8 +795,8 @@ ListNode* mergeKLists(vector<ListNode*>& lists)
 
     buildMinHeap(minHeap);
 
-    ListNode dummy(0);
-    ListNode* last = &dummy;
+    ListNode dummyHead(0);
+    ListNode* last = &dummyHead;
     while (!minHeap.empty())
     {
         last->next = minHeap[0];
@@ -820,18 +819,18 @@ ListNode* mergeKLists(vector<ListNode*>& lists)
     }
 
     last->next = nullptr; // seal the list
-    return dummy.next;
+    return dummyHead.next;
 }
 
 // 24. Swap Nodes in Pairs
 ListNode* swapPairs(ListNode* head)
 {
-    ListNode dummy(0);
-    dummy.next = head;
+    ListNode dummyHead(0);
+    dummyHead.next = head;
 
     // What will be swapped are p->next and q->next.
     // check q is null is only for empty list. check q->next is null is really needed for non empty list.
-    for (ListNode* p = &dummy, *q = head; q != nullptr && q->next != nullptr;)
+    for (ListNode* p = &dummyHead, *q = head; q != nullptr && q->next != nullptr;)
     {
         p->next = q->next;
         p = p->next; // Moving p forward makes code looks a little bit clean, otherwise it would be q->next = p->next->next;p->next->next=q;
@@ -842,16 +841,16 @@ ListNode* swapPairs(ListNode* head)
         q = p->next;
     }
 
-    return dummy.next;
+    return dummyHead.next;
 }
 
 //25. Reverse Nodes in k-Group
 ListNode* reverseKGroup(ListNode* head, const int k)
 {
-    ListNode dummy(0);
-    dummy.next = head;
+    ListNode dummyHead(0);
+    dummyHead.next = head;
 
-    for (ListNode* p = &dummy, *q = head; q != nullptr;)
+    for (ListNode* p = &dummyHead, *q = head; q != nullptr;)
     {
         // Moving q forward by k-1 elements.
         int n;
@@ -880,7 +879,7 @@ ListNode* reverseKGroup(ListNode* head, const int k)
         }
     }
 
-    return dummy.next;
+    return dummyHead.next;
 }
 
 // 26. Remove Duplicates from Sorted Array
@@ -1869,7 +1868,7 @@ vector<vector<int>> permuteRecursiveInsertion(vector<int>& nums)
 // unused elements, its left, nums[0 .. currentIndex-1] are the elements we currently have chosen. Every time we choose an element
 // in nums[currentIndex .. size-1] and exchange it with nums[currentIndex], treated this process as 'choose an unused element',
 // update currentIndex to currentIndex+1, and keep repeating this process until currentIndex == size, we get one permutation.
-void dfsPermuteImpl(vector<int>& nums, unsigned currentIndex, vector<vector<int>>& results)
+void dfsPermuteImpl(vector<int>& nums, const unsigned currentIndex, vector<vector<int>>& results)
 {
     if (currentIndex == nums.size())
     {
@@ -2001,7 +2000,7 @@ vector<vector<string>> groupAnagrams(vector<string>& strs)
     }
 
     vector<vector<string>> results(charset2Strings.size());
-    transform(charset2Strings.begin(), charset2Strings.end(), results.begin(), [](const auto &pair) { return pair.second; });
+    transform(charset2Strings.begin(), charset2Strings.end(), results.begin(), [](const auto& pair) { return pair.second; });
     return results;
 }
 
@@ -2828,48 +2827,57 @@ string addBinary2(string a, string b)
 }
 
 // 68. Text Justification
-vector<string> fullJustify(vector<string>& words, int maxWidth)
+vector<string> fullJustify(const vector<string>& words, const int maxWidth)
 {
-    vector<string> justifiedText;
+    vector<string> lines;
 
-    for (unsigned i = 0, j, lineWordsLength = 0; i < words.size(); i = j, lineWordsLength = 0) // lineWordsLength doesn't count whitespace
+    for (unsigned i = 0, j; i < words.size(); i = j)
     {
-        // Starting from word[i], add as many words as possible to current line, when loop ends, word[j] is the first word of next line.
-        for (j = i; j < words.size() && lineWordsLength + words[j].size() + (j - i) <= maxWidth; lineWordsLength += words[j++].size());
+        // Step 1: find the start and end index of current line. Starting from word[i], add as many words as possible to current line,
+        // when loop ends, word[j] is the first word of next line.
+        int wordsLength = 0; // wordsLength doesn't count whitespace, only total length of all words in current line.
+        for (j = i; j < words.size() && wordsLength + words[j].size() + (j - i) <= maxWidth; wordsLength += words[j++].size());
 
-        // Now justify current line, which is composed by words[i .. j-1], with a total of (maxWidth - lineWordsLength) whitespace.
-        string line = words[i];
-        for (unsigned k = i + 1; k < j; ++k) // we start from i+1 so if current line only have 1 word, no inter-word padding will be made.
+        // Step 2: Now justify current line, which includes words[i..j), with a total of (maxWidth-wordsLength) whitespace and j-i-1 padding
+        // slots. There are 2 corner cases:
+        // If current line is the last line, every two words has 1 whitespace (note all unused whitespace are appended at the end of line).
+        // If current line is not the last line, we need to consider when (maxWidth-wordsLength) is not divisible by (j-i-1), according to
+        // the problem, the empty slots on the left will be assigned more spaces than the slots on the right. For example, let's assume that
+        // there are 27 whitespace and 6 slots, 27/6=4..3, every slot has 4 whitespace initially, for the 3 unused whitespace, assign them
+        // to all slots from left to right, so the correct padding sizes are [4+1,4+1,4+1,4,4,4]=[5,5,5,4,4,4].
+        vector<int> paddings(j - i - 1, 1);
+        if (j < words.size() && j - i - 1 > 0) // Not last line, and current line contains more than 1 word.
         {
-            int paddingSize = 1;
-
-            // When j == words.size(), current line is the last line, should only have 1 whitespace between words, no padding actually.
-            // Only need to calculate padding size when current line is not the last line.
-            if (j < words.size())
+            const int avg = (maxWidth - wordsLength) / (j - i - 1);
+            int reminder = (maxWidth - wordsLength) % (j - i - 1);
+            for (int& padding : paddings)
             {
-                // j-k is the count of remaining padding slots. First we calculate average count of whitespace, e.g. if we have total of 10
-                // whitespace and 4 slots (5 words), average count of whitespace = 10/4 = 2, so every two words have 2 whitespace, but it
-                // is not done yet, still need to check if reminder is 0 or not, if not, means there are some whitespace cannot be distributed
-                // among slots evenly, according to problem, left slots should have more whitespace than right, so in this example, 2+1=3, then
-                // remaining slots becomes 3 and remaining count of whitespace become 10-3=7, repeat this process we get distribution array 
-                // [3, 3, 2, 2].
-                paddingSize = (maxWidth - lineWordsLength) / (j - k) + ((maxWidth - lineWordsLength) % (j - k) != 0 ? 1 : 0);
-
-                // update lineWordsLength to reflect the whitespace we are about to pad in current iteration, so in next iteration 
-                // we can get correct count of remaining whitespace.
-                lineWordsLength += paddingSize;
+                padding = avg;
+                if (reminder > 0)
+                {
+                    padding++;
+                    reminder--;
+                }
             }
-
-            line.append(paddingSize, ' ').append(words[k]);
         }
 
-        // If we are processing last line, or a line only has 1 word, now pad trailing whitespace up to maxWidth.
-        // otherwise, here line.size() should equal to maxWidth after above loop, thus no trailing padding will be made.
+        // Step 3: Concatenate all words using paddings[] calculated in step 2. We start from word[i+1] so we can handle the case that 
+        // current line only has 1 word.
+        string line = words[i];
+        for (unsigned k = i + 1; k < j; ++k)
+        {
+            line.append(paddings[k - i - 1], ' ').append(words[k]);
+        }
+
+        // Step 4: Check if current line length == maxWidth, if not it means there are unused whitespace, append all unused
+        // whitespace to the end of line, it happens when:
+        // (1) We are justifying the last line.
+        // (2) We are not justifying the last line but current line only contains one word (thus above loop are skipped).
         line.append(maxWidth - line.size(), ' ');
-        justifiedText.push_back(line);
+        lines.push_back(line);
     }
 
-    return justifiedText;
+    return lines;
 }
 
 // 69. Sqrt(x)
@@ -2905,7 +2913,7 @@ int mySqrtNewton(int x)
     for (; r > 0 && x > 0 && r > x / r; r = (r + x / r) / 2);
     return r;
 }
-int mySqrt(int x)
+int mySqrt(const int x)
 {
     // No matter binary search or Newton iterative, they all start from an initial value that is greater than
     // sqrt(x), then keep iterating to get more and more close to answer. So choosing a initial value that as
@@ -2918,18 +2926,18 @@ int mySqrt(int x)
     // if there is only one 1, it means x is a power of 2, e.g. 8 = 2^3, so the maximum power of 2 that smaller
     // than x, is 2^(3-1) = 2^2 = 4.
     int msb = -1;
-    int countofOne = 0;
+    int countOfOne = 0;
     for (unsigned i = 0, y = x; i < 31 && y > 0; ++i, y >>= 1)
     {
         if (y & 1)
         {
             msb = i;
-            ++countofOne;
+            ++countOfOne;
         }
     }
 
     unsigned startValue = x;
-    for (unsigned half = (countofOne == 1 ? msb - 1 : msb) / 2; half > 0; startValue >>= 1, --half);
+    for (unsigned half = (countOfOne == 1 ? msb - 1 : msb) / 2; half > 0; startValue >>= 1, --half);
 
     // we can pass the startValue into sub functions or just paste the code into sub functions to get startValue.
     return mySqrtNewton(x);
@@ -3189,20 +3197,20 @@ void setZeroesNoExtraSpace(vector<vector<int>>& matrix)
     // Go through column 1 -> column n
     for (unsigned j = 1, i; j < matrix[0].size(); ++j)
     {
-        bool clearnCurrentColumn = false;
+        bool clearCurrentColumn = false;
         for (i = 0; i < matrix.size(); ++i)
         {
             // When matrix[i][j] == 0, row i and column j will be cleared. For row i, set matrix[i][0] to 0, row i will be cleared later.
             // For column j, it will be cleared now.
             if (matrix[i][j] == 0)
             {
-                clearnCurrentColumn = true;
+                clearCurrentColumn = true;
                 matrix[i][0] = 0;
             }
         }
 
         // Clear current column
-        if (clearnCurrentColumn)
+        if (clearCurrentColumn)
         {
             for (i = 0; i < matrix.size(); ++i)
             {
@@ -3619,10 +3627,10 @@ bool search2_2(vector<int>& nums, int target)
 // 82. Remove Duplicates from Sorted List II
 ListNode* deleteDuplicates2(ListNode* head)
 {
-    ListNode dummy(-1);
-    dummy.next = head;
+    ListNode dummyHead(0);
+    dummyHead.next = head;
 
-    for (ListNode* current = &dummy, *runner; current != nullptr;)
+    for (ListNode* current = &dummyHead, *runner; current != nullptr;)
     {
         for (runner = current->next; runner != nullptr && runner->val == current->next->val; runner = runner->next);
 
@@ -3647,15 +3655,15 @@ ListNode* deleteDuplicates2(ListNode* head)
         }
     }
 
-    return dummy.next;
+    return dummyHead.next;
 }
 ListNode* deleteDuplicates2_2(ListNode* head)
 {
-    ListNode dummy(-1);
-    dummy.next = head;
+    ListNode dummyHead(0);
+    dummyHead.next = head;
 
     // use two pointers, prev - track the node before the dup nodes; runner - to find the last node of duplications.
-    for (ListNode* prev = &dummy, *runner = head; runner != nullptr;)
+    for (ListNode* prev = &dummyHead, *runner = head; runner != nullptr;)
     {
         for (; runner->next != nullptr && runner->val == runner->next->val; runner = runner->next);
 
@@ -3677,11 +3685,11 @@ ListNode* deleteDuplicates2_2(ListNode* head)
         }
     }
 
-    return dummy.next;
+    return dummyHead.next;
 }
 
 // 83. Remove Duplicates from Sorted List
-ListNode *deleteDuplicates(ListNode* head)
+ListNode* deleteDuplicates(ListNode* head)
 {
     for (ListNode* p = head; p != nullptr;)
     {
@@ -4083,10 +4091,10 @@ int numDecodings(const string& s)
 // Note, since it is guaranteed that 1 <= m <= n < list length, so no needs to check m and n, node m and node n are always valid.
 ListNode* reverseBetween(ListNode* head, int m, int n)
 {
-    ListNode dummy(0);
-    dummy.next = head;
+    ListNode dummyHead(0);
+    dummyHead.next = head;
 
-    ListNode* p = &dummy;
+    ListNode* p = &dummyHead;
     for (n -= m; m > 1; --m, p = p->next); // find the predecessor of node m and update n relative to m.
 
     ListNode* q = p->next; // q points to node m.
@@ -4096,7 +4104,7 @@ ListNode* reverseBetween(ListNode* head, int m, int n)
     p->next->next = r;
     p->next = q;
 
-    return dummy.next;
+    return dummyHead.next;
 }
 
 // 93. Restore IP Addresses
@@ -5108,7 +5116,7 @@ void connect(TreeLinkNode* root)
     }
 }
 // Following are the solutions only for 116. 117 is more generic case.
-void connectUseRecursionOnlyFor116(TreeLinkNode *root)
+void connectUseRecursionOnlyFor116(TreeLinkNode* root)
 {
     if (root == nullptr)
     {
@@ -5116,7 +5124,7 @@ void connectUseRecursionOnlyFor116(TreeLinkNode *root)
     }
 
     // Setup next links between left child tree and right child tree, including left child and right child.
-    for (TreeLinkNode *p = root->left, *q = root->right; p != nullptr && q != nullptr; p->next = q, p = p->right, q = q->left);
+    for (TreeLinkNode* p = root->left, *q = root->right; p != nullptr && q != nullptr; p->next = q, p = p->right, q = q->left);
     connectUseRecursionOnlyFor116(root->left);
     connectUseRecursionOnlyFor116(root->right);
 }
@@ -5125,7 +5133,7 @@ void connectUseRecursionOnlyFor116(TreeLinkNode *root)
 // every level, connect all nodes on same level.
 void connectUseIterationOnlyFor116(TreeLinkNode* root)
 {
-    for (; root != nullptr && root->left != nullptr &&root->right != nullptr; root = root->left) // From root to last non-leaf
+    for (; root != nullptr && root->left != nullptr && root->right != nullptr; root = root->left) // From root to last non-leaf
     {
         for (TreeLinkNode* level = root; level != nullptr; level = level->next)
         {
@@ -5284,15 +5292,14 @@ int maxProfit2(vector<int>& prices)
 }
 
 // 123. Best Time to Buy and Sell Stock III
-// Since we must sell then buy again, so it means there is an index i (0 <= i < prices.size()) which splits
-// prices[] into 2 ranges: prices[0..i] and prices[i..prices.size()-1], the sum of maximum profits in each
-// range is also the maximum (among all possible values of i). So it can be done in 3 steps:
-// 1. Scan prices[] from begin to end, calculate and store the maximum profit of every range prices[0..i] in
-//    profits[].
-// 2. Scan prices[] from end to begin, calculate the the maximum profit of every range prices[i..prices.end()-1] 
-//    and update profits[].
+// Since we must sell then buy again, so it means there is an index i ï¿½ï¿½[0, prices.size()-1] can splits prices[]
+// into 2 ranges: prices[0..i] and prices[i..prices.size()-1], the sum of maximum profits in each range is also
+// the maximum (among all possible values of i). So it can be done in 3 steps:
+// 1. Scan prices[] from begin to end, calculate and store the maximum profit of prices[0..i] in profits[i].
+// 2. Scan prices[] from end to begin, calculate the maximum profit of prices[i..prices.end()-1] and update 
+//    profits[i].
 // 3. Get the maximum element of profits[].
-// In practical, we can combine 2 and 3 in one loop and no need to update the profits[] in 2nd loop.
+// In practical, we can combine 2 and 3 in one loop, no need to update the profits[].
 int maxProfit3UseTwoPassScan(vector<int>& prices)
 {
     vector<int> profits(prices.size(), 0);
@@ -5302,7 +5309,8 @@ int maxProfit3UseTwoPassScan(vector<int>& prices)
         return 0;
     }
 
-    // First scan from begin to end to calculate: profits[i] = the maximum profit of prices[0..i].
+    // First scan from begin to end, for every i calculate profits[i] = maximum profit of prices[0..i], i ï¿½ï¿½[0, prices.size()-1].
+    // Just reuse problem 121's solution.
     for (int i = 1, lowest = prices[0]; i < prices.size(); ++i)
     {
         if (prices[i] < lowest)
@@ -5313,7 +5321,7 @@ int maxProfit3UseTwoPassScan(vector<int>& prices)
         profits[i] = max(prices[i] - lowest, profits[i - 1]);
     }
 
-    // Now scan from end to begin, get maximum profit of prices[i..prices.size()-1], and maintain the maxp profit.
+    // Next scan from end to begin, for every i calculate maximum profit of prices[i..prices.size()-1], and maintain the max profit.
     int maxProfit = profits.back();
     for (int i = prices.size() - 2, highest = prices.back(), previousProfit = 0; i >= 0; --i)
     {
@@ -5329,13 +5337,129 @@ int maxProfit3UseTwoPassScan(vector<int>& prices)
     return maxProfit;
 }
 int maxProfit4(int k, vector<int>& prices);
-int maxProfit3UseDP(vector<int>& prices)
+int maxProfit3(vector<int>& prices)
 {
     return maxProfit4(2, prices);
 }
-int maxProfit3(vector<int>& prices)
+
+// 124. Binary Tree Maximum Path Sum
+// Drawing some examples can show that the max path always has a root, in other words, all nodes on the path
+// has a lowest comment ancestor. Given a node p, how to get the max path with p as root? If we know the max
+// paths end at its left and right child, we get its max path:
+// max path of p = max(p->val,
+//                     p->val + max path ends at p->left,
+//                     p->val + max path ends at p->right,
+//                     p->val + max path ends at p->left + max path ends at p->right)
+// But don't forget that p's parent node also  needs to know the max path ends at p, so it can calculate the
+// max path with it as root. So we need a helper function, it visits every node and return the max path ends
+// at current node, also it maintains the max path so far.
+int dfsSearchMaxPath(TreeNode* root, int& maxPath)
 {
-    return maxProfit3UseDP(prices);
+    if (root == nullptr)
+    {
+        return 0;
+    }
+
+    const int leftMaxPath = dfsSearchMaxPath(root->left, maxPath);
+    const int rightMaxPath = dfsSearchMaxPath(root->right, maxPath);
+
+    int curMaxPath = max(root->val, leftMaxPath + root->val);
+    curMaxPath = max(curMaxPath, rightMaxPath + root->val);
+    curMaxPath = max(curMaxPath, leftMaxPath + rightMaxPath + root->val);
+    maxPath = max(maxPath, curMaxPath);
+
+    return max(root->val, root->val + max(leftMaxPath, rightMaxPath)); // don't forget that max path ends at root could be root itself.
+}
+int maxPathSum(TreeNode* root)
+{
+    int maxPath = INT_MIN;
+    dfsSearchMaxPath(root, maxPath);
+    return maxPath;
+}
+
+// 125. Valid Palindrome
+// No need to care about the non alphanumeric characters in string.
+bool isPalindrome(string s)
+{
+    for (int i = 0, j = s.length() - 1; i <= j; )
+    {
+        if (!isalnum(s[i]))
+        {
+            ++i;
+        }
+        else if (!isalnum(s[j]))
+        {
+            --j;
+        }
+        else
+        {
+            if (tolower(s[i++]) != tolower(s[j--]))
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+// 126. Word Ladder II
+vector<vector<string>> findLadders(const string& beginWord, const string& endWord, const vector<string>& wordList)
+{
+    vector<vector<string>> result;
+    unordered_set<string> words(wordList.begin(), wordList.end()); // use hash set since it supports deleting element by value, makes code simple.
+    queue<vector<string>> paths({ {beginWord} });
+    vector<string> levelWords; // save all words selected in current level.
+
+    for (unsigned minLength = UINT_MAX; !paths.empty() && paths.front().size() < minLength; )
+    {
+        // delete all words used in previous level from unused word list, these words cannot be used in current level.
+        for (string previousLevelWord : levelWords)
+        {
+            words.erase(previousLevelWord);
+        }
+
+        levelWords.clear();
+
+        for (unsigned i = 0, queueLength = paths.size(); i < queueLength; ++i, paths.pop()) // process one level of BFS.
+        {
+            const vector<string>& path = paths.front();
+            const string& lastWord = path.back();
+
+            // Find next word, this is fast than check every unused word, assume word length = m, there are n unused words,
+            // this method needs m * 26 compares, if we check every unused word, then need (n-1) * m compares, for large 
+            // test cases this is much faster.
+            for (unsigned j = 0; j < lastWord.size(); ++j)
+            {
+                string nextWord = lastWord;
+                for (char ch = 'a'; ch <= 'z'; ++ch)
+                {
+                    nextWord[j] = ch;
+                    if (words.count(nextWord) == 0)
+                    {
+                        continue;
+                    }
+
+                    vector<string> nextPath = path;
+                    nextPath.push_back(nextWord);
+
+                    levelWords.push_back(nextWord);
+
+                    if (nextWord == endWord)
+                    {
+                        result.push_back(nextPath);
+                        minLength = nextPath.size();
+                    }
+                    else
+                    {
+                        paths.push(nextPath);
+                    }
+                }
+            }
+        }
+    }
+
+    return result;
 }
 
 // 138. Copy List with Random Pointer
@@ -5446,11 +5570,11 @@ vector<int> postorderTraversal(TreeNode* root)
 // Let profits[k][j] represent the max profit when we only trade from prices[0] to prices[j] (inclusive) using at most k
 // transactions.
 // Consider prices[j], we may ignore it, thus downgrading to f[k][j - 1], or sell at prices[j]. If we sell at prices[j],
-// we have to buy at some price before prices[j], assume buy at prices[i], i ¡Ê[0, j); between prices[i..j] no other trade
+// we have to buy at some price before prices[j], assume buy at prices[i], iâˆˆ[0, j); between prices[i..j] no other trade
 // can happen (required by the problem statement).
 // We earn prices[j] - prices[i] in this trade, and at most k - 1 trades are allowed at and before prices[i], which is 
 // profits[k - 1][i], so the max profit of prices[0..j] is:
-// profits[k][j] = max(profits[k][j - 1], prices[j] - prices[i] + profits[k - 1][i]), i ¡Ê[0, j).
+// profits[k][j] = max(profits[k][j - 1], prices[j] - prices[i] + profits[k - 1][i]), iâˆˆ[0, j).
 // Initial conditions:
 // first row profits[0][] = 0; 0 trade makes 0 profit
 // first column profits[][0] = 0; if there is only one price data point no profit no matter how many times you can trade.
@@ -5487,7 +5611,7 @@ int maxProfit4WithSpaceOptimization(int k, vector<int>& prices)
         return 0;
     }
 
-    // When k >= prices.size(), it degenerates to problem 122, which is, you can transact as many times as want.
+    // When k >= prices.size(), it degenerates to problem 122 (unlimited transactions).
     if (k > static_cast<int>(prices.size()))
     {
         return maxProfit2(prices);
@@ -5522,7 +5646,7 @@ int maxProfit4(int k, vector<int>& prices)
         return 0;
     }
 
-    // When k >= prices.size(), it degenerates to problem 122 (you can transact as many times as you want).
+    // When k >= prices.size(), it degenerates to problem 122 (unlimited transactions).
     if (k >= prices.size())
     {
         return maxProfit2(prices); // greedy
@@ -5545,7 +5669,7 @@ int maxProfit4(int k, vector<int>& prices)
                                                                                       = prices[3] + max(profits[0][0] - prices[0],
                                                                                                         profits[0][1] - prices[1],
                                                                                                         profits[0][2] - prices[2])
-        As we can see, for every j, we add prices[j] to max(profits[0][i] - prices[i]), i ¡Ê[0, j), the purpose of 3rd loop is
+        As we can see, for every j, we add prices[j] to max(profits[0][i] - prices[i]), iâˆˆ[0, j), the purpose of 3rd loop is
         actually trying to find max(profits[0][i] - prices[i]), we can maintain the maximum value of profits[0][i] - prices[i]
         so far, then we don't need the 3rd loop.
         */
@@ -5560,6 +5684,20 @@ int maxProfit4(int k, vector<int>& prices)
     }
 
     return profits[1].back();
+}
+
+// 202. Happy Number
+bool isHappy(int n)
+{
+    for (int next; n != 1 && n != 4; n = next) // NOTE: when a number is unhappy, loop will contains 4.
+    {
+        for (next = 0; n > 0; n /= 10)
+        {
+            next += (n % 10) * (n % 10);
+        }
+    }
+
+    return n == 1;
 }
 
 // 226. Invert Binary Tree
@@ -5583,7 +5721,7 @@ TreeNode* invertTree(TreeNode* root)
 //235. Lowest Common Ancestor of a Binary Search Tree
 TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
 {
-    for (; root->val > p->val && root->val > q->val || root->val < p->val && root->val < q->val; root = p->val < root->val ? root->left : root->right);
+    for (; root->val > p->val&& root->val > q->val || root->val < p->val && root->val < q->val; root = p->val < root->val ? root->left : root->right);
     return root;
 }
 
@@ -5627,24 +5765,104 @@ string addStrings(const string& num1, const string& num2)
 // 674. Longest Continuous Increasing Subsequence
 int findLengthOfLCIS(vector<int>& nums)
 {
-    int maxIncreaingLength = 0;
-    int currrentIncreasingLength = 0;
+    int maxIncreasingLength = 0;
+    int currentIncreasingLength = 0;
     for (unsigned i = 0; i < nums.size(); ++i)
     {
         if (i == 0 || nums[i] > nums[i - 1])
         {
-            if (++currrentIncreasingLength > maxIncreaingLength)
+            if (++currentIncreasingLength > maxIncreasingLength)
             {
-                maxIncreaingLength = currrentIncreasingLength;
+                maxIncreasingLength = currentIncreasingLength;
             }
         }
         else
         {
-            currrentIncreasingLength = 1;
+            currentIncreasingLength = 1;
         }
     }
 
-    return maxIncreaingLength;
+    return maxIncreasingLength;
+}
+
+// 695. Max Area of Island
+// NOTE: both DFS and BFS solution are slow because of using additional data structure visited to maintain all coordinates that have been
+// visited. To speed up, can directly change visited grid value from 1 to 0 or 2.
+bool checkLand(const int i, const int j, const vector<vector<int>>& grid, vector<vector<bool>>& visited, queue<pair<int, int>>& queue)
+{
+    if (i >= 0 && i < grid.size() && j >= 0 && j < grid[i].size() && grid[i][j] == 1 && !visited[i][j])
+    {
+        visited[i][j] = true;
+        queue.push(make_pair(i, j));
+
+        return true;
+    }
+
+    return false;
+}
+int maxAreaOfIslandUseBFS(const vector<vector<int>>& grid)
+{
+    int maxArea = 0;
+    vector<vector<bool>> visited(grid.size(), vector<bool>(grid[0].size(), false));
+    queue<pair<int, int>> queue;
+    for (unsigned i = 0; i < grid.size(); ++i)
+    {
+        for (unsigned j = 0; j < grid[i].size(); ++j)
+        {
+            if (checkLand(i, j, grid, visited, queue)) // Note checkLand will push coordinate (i,j) to queue if it is an unexplored land
+            {
+                int area = 0; // We are going to counting size when popping, if initialize size to 1, the first element will be counted twice.
+                while (!queue.empty()) // Start BFS from grid[i][j]
+                {
+                    for (unsigned k = 0, len = queue.size(); k < len; ++k, ++area, queue.pop())
+                    {
+                        checkLand(queue.front().first - 1, queue.front().second, grid, visited, queue); // top
+                        checkLand(queue.front().first + 1, queue.front().second, grid, visited, queue); // bottom
+                        checkLand(queue.front().first, queue.front().second - 1, grid, visited, queue); // left
+                        checkLand(queue.front().first, queue.front().second + 1, grid, visited, queue); // right
+                    }
+                }
+
+                maxArea = max(maxArea, area);
+            }
+        }
+    }
+
+    return maxArea;
+}
+void areaOfIsland(const vector<vector<int>>& grid, vector<vector<bool>>& visited, const int i, const int j, int& area)
+{
+    if (i >= 0 && i < grid.size() && j >= 0 && j < grid[i].size() &&
+        grid[i][j] == 1 && !visited[i][j])
+    {
+        visited[i][j] = true;
+        ++area;
+
+        areaOfIsland(grid, visited, i - 1, j, area); // top
+        areaOfIsland(grid, visited, i + 1, j, area); // bottom
+        areaOfIsland(grid, visited, i, j - 1, area); // left
+        areaOfIsland(grid, visited, i, j + 1, area); // right
+    }
+}
+int maxAreaOfIslandUseDFS(const vector<vector<int>>& grid)
+{
+    int maxArea = 0;
+    vector<vector<bool>> visited(grid.size(), vector<bool>(grid[0].size(), false));
+    for (unsigned i = 0; i < grid.size(); ++i)
+    {
+        for (unsigned j = 0; j < grid[i].size(); ++j)
+        {
+            int area = 0;
+            areaOfIsland(grid, visited, i, j, area);
+            maxArea = max(area, maxArea);
+        }
+    }
+
+    return maxArea;
+}
+int maxAreaOfIsland(const vector<vector<int>>& grid)
+{
+    return maxAreaOfIslandUseDFS(grid);
 }
 
 // 973. K Closest Points to Origin
@@ -5681,7 +5899,7 @@ vector<vector<int>> kClosestUseMaxHeap(const vector<vector<int>>& points, const 
 }
 // Similar to quick sort, we can choose a pivot element and partition vector into 2 ranges, all elements in left range are 
 // smaller than right range, if left range's size == k, then we found the answer.
-vector<vector<int>> kClosestUsePartitioning(vector<vector<int>>& points, int k)
+vector<vector<int>> kClosestUsePartitioning(vector<vector<int>>& points, const int k)
 {
     const function<bool(const vector<int>&, const vector<int>&)> distanceComparer = [](const vector<int>& a, const vector<int>& b)
     {
