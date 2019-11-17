@@ -5409,17 +5409,13 @@ vector<vector<string>> findLadders(const string& beginWord, const string& endWor
     vector<vector<string>> result;
     unordered_set<string> words(wordList.begin(), wordList.end()); // use hash set since it supports deleting element by value, makes code simple.
     queue<vector<string>> paths({ {beginWord} });
-    vector<string> levelWords; // save all words selected in current level.
 
+    // because in nested for loop, we always process all paths belong to one level, so every time when back to outer loop,
+    // all paths in queue have the same length, so here paths.front().size() actually means, if current level > minLength,
+    // then no need to continue searching.
     for (unsigned minLength = UINT_MAX; !paths.empty() && paths.front().size() < minLength; )
     {
-        // delete all words used in previous level from unused word list, these words cannot be used in current level.
-        for (string previousLevelWord : levelWords)
-        {
-            words.erase(previousLevelWord);
-        }
-
-        levelWords.clear();
+        unordered_set<string> levelWords; // save current level selected words.
 
         for (unsigned i = 0, queueLength = paths.size(); i < queueLength; ++i, paths.pop()) // process one level of BFS.
         {
@@ -5440,11 +5436,10 @@ vector<vector<string>> findLadders(const string& beginWord, const string& endWor
                         continue;
                     }
 
+                    levelWords.insert(nextWord);
+
                     vector<string> nextPath = path;
                     nextPath.push_back(nextWord);
-
-                    levelWords.push_back(nextWord);
-
                     if (nextWord == endWord)
                     {
                         result.push_back(nextPath);
@@ -5457,6 +5452,18 @@ vector<vector<string>> findLadders(const string& beginWord, const string& endWor
                 }
             }
         }
+
+        // After current level has been processed, now it is safe to remove all new used words from unused word list,
+        // these words cannot be selected again. Why removing them after whole level has been processed? Because it is
+        // possible that one word can be used in multiple paths, e.g.: tax-tex-ted and tax-tad-ted, ted is used in both
+        // paths, if removing ted immediately after it is selected into a path, other paths may not be able to use it
+        // so can get a incomplete path set.
+        for (string word : levelWords)
+        {
+            words.erase(word);
+        }
+
+        levelWords.clear();
     }
 
     return result;
