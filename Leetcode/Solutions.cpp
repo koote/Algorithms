@@ -5415,15 +5415,15 @@ vector<vector<string>> findLadders(const string& beginWord, const string& endWor
     // then no need to continue searching.
     for (unsigned minLength = UINT_MAX; !paths.empty() && paths.front().size() < minLength; )
     {
-        unordered_set<string> levelWords; // save current level selected words.
+        unordered_set<string> levelWords; // save words that will be selected when processing current level.
 
         for (unsigned i = 0, queueLength = paths.size(); i < queueLength; ++i, paths.pop()) // process one level of BFS.
         {
             const vector<string>& path = paths.front();
             const string& lastWord = path.back();
 
-            // Find next word, this is fast than check every unused word, assume word length = m, there are n unused words,
-            // this method needs m * 26 compares, if we check every unused word, then need (n-1) * m compares, for large 
+            // Finding next word, this is faster than checking every unused word. Assume word length = m, there are n
+            // unused words, it needs m * 26 compares, checking every unused word needs (n-1) * m compares, for large
             // test cases this is much faster.
             for (unsigned j = 0; j < lastWord.size(); ++j)
             {
@@ -5458,15 +5458,55 @@ vector<vector<string>> findLadders(const string& beginWord, const string& endWor
         // possible that one word can be used in multiple paths, e.g.: tax-tex-ted and tax-tad-ted, ted is used in both
         // paths, if removing ted immediately after it is selected into a path, other paths may not be able to use it
         // so can get a incomplete path set.
-        for (string word : levelWords)
+        for (string usedWord : levelWords)
         {
-            words.erase(word);
+            words.erase(usedWord);
         }
-
-        levelWords.clear();
     }
 
     return result;
+}
+
+// 127. Word Ladder
+int ladderLength(const string& beginWord, const string& endWord, const vector<string>& wordList)
+{
+    unordered_set<string> words(wordList.begin(), wordList.end());
+    queue<string> queue({ beginWord });
+    for (unsigned level = 1; !queue.empty(); ++level)
+    {
+        unordered_set<string> levelWords;
+        for (unsigned i = 0, queueLength = queue.size(); i < queueLength; ++i, queue.pop())
+        {
+            string currentWord = queue.front();
+            for (unsigned j = 0; j < currentWord.size(); ++j)
+            {
+                string nextWord = currentWord;
+                for (char ch = 'a'; ch != 'z'; ++ch)
+                {
+                    nextWord[j] = ch;
+                    if (words.count(nextWord) == 0)
+                    {
+                        continue;
+                    }
+
+                    if (nextWord == endWord)
+                    {
+                        return level + 1;
+                    }
+
+                    queue.push(nextWord);
+                    levelWords.insert(nextWord);
+                }
+            }
+        }
+
+        for (string usedWord : levelWords)
+        {
+            words.erase(usedWord);
+        }
+    }
+
+    return 0;
 }
 
 // 138. Copy List with Random Pointer
