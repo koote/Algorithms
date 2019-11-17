@@ -137,6 +137,7 @@ extern int maxPathSum(TreeNode* root);
 extern bool isPalindrome(string s);
 extern vector<vector<string>> findLadders(const string& beginWord, const string& endWord, const vector<string>& wordList);
 extern int ladderLength(const string& beginWord, const string& endWord, const vector<string>& wordList);
+extern int longestConsecutive(vector<int>& nums);
 
 extern RandomListNode* copyRandomList(RandomListNode *head);
 
@@ -188,7 +189,7 @@ void main()
         { '.', '.', '.', '.', '8', '.', '.', '7', '9' }
         });
     
-    findLadders("hit", "cog", { "hot","dot","dog","lot","log","cog" });
+    ladderLength("hit", "cog", { "hot","dot","dog","lot","log","cog" });
 
     const auto duration = (clock() - start) / static_cast<double>(CLOCKS_PER_SEC);
     cout << duration << endl;

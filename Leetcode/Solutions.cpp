@@ -5404,7 +5404,7 @@ bool isPalindrome(string s)
 }
 
 // 126. Word Ladder II
-vector<vector<string>> findLadders(const string& beginWord, const string& endWord, const vector<string>& wordList)
+vector<vector<string>> findLaddersUseBFS(const string& beginWord, const string& endWord, const vector<string>& wordList)
 {
     vector<vector<string>> result;
     unordered_set<string> words(wordList.begin(), wordList.end()); // use hash set since it supports deleting element by value, makes code simple.
@@ -5466,9 +5466,17 @@ vector<vector<string>> findLadders(const string& beginWord, const string& endWor
 
     return result;
 }
+vector<vector<string>> findLaddersUseBidirectionalBFS(const string& beginWord, const string& endWord, const vector<string>& wordList)
+{
+    return { {} };
+}
+vector<vector<string>> findLadders(const string& beginWord, const string& endWord, const vector<string>& wordList)
+{
+    return findLaddersUseBFS(beginWord, endWord, wordList);
+}
 
 // 127. Word Ladder
-int ladderLength(const string& beginWord, const string& endWord, const vector<string>& wordList)
+int ladderLengthUseBFS(const string& beginWord, const string& endWord, const vector<string>& wordList)
 {
     unordered_set<string> words(wordList.begin(), wordList.end());
     queue<string> queue({ beginWord });
@@ -5507,6 +5515,80 @@ int ladderLength(const string& beginWord, const string& endWord, const vector<st
     }
 
     return 0;
+}
+int ladderLengthUseBidirectionalBFS(const string& beginWord, const string& endWord, const vector<string>& wordList)
+{
+    unordered_set<string> wordsBegin(wordList.begin(), wordList.end());
+    unordered_set<string> wordsEnd(wordList.begin(), wordList.end());
+    vector<string> begin({ beginWord });
+    vector<string> end({ endWord });
+    vector<string>* q1 = &begin;
+    vector<string>* q2 = &end;
+    unordered_set<string>* dict1 = &wordsBegin;
+    unordered_set<string>* dict2 = &wordsEnd;
+
+    if (wordsBegin.count(endWord) == 0)
+    {
+        return 0;
+    }
+
+    for (unsigned level = 1; !begin.empty() && !end.empty(); ++level)
+    {
+        if (q1->size() > q2->size()) // always operates the smaller queue.
+        {
+            swap(q1, q2);
+            swap(dict1, dict2);
+        }
+
+        unordered_set<string> levelWords;
+        for (unsigned i = 0, queueLength = q1->size(); i < queueLength; ++i)
+        {
+            string lastWord = *(q1->begin());
+            q1->erase(q1->begin()); //pop
+
+            for (unsigned j = 0; j < lastWord.size(); ++j)
+            {
+                string nextWord = lastWord;
+                for (char ch = 'a'; ch <= 'z'; ++ch)
+                {
+                    nextWord[j] = ch;
+
+                    if (nextWord == lastWord || (*dict1).count(nextWord) == 0)
+                    {
+                        continue;
+                    }
+
+                    for (string w : *q2)
+                    {
+                        if (w == nextWord)
+                        {
+                            return level;
+                        }
+                    }
+
+                    levelWords.insert(nextWord);
+                    q1->push_back(nextWord);
+                }
+            }
+        }
+
+        for (string usedWord : levelWords)
+        {
+            dict1->erase(usedWord);
+        }
+    }
+
+    return 0;
+}
+int ladderLength(const string& beginWord, const string& endWord, const vector<string>& wordList)
+{
+    return ladderLengthUseBidirectionalBFS(beginWord, endWord, wordList);
+}
+
+// 128. Longest Consecutive Sequence
+int longestConsecutive(vector<int>& nums)
+{
+
 }
 
 // 138. Copy List with Random Pointer
