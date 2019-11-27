@@ -5407,7 +5407,7 @@ bool isPalindrome(string s)
 vector<vector<string>> findLaddersUseBFS(const string& beginWord, const string& endWord, const vector<string>& wordList)
 {
     vector<vector<string>> result;
-    unordered_set<string> words(wordList.begin(), wordList.end()); // use hash set since it supports deleting element by value, makes code simple.
+    unordered_set<string> unusedWords(wordList.begin(), wordList.end()); // use hash set as it supports deleting element by value, makes code simple.
     queue<vector<string>> paths({ {beginWord} });
 
     // because in nested for loop, we always process all paths belong to one level, so every time when back to outer loop,
@@ -5415,7 +5415,7 @@ vector<vector<string>> findLaddersUseBFS(const string& beginWord, const string& 
     // then no need to continue searching.
     for (unsigned minLength = UINT_MAX; !paths.empty() && paths.front().size() < minLength; )
     {
-        unordered_set<string> levelWords; // save words that will be selected when processing current level.
+        unordered_set<string> usedWords; // save words that will be selected when processing current level.
 
         for (unsigned i = 0, queueLength = paths.size(); i < queueLength; ++i, paths.pop()) // process one level of BFS.
         {
@@ -5431,12 +5431,12 @@ vector<vector<string>> findLaddersUseBFS(const string& beginWord, const string& 
                 for (char ch = 'a'; ch <= 'z'; ++ch)
                 {
                     nextWord[j] = ch;
-                    if (words.count(nextWord) == 0)
+                    if (unusedWords.count(nextWord) == 0)
                     {
                         continue;
                     }
 
-                    levelWords.insert(nextWord);
+                    usedWords.insert(nextWord);
 
                     vector<string> nextPath = path;
                     nextPath.push_back(nextWord);
@@ -5458,9 +5458,9 @@ vector<vector<string>> findLaddersUseBFS(const string& beginWord, const string& 
         // possible that one word can be used in multiple paths, e.g.: tax-tex-ted and tax-tad-ted, ted is used in both
         // paths, if removing ted immediately after it is selected into a path, other paths may not be able to use it
         // so can get a incomplete path set.
-        for (string usedWord : levelWords)
+        for (string usedWord : usedWords)
         {
-            words.erase(usedWord);
+            unusedWords.erase(usedWord);
         }
     }
 
@@ -5478,11 +5478,11 @@ vector<vector<string>> findLadders(const string& beginWord, const string& endWor
 // 127. Word Ladder
 int ladderLengthUseBFS(const string& beginWord, const string& endWord, const vector<string>& wordList)
 {
-    unordered_set<string> words(wordList.begin(), wordList.end());
+    unordered_set<string> unusedWords(wordList.begin(), wordList.end());
     queue<string> queue({ beginWord });
     for (unsigned level = 1; !queue.empty(); ++level)
     {
-        unordered_set<string> levelWords;
+        unordered_set<string> usedWords;
         for (unsigned i = 0, queueLength = queue.size(); i < queueLength; ++i, queue.pop())
         {
             string currentWord = queue.front();
@@ -5492,7 +5492,7 @@ int ladderLengthUseBFS(const string& beginWord, const string& endWord, const vec
                 for (char ch = 'a'; ch != 'z'; ++ch)
                 {
                     nextWord[j] = ch;
-                    if (words.count(nextWord) == 0)
+                    if (unusedWords.count(nextWord) == 0)
                     {
                         continue;
                     }
@@ -5503,14 +5503,14 @@ int ladderLengthUseBFS(const string& beginWord, const string& endWord, const vec
                     }
 
                     queue.push(nextWord);
-                    levelWords.insert(nextWord);
+                    usedWords.insert(nextWord);
                 }
             }
         }
 
-        for (string usedWord : levelWords)
+        for (string usedWord : usedWords)
         {
-            words.erase(usedWord);
+            unusedWords.erase(usedWord);
         }
     }
 
@@ -5518,63 +5518,58 @@ int ladderLengthUseBFS(const string& beginWord, const string& endWord, const vec
 }
 int ladderLengthUseBidirectionalBFS(const string& beginWord, const string& endWord, const vector<string>& wordList)
 {
-    unordered_set<string> wordsBegin(wordList.begin(), wordList.end());
-    unordered_set<string> wordsEnd(wordList.begin(), wordList.end());
-    vector<string> begin({ beginWord });
-    vector<string> end({ endWord });
-    vector<string>* q1 = &begin;
-    vector<string>* q2 = &end;
-    unordered_set<string>* dict1 = &wordsBegin;
-    unordered_set<string>* dict2 = &wordsEnd;
+    unordered_set<string> beginUnusedWords(wordList.begin(), wordList.end());
+    unordered_set<string> endUnusedWords(wordList.begin(), wordList.end());
+    vector<string> beginQueue({ beginWord });
+    vector<string> endQueue({ endWord });
 
-    if (wordsBegin.count(endWord) == 0)
+    if (beginUnusedWords.count(endWord) == 0)
     {
         return 0;
     }
 
-    for (unsigned level = 1; !begin.empty() && !end.empty(); ++level)
+    for (unsigned level = 1; !beginQueue.empty() && !endQueue.empty(); ++level)
     {
-        if (q1->size() > q2->size()) // always operates the smaller queue.
-        {
-            swap(q1, q2);
-            swap(dict1, dict2);
-        }
+        // always operates the smaller queue.
+        vector<string>& queue = beginQueue.size() > endQueue.size() ? endQueue : beginQueue;
+        vector<string>& otherQueue = beginQueue.size() > endQueue.size() ? beginQueue : endQueue;
+        unordered_set<string>& unusedWords = beginQueue.size() > endQueue.size() ? endUnusedWords : beginUnusedWords;
 
-        unordered_set<string> levelWords;
-        for (unsigned i = 0, queueLength = q1->size(); i < queueLength; ++i)
+        unordered_set<string> usedWords;
+        for (unsigned i = 0, queueLength = queue.size(); i < queueLength; ++i)
         {
-            string lastWord = *(q1->begin());
-            q1->erase(q1->begin()); //pop
+            string currentWord = *(queue.begin());
+            queue.erase(queue.begin()); // pop
 
-            for (unsigned j = 0; j < lastWord.size(); ++j)
+            for (unsigned j = 0; j < currentWord.size(); ++j)
             {
-                string nextWord = lastWord;
+                string nextWord = currentWord;
                 for (char ch = 'a'; ch <= 'z'; ++ch)
                 {
                     nextWord[j] = ch;
 
-                    if (nextWord == lastWord || (*dict1).count(nextWord) == 0)
+                    if (nextWord == currentWord || unusedWords.count(nextWord) == 0)
                     {
                         continue;
                     }
 
-                    for (string w : *q2)
+                    for (string word : otherQueue)
                     {
-                        if (w == nextWord)
+                        if (word == nextWord)
                         {
-                            return level;
+                            return level + 1;
                         }
                     }
 
-                    levelWords.insert(nextWord);
-                    q1->push_back(nextWord);
+                    usedWords.insert(nextWord);
+                    queue.push_back(nextWord);
                 }
             }
         }
 
-        for (string usedWord : levelWords)
+        for (string usedWord : usedWords)
         {
-            dict1->erase(usedWord);
+            unusedWords.erase(usedWord);
         }
     }
 
@@ -5588,7 +5583,23 @@ int ladderLength(const string& beginWord, const string& endWord, const vector<st
 // 128. Longest Consecutive Sequence
 int longestConsecutive(vector<int>& nums)
 {
+    int maxLength = 0;
+    unordered_set<int> set(nums.begin(), nums.end());
 
+    for (int num : set)
+    {
+        if (set.count(num - 1) == 0)
+        {
+            int count = 0;
+            for (int n = num; set.count(n) != 0; ++n, ++count);
+            if (count > maxLength)
+            {
+                maxLength = count;
+            }
+        }
+    }
+
+    return maxLength;
 }
 
 // 138. Copy List with Random Pointer
@@ -5915,7 +5926,7 @@ int findLengthOfLCIS(vector<int>& nums)
 }
 
 // 695. Max Area of Island
-// NOTE: both DFS and BFS solution are slow because of using additional data structure visited to maintain all coordinates that have been
+// NOTE: both DFS and BFS solution are slow because of using additional data structure to maintain coordinates that have been
 // visited. To speed up, can directly change visited grid value from 1 to 0 or 2.
 bool checkLand(const int i, const int j, const vector<vector<int>>& grid, vector<vector<bool>>& visited, queue<pair<int, int>>& queue)
 {

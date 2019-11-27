@@ -188,7 +188,7 @@ void main()
         { '.', '.', '.', '4', '1', '9', '.', '.', '5' },
         { '.', '.', '.', '.', '8', '.', '.', '7', '9' }
         });
-    
+
     ladderLength("hit", "cog", { "hot","dot","dog","lot","log","cog" });
 
     const auto duration = (clock() - start) / static_cast<double>(CLOCKS_PER_SEC);
