@@ -138,6 +138,7 @@ extern bool isPalindrome(string s);
 extern vector<vector<string>> findLadders(const string& beginWord, const string& endWord, const vector<string>& wordList);
 extern int ladderLength(const string& beginWord, const string& endWord, const vector<string>& wordList);
 extern int longestConsecutive(vector<int>& nums);
+extern int sumNumbers(TreeNode* root);
 
 extern RandomListNode* copyRandomList(RandomListNode *head);
 

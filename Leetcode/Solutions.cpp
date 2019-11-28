@@ -5602,6 +5602,27 @@ int longestConsecutive(vector<int>& nums)
     return maxLength;
 }
 
+// 129. Sum Root to Leaf Numbers
+int dfsSum(TreeNode* root, int path)
+{
+    if (root == nullptr)
+    {
+        return 0;
+    }
+
+    path = path * 10 + root->val;
+    if (root->left == nullptr && root->right == nullptr)
+    {
+        return path;
+    }
+
+    return dfsSum(root->left, path) + dfsSum(root->right, path);
+}
+int sumNumbers(TreeNode* root)
+{
+    return dfsSum(root, 0);
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode* copyRandomList(RandomListNode* head)
 {
