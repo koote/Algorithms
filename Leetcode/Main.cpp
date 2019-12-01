@@ -139,6 +139,7 @@ extern vector<vector<string>> findLadders(const string& beginWord, const string&
 extern int ladderLength(const string& beginWord, const string& endWord, const vector<string>& wordList);
 extern int longestConsecutive(vector<int>& nums);
 extern int sumNumbers(TreeNode* root);
+extern void solve(vector<vector<char>>& board);
 
 extern RandomListNode* copyRandomList(RandomListNode *head);
 
@@ -175,7 +176,6 @@ void main()
         {'1','1','1','1','1'},
         {'0','0','0','0','0'}
         });
-
     maximalRectangle(matrix);
 
     vector<vector<char>> sudoku({

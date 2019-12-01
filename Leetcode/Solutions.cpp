@@ -5623,6 +5623,71 @@ int sumNumbers(TreeNode* root)
     return dfsSum(root, 0);
 }
 
+// 130. Surrounded Regions
+void dfsNotSurroundedRegion(vector<vector<char>>& board, unsigned i, unsigned j)
+{
+    if (board[i][j] == 'O')
+    {
+        board[i][j] = '*';
+
+        if (i > 0)
+        {
+            dfsNotSurroundedRegion(board, i - 1, j);
+        }
+
+        if (j > 0)
+        {
+            dfsNotSurroundedRegion(board, i, j - 1);
+        }
+
+        if (j < board[i].size() - 1)
+        {
+            dfsNotSurroundedRegion(board, i, j + 1);
+        }
+
+        if (i < board.size() - 1)
+        {
+            dfsNotSurroundedRegion(board, i + 1, j);
+        }
+    }
+}
+void solve(vector<vector<char>>& board)
+{
+    if (!board.empty())
+    {
+        // first row and last row
+        for (unsigned j = 0; j < board[0].size(); ++j)
+        {
+            dfsNotSurroundedRegion(board, 0, j);
+            dfsNotSurroundedRegion(board, board.size() - 1, j);
+        }
+
+        // first column and last column.
+        for (unsigned i = 0; i < board.size(); ++i)
+        {
+            dfsNotSurroundedRegion(board, i, 0);
+            dfsNotSurroundedRegion(board, i, board[i].size() - 1);
+        }
+
+        // Not surrounded region are all '*', all locations have 'O' are surrounded.
+        for (unsigned i = 0; i < board.size(); ++i)
+        {
+            for (unsigned j = 0; j < board[i].size(); ++j)
+            {
+                if (board[i][j] == 'O')
+                {
+                    board[i][j] = 'X';
+                }
+
+                if (board[i][j] == '*')
+                {
+                    board[i][j] = 'O';
+                }
+            }
+        }
+    }
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode* copyRandomList(RandomListNode* head)
 {
