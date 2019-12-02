@@ -5688,6 +5688,95 @@ void solve(vector<vector<char>>& board)
     }
 }
 
+// 131. Palindrome Partitioning
+bool isPalindromeString(string s)
+{
+    unsigned i, j;
+    for (i = 0, j = s.length() - 1; i < j && s[i] == s[j]; ++i, --j);
+    return i >= j;
+}
+vector<vector<string>> partitionUseRecursion(string& s)
+{
+    vector<vector<string>> results;
+    for (unsigned i = 0; i < s.length(); ++i)
+    {
+        string s1 = s.substr(0, i + 1);
+        if (isPalindromeString(s1))
+        {
+            string s2 = s.substr(i + 1, s.length() - i - 1);
+            vector<vector<string>> s2partitions = partitionUseRecursion(s2);
+            if (s2partitions.empty())
+            {
+                vector<string> cur(1, s1);
+                results.push_back(cur);
+            }
+            else
+            {
+                for (vector<string> s2partition : s2partitions)
+                {
+                    vector<string> cur(1, s1);
+                    cur.insert(cur.end(), s2partition.begin(), s2partition.end());
+                    results.push_back(cur);
+                }
+            }
+        }
+    }
+
+    return results;
+}
+void dfsPalindrome(const string& s, const vector<vector<bool>>& isPalindrome, vector<vector<string>>& partitions, vector<string>& currentPartition, unsigned start)
+{
+    if (start == s.length())
+    {
+        partitions.push_back(currentPartition);
+        return;
+    }
+
+    for (unsigned i = start; i < s.length(); ++i)
+    {
+        if (isPalindrome[start][i]) // s[start .. i] is palindrome
+        {
+            currentPartition.push_back(s.substr(start, i - start + 1)); // s[start .. i]
+            dfsPalindrome(s, isPalindrome, partitions, currentPartition, i + 1); // search s[i+1 .. s.length()-1]
+            currentPartition.pop_back();
+        }
+    }
+}
+vector<vector<string>> partitionUseDFS(string& s)
+{
+    // palindrome[i][j] means s[i..j] is palindrome or not.
+    vector<vector<bool>> isPalindrome(s.length(), vector<bool>(s.length(), false));
+    
+    // NOTE 1. Definition of palindrome[][] implies that always have i <= j, so only top
+    //         half of this 2D vector is used.
+    //      2. It should be filled from bottom to up, thus i starts from s.length() - 1.
+    //         Why? Take a look at formula, s[i..j] is palindrome only when s[i] == s[j]
+    //         and s[i+1][j-1] is also palindrome, if draw the 2D array, s[i][j] depends
+    //         on its bottom left element s[i+1][j-1] which is located on below row, so 
+    //         we should fill from last row, thus can get correct result.
+    // LEARNED: When filling DP array, should first find dependency between elements then
+    //          decide how to fill the array.
+    for (int i = s.length() - 1; i >= 0; --i)
+    {
+        for (int j = i; j < s.length(); ++j)
+        {
+            if (s[i] == s[j])
+            {
+                isPalindrome[i][j] = i + 1 < j - 1 ? isPalindrome[i + 1][j - 1] : true;
+            }
+        }
+    }
+
+    vector<vector<string>> results;
+    vector<string> currentPartition;
+    dfsPalindrome(s, isPalindrome, results, currentPartition, 0);
+    return results;
+}
+vector<vector<string>> partition(string& s)
+{
+    return partitionUseDFS(s);
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode* copyRandomList(RandomListNode* head)
 {
