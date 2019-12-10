@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "DataStructure.h"
+#include <sstream>
 
 using namespace std;
 
@@ -6078,6 +6079,54 @@ string addStrings(const string& num1, const string& num2)
     }
 
     return sum;
+}
+
+// 449. Serialize and Deserialize BST
+void getPreorderHelper(TreeNode* root, ostringstream& preorder) // Encodes a tree to a single string.
+{
+    if (root == nullptr)
+    {
+        return;
+    }
+
+    preorder << root->val << " ";
+    getPreorderHelper(root->left, preorder);
+    getPreorderHelper(root->right, preorder);
+}
+string serialize(TreeNode* root)
+{
+    ostringstream preorder;
+    getPreorderHelper(root, preorder);
+    return preorder.str();
+}
+TreeNode* buildFromPreorderHelper(vector<int>& nums, const int start, const int end)
+{
+    if (start > end)
+    {
+        return nullptr;
+    }
+
+    TreeNode* root = new TreeNode(nums[start]);
+    int insert;
+    for (insert = start; insert < end; ++insert)
+    {
+        if (nums[insert] <= nums[start] && nums[insert + 1] > nums[start])
+        {
+            break;
+        }
+    }
+
+    root->left = buildFromPreorderHelper(nums, start + 1, insert);
+    root->right = buildFromPreorderHelper(nums, insert + 1, end);
+
+    return root;
+}
+TreeNode* deserialize(string data) // Decodes your encoded data to tree.
+{
+    vector<int> nums;
+    istringstream is(data);
+    for (string num; is >> num; nums.push_back(stoi(num)));
+    return buildFromPreorderHelper(nums, 0, nums.size() - 1); // No need to check if string is empty as nums.size()-1 = -1 < 0.
 }
 
 // 674. Longest Continuous Increasing Subsequence

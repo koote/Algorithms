@@ -126,7 +126,7 @@ extern bool hasPathSum(TreeNode* root, int sum);
 extern vector<vector<int>> pathSum(TreeNode* root, int sum);
 extern void flatten(TreeNode* root);
 extern int numDistinct(const string& s, const string& t);
-extern void connect(TreeLinkNode *root);
+extern void connect(TreeLinkNode* root);
 extern vector<vector<int>> generate(int numRows);
 extern vector<int> getRow(int rowIndex);
 extern int minimumTotal(vector<vector<int>>& triangle);
@@ -158,6 +158,8 @@ extern TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q);
 extern bool increasingTriplet(vector<int>& nums);
 
 extern string addStrings(const string& num1, const string& num2);
+
+extern string serialize(TreeNode* root); extern TreeNode* deserialize(string data);
 
 extern int findLengthOfLCIS(vector<int>& nums);
 
