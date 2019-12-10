@@ -5742,7 +5742,7 @@ void dfsPalindrome(const string& s, const vector<vector<bool>>& isPalindrome, ve
         }
     }
 }
-vector<vector<string>> partitionUseDFS(string& s)
+vector<vector<string>> partitionUseDFS(string& s) 
 {
     // palindrome[i][j] means s[i..j] is palindrome or not.
     vector<vector<bool>> isPalindrome(s.length(), vector<bool>(s.length(), false));
@@ -5786,22 +5786,22 @@ RandomListNode* copyRandomList(RandomListNode* head)
     }
 
     // First, insert a duplicate node after each original node.
-    // NOTE: to make code simple, actually no need to set new node's random.
+    // NOTE: No need to set new node's random pointer now.
     for (RandomListNode* p = head; p != nullptr; )
     {
-        RandomListNode* q = new RandomListNode(p->label);
-        q->next = p->next;
-        p->next = q;
-        p = q->next;
+        RandomListNode* q = p->next;
+        p->next = new RandomListNode(p->label);
+        p->next->next = q;
+        p = q;
     }
 
     // Second, traverse each original node, and set duplicated node's random link.
-    for (RandomListNode* p = head; p != nullptr; p = p->next->next)
+    // NOTE: random could be null.
+    for (RandomListNode* p = head; p != nullptr;)
     {
-        if (p->random != nullptr)
-        {
-            p->next->random = p->random->next;
-        }
+        RandomListNode* q = p->next;
+        q->random = p->random == nullptr ? nullptr : p->random->next;
+        p = q->next;
     }
 
     // Final, decouple the duplicated list from original list.
@@ -5811,7 +5811,10 @@ RandomListNode* copyRandomList(RandomListNode* head)
         RandomListNode* q = p->next;
         p->next = q->next;
         p = p->next;
-        q->next = p == nullptr ? nullptr : p->next;
+        if (p != nullptr)
+        {
+            q->next = p->next;
+        }
     }
 
     return newHead;
