@@ -5651,6 +5651,10 @@ void dfsNotSurroundedRegion(vector<vector<char>>& board, const unsigned i, const
         }
     }
 }
+// Instead of start searching from every not captured location that is also not on boundary,
+// we search from all not captured locations *on* boundary, mark reachable locations to '*'.
+// After all locations have been explored, those locations are still not captured now can be
+// claimed as captured.
 void solve(vector<vector<char>>& board)
 {
     if (!board.empty())
