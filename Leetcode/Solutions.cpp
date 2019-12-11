@@ -3,14 +3,13 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <sstream>
 #include <numeric>
-#include <iostream>
 #include <algorithm>
 #include <functional>
 #include <unordered_map>
 #include <unordered_set>
 #include "DataStructure.h"
-#include <sstream>
 
 using namespace std;
 
