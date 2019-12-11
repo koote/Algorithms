@@ -159,6 +159,7 @@ extern string serializeBT(TreeNode* root); extern TreeNode* deserializeBT(string
 
 extern bool increasingTriplet(vector<int>& nums);
 
+extern int thirdMax(vector<int>& nums);
 extern string addStrings(const string& num1, const string& num2);
 
 extern string serializeBST(TreeNode* root); extern TreeNode* deserializeBST(string data);

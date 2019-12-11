@@ -401,7 +401,7 @@ string longestCommonPrefix(vector<string>& strs)
 }
 
 // 15. 3Sum
-vector<vector<int>> kSum(vector<int>& nums, const unsigned int k, const int sum) // nums must be sorted.
+vector<vector<int>> kSum(vector<int>& nums, const unsigned k, const int sum) // nums must be sorted.
 {
     vector<vector<int>> result(0);
 
@@ -738,9 +738,9 @@ vector<string> generateParenthesisBacktracking(const string trail, int remaining
 
     return results;
 }
-vector<string> generateParenthesis(int n)
+vector<string> generateParenthesis(const int n)
 {
-    vector<string> r1 = generateParenthesisBacktracking("", n, n);
+    const vector<string> r1 = generateParenthesisBacktracking("", n, n);
     vector<string> r2 = generateParenthesisBottomUp(n);
     assert(r1 == r2);
     return r2;
@@ -833,7 +833,7 @@ ListNode* swapPairs(ListNode* head)
     for (ListNode* p = &dummyHead, *q = head; q != nullptr && q->next != nullptr;)
     {
         p->next = q->next;
-        p = p->next; // Moving p forward makes code looks a little bit clean, otherwise it would be q->next = p->next->next;p->next->next=q;
+        p = p->next; // Moving p forward makes code looks a little bit clean, otherwise it would be "q->next = p->next->next;p->next->next = q".
         q->next = p->next;
         p->next = q;
 
@@ -915,7 +915,7 @@ int removeDuplicates(vector<int>& nums)
 // 27. Remove Element
 int removeElement(vector<int>& nums, const int val)
 {
-    unsigned last = 0;
+    int last = 0;
     for (unsigned probe = 0; probe < nums.size(); ++probe)
     {
         if (nums[probe] != val)
@@ -945,9 +945,9 @@ int strStr(string text, string pattern)
 // 29. Divide Two Integers
 int divide2(const int dividend, const int divisor)
 {
-    unsigned int quotient = 0;
+    unsigned quotient = 0;
 
-    for (unsigned int a = dividend < 0 ? -dividend : dividend, b = divisor < 0 ? -divisor : divisor, k; a >= b; a -= b << k)
+    for (unsigned a = dividend < 0 ? -dividend : dividend, b = divisor < 0 ? -divisor : divisor, k; a >= b; a -= b << k)
     {
         // We are looking for a k that b << k <= a but b << (k + 1) > a. The loop looks complicated since
         // we need to handle overflow. E.g. a == 1 << 31 and b == 1, k should be 31, because b << 31 == a
@@ -965,8 +965,8 @@ int divide2(const int dividend, const int divisor)
 }
 int divide(const int dividend, const int divisor)
 {
-    unsigned int quotient = 0;
-    for (unsigned int a = dividend < 0 ? -dividend : dividend, b = divisor < 0 ? -divisor : divisor, k, temp; a >= b; a -= temp, quotient += k)
+    unsigned quotient = 0;
+    for (unsigned a = dividend < 0 ? -dividend : dividend, b = divisor < 0 ? -divisor : divisor, k, temp; a >= b; a -= temp, quotient += k)
     {
         // use a-temp >= temp to prevent overflow
         for (k = 1, temp = b; a - temp >= temp; temp <<= 1, k <<= 1);
@@ -6176,6 +6176,32 @@ bool increasingTriplet(vector<int>& nums)
     }
 
     return false;
+}
+
+// 414. Third Maximum Number
+int thirdMax(vector<int>& nums)
+{
+    vector<long long> maxes(3, LLONG_MIN); // 0: max, 1: 2ndmax, 3: 3rdmax
+    for (int num : nums)
+    {
+        if (num > maxes[0])
+        {
+            maxes[2] = maxes[1];
+            maxes[1] = maxes[0];
+            maxes[0] = num;
+        }
+        else if (num != maxes[0] && num > maxes[1])
+        {
+            maxes[2] = maxes[1];
+            maxes[1] = num;
+        }
+        else if (num != maxes[0] && num != maxes[1] && num > maxes[2])
+        {
+            maxes[2] = num;
+        }
+    }
+
+    return maxes[2] != INT64_MIN ? maxes[2] : maxes[0];
 }
 
 // 415. Add Strings
