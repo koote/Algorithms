@@ -155,11 +155,13 @@ extern TreeNode* invertTree(TreeNode* root);
 
 extern TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q);
 
+extern string serializeBT(TreeNode* root); extern TreeNode* deserializeBT(string data);
+
 extern bool increasingTriplet(vector<int>& nums);
 
 extern string addStrings(const string& num1, const string& num2);
 
-extern string serialize(TreeNode* root); extern TreeNode* deserialize(string data);
+extern string serializeBST(TreeNode* root); extern TreeNode* deserializeBST(string data);
 
 extern int findLengthOfLCIS(vector<int>& nums);
 

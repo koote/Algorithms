@@ -4708,7 +4708,7 @@ int maxDepth(TreeNode* root)
     return root == nullptr ? 0 : max(maxDepth(root->left), maxDepth(root->right)) + 1;
 }
 
-// 105. Construct Binary Tree from Preorder and Inorder Traversal
+// 105. Construct Binary Tree from PreOrder and InOrder Traversal
 // this helper function's purpose is to avoid sub array allocation and copy.
 TreeNode* buildTree105Helper(vector<int>& preorder, const int ps, const int pe, vector<int>& inorder, const int is, const int ie)
 {
@@ -5481,7 +5481,7 @@ int ladderLengthUseBFS(const string& beginWord, const string& endWord, const vec
 {
     unordered_set<string> unusedWords(wordList.begin(), wordList.end());
     queue<string> queue({ beginWord });
-    for (unsigned level = 1; !queue.empty(); ++level)
+    for (int level = 1; !queue.empty(); ++level)
     {
         unordered_set<string> usedWords;
         for (unsigned i = 0, queueLength = queue.size(); i < queueLength; ++i, queue.pop())
@@ -5625,7 +5625,7 @@ int sumNumbers(TreeNode* root)
 }
 
 // 130. Surrounded Regions
-void dfsNotSurroundedRegion(vector<vector<char>>& board, unsigned i, unsigned j)
+void dfsNotSurroundedRegion(vector<vector<char>>& board, const unsigned i, const unsigned j)
 {
     if (board[i][j] == 'O')
     {
@@ -5743,11 +5743,11 @@ void dfsPalindrome(const string& s, const vector<vector<bool>>& isPalindrome, ve
         }
     }
 }
-vector<vector<string>> partitionUseDFS(string& s) 
+vector<vector<string>> partitionUseDFS(string& s)
 {
     // palindrome[i][j] means s[i..j] is palindrome or not.
     vector<vector<bool>> isPalindrome(s.length(), vector<bool>(s.length(), false));
-    
+
     // NOTE 1. Definition of palindrome[][] implies that always have i <= j, so only top
     //         half of this 2D vector is used.
     //      2. It should be filled from bottom to up, thus i starts from s.length() - 1.
@@ -6044,6 +6044,117 @@ TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
     return root;
 }
 
+// 297. Serialize and Deserialize Binary Tree
+void getBTPreOrderHelper(TreeNode* root, ostringstream& os)
+{
+    if (root == nullptr)
+    {
+        os << "#" << " ";
+        return;
+    }
+
+    os << root->val << " ";
+    getBTPreOrderHelper(root->left, os);
+    getBTPreOrderHelper(root->right, os);
+}
+string serializeBTUsePreOrder(TreeNode* root)
+{
+    ostringstream os;
+    getBTPreOrderHelper(root, os);
+    return os.str();
+}
+TreeNode* buildBTFromPreOrderHelper(istringstream& is)
+{
+    string val;
+    if (!(is >> val) || val == "#")
+    {
+        return nullptr;
+    }
+
+    TreeNode* root = new TreeNode(stoi(val));
+    root->left = buildBTFromPreOrderHelper(is);
+    root->right = buildBTFromPreOrderHelper(is);
+
+    return root;
+}
+TreeNode* deserializeBTUsePreOrder(string data)
+{
+    istringstream is(data);
+    return buildBTFromPreOrderHelper(is);
+}
+string serializeBTUseLevelOrder(TreeNode* root) // Encodes a tree to a single string.
+{
+    ostringstream os;
+    queue<TreeNode*> queue;
+    for (queue.push(root); !queue.empty();)
+    {
+        for (unsigned i = 0, queueLength = queue.size(); i < queueLength; ++i, queue.pop())
+        {
+            TreeNode* current = queue.front();
+            if (current != nullptr)
+            {
+                os << current->val << " ";
+                queue.push(current->left);
+                queue.push(current->right);
+            }
+            else
+            {
+                os << "#" << " ";
+            }
+        }
+    }
+
+    return os.str();
+}
+TreeNode* deserializeBTFromLevelOrder(string data) // Decodes your encoded data to tree.
+{
+    istringstream is(data);
+    vector<string> nums;
+    for (string num; is >> num; nums.push_back(num));
+
+    TreeNode* root = nullptr;
+    if (!nums.empty() && nums[0] != "#")
+    {
+        queue<TreeNode*> queue;
+        root = new TreeNode(stoi(nums[0]));
+        queue.push(root);
+
+        for (unsigned i = 1; i < nums.size() - 1 && !queue.empty(); i += 2, queue.pop())
+        {
+            TreeNode* current = queue.front();
+            if (nums[i] == "#")
+            {
+                current->left = nullptr;
+            }
+            else
+            {
+                current->left = new TreeNode(stoi(nums[i]));
+                queue.push(current->left);
+            }
+
+            if (nums[i + 1] == "#")
+            {
+                current->right = nullptr;
+            }
+            else
+            {
+                current->right = new TreeNode(stoi(nums[i + 1]));
+                queue.push(current->right);
+            }
+        }
+    }
+
+    return root;
+}
+string serializeBT(TreeNode* root)
+{
+    return serializeBTUseLevelOrder(root);
+}
+TreeNode* deserializeBT(string data)
+{
+    return deserializeBTFromLevelOrder(data);
+}
+
 // 334. Increasing Triplet Subsequence
 bool increasingTriplet(vector<int>& nums)
 {
@@ -6082,24 +6193,24 @@ string addStrings(const string& num1, const string& num2)
 }
 
 // 449. Serialize and Deserialize BST
-void getPreorderHelper(TreeNode* root, ostringstream& preorder) // Encodes a tree to a single string.
+void getBSTPreOrderHelper(TreeNode* root, ostringstream& os) // Encodes a tree to a single string.
 {
     if (root == nullptr)
     {
         return;
     }
 
-    preorder << root->val << " ";
-    getPreorderHelper(root->left, preorder);
-    getPreorderHelper(root->right, preorder);
+    os << root->val << " ";
+    getBSTPreOrderHelper(root->left, os);
+    getBSTPreOrderHelper(root->right, os);
 }
-string serialize(TreeNode* root)
+string serializeBST(TreeNode* root)
 {
-    ostringstream preorder;
-    getPreorderHelper(root, preorder);
-    return preorder.str();
+    ostringstream os;
+    getBSTPreOrderHelper(root, os);
+    return os.str();
 }
-TreeNode* buildFromPreorderHelper(vector<int>& nums, const int start, const int end)
+TreeNode* buildBSTFromPreOrderHelper(vector<int>& nums, const int start, const int end)
 {
     if (start > end)
     {
@@ -6116,17 +6227,17 @@ TreeNode* buildFromPreorderHelper(vector<int>& nums, const int start, const int 
         }
     }
 
-    root->left = buildFromPreorderHelper(nums, start + 1, insert);
-    root->right = buildFromPreorderHelper(nums, insert + 1, end);
+    root->left = buildBSTFromPreOrderHelper(nums, start + 1, insert);
+    root->right = buildBSTFromPreOrderHelper(nums, insert + 1, end);
 
     return root;
 }
-TreeNode* deserialize(string data) // Decodes your encoded data to tree.
+TreeNode* deserializeBST(string data) // Decodes your encoded data to tree.
 {
     vector<int> nums;
     istringstream is(data);
     for (string num; is >> num; nums.push_back(stoi(num)));
-    return buildFromPreorderHelper(nums, 0, nums.size() - 1); // No need to check if string is empty as nums.size()-1 = -1 < 0.
+    return buildBSTFromPreOrderHelper(nums, 0, nums.size() - 1); // No need to check if string is empty as nums.size()-1 = -1 < 0.
 }
 
 // 674. Longest Continuous Increasing Subsequence
