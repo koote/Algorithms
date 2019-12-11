@@ -6201,7 +6201,7 @@ int thirdMax(vector<int>& nums)
         }
     }
 
-    return maxes[2] != INT64_MIN ? maxes[2] : maxes[0];
+    return maxes[2] != LLONG_MIN ? maxes[2] : maxes[0];
 }
 
 // 415. Add Strings
