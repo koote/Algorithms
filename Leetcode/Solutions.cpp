@@ -5888,6 +5888,70 @@ vector<int> postorderTraversal(TreeNode* root)
     return postorder;
 }
 
+// 151. Reverse Words in a String
+string reverseWordsUseSplitAndExtraSpace(string s)
+{
+    stack<string> words;
+
+    // split
+    for (unsigned i = 0, j, k; i < s.length(); i = k)
+    {
+        for (j = i; j < s.length() && s[j] == ' '; ++j);
+        for (k = j; k < s.length() && s[k] != ' '; ++k);
+        if (k > j) // Note: if k == j, substr() returns an empty string.
+        {
+            words.push(s.substr(j, k - j));
+        }
+    }
+
+    // join
+    for (s.clear(); !words.empty(); words.pop())
+    {
+        s += words.top() + " ";
+    }
+
+    return s.substr(0, s.length() - 1);
+}
+void reverseSubstring(string& s, int i, int j)
+{
+    for (; i < j; ++i, --j)
+    {
+        char temp = s[i];
+        s[i] = s[j];
+        s[j] = temp;
+    }
+}
+string reverseWordsInPlace(string s)
+{
+    reverseSubstring(s, 0, s.length() - 1); // reverse whole string
+
+    for (int i = 0, j, k; i < s.length(); i = k) // reverse all words
+    {
+        for (j = i; j < s.length() && s[j] == ' '; ++j);
+        for (k = j; k < s.length() && s[k] != ' '; ++k);
+        reverseSubstring(s, j, k - 1);
+    }
+
+    // trim extra whitespace.
+    int last = 0;
+    for (int probe = 0; probe < s.length(); )
+    {
+        for (; probe < s.length() && s[probe] == ' '; ++probe);
+        for (; probe < s.length() && s[probe] != ' '; s[last++] = s[probe++]);
+        for (; probe < s.length() && s[probe] == ' '; ++probe);
+        if (probe != s.length())
+        {
+            s[last++] = ' ';
+        }
+    }
+
+    return s.substr(0, last);
+}
+string reverseWords(string s)
+{
+    return reverseWordsInPlace(s);
+}
+
 // 188. Best Time to Buy and Sell Stock IV
 // Let profits[k][j] represent the max profit when we only trade from prices[0] to prices[j] (inclusive) using at most k
 // transactions.
@@ -6008,6 +6072,52 @@ int maxProfit4(int k, vector<int>& prices)
     return profits[1].back();
 }
 
+// 200. Number of Islands
+int dfsCheckIsland(vector<vector<char>>& grid, vector<vector<bool>>& visited, unsigned i, unsigned j)
+{
+    if (i < 0 || i >= grid.size() || j < 0 || j >= grid[i].size() ||
+        grid[i][j] != '1' || visited[i][j])
+    {
+        return 0;
+    }
+
+    visited[i][j] = true;
+
+    // top
+    dfsCheckIsland(grid, visited, i - 1, j);
+
+    // left
+    dfsCheckIsland(grid, visited, i, j - 1);
+
+    // bottom
+    dfsCheckIsland(grid, visited, i + 1, j);
+
+    // right
+    dfsCheckIsland(grid, visited, i, j + 1);
+
+    return 1;
+}
+int numIslands(vector<vector<char>>& grid)
+{
+    if (grid.size() == 0)
+    {
+        return 0;
+    }
+
+    int result = 0;
+    vector<vector<bool>> visited(grid.size(), vector<bool>(grid[0].size(), false));
+    
+    for (unsigned i = 0; i < grid.size(); ++i)
+    {
+        for (unsigned j = 0; j < grid[i].size(); ++j)
+        {
+            result += dfsCheckIsland(grid, visited, i, j);
+        }
+    }
+
+    return result;
+}
+
 // 202. Happy Number
 bool isHappy(int n)
 {
@@ -6020,6 +6130,31 @@ bool isHappy(int n)
     }
 
     return n == 1;
+}
+
+// 206. Reverse Linked List
+ListNode* reverseList(ListNode* head)
+{
+    if (head == nullptr)
+    {
+        return head;
+    }
+
+    ListNode* p, * q;
+    for (p = head, q = head->next; q != nullptr;)
+    {
+        ListNode* k = q->next;
+        q->next = p;
+        if (p == head)
+        {
+            p->next = nullptr;
+        }
+
+        p = q;
+        q = k;
+    }
+
+    return p;
 }
 
 // 226. Invert Binary Tree

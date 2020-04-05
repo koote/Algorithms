@@ -147,9 +147,15 @@ extern RandomListNode* copyRandomList(RandomListNode *head);
 extern vector<int> preorderTraversal(TreeNode* root);
 extern vector<int> postorderTraversal(TreeNode* root);
 
+extern string reverseWords(string s);
+
 extern int maxProfit4(int k, vector<int>& prices);
 
+extern int numIslands(vector<vector<char>>& grid);
+
 extern bool isHappy(int n);
+
+extern ListNode* reverseList(ListNode* head);
 
 extern TreeNode* invertTree(TreeNode* root);
 
@@ -173,6 +179,8 @@ extern vector<vector<int>> kClosest(vector<vector<int>>& points, int k);
 void main()
 {
     const auto start = clock();
+
+    reverseWords("  hello world!  ");
 
     vector<vector<char>> matrix({
         {'0','1','1','0','1'},
