@@ -5746,28 +5746,17 @@ void dfsPalindrome(const string& s, const vector<vector<bool>>& isPalindrome, ve
         }
     }
 }
-vector<vector<string>> partitionUseDFS(string& s)
+vector<vector<string>> partitionUseDFSWithDPOptimization(string& s) // The idea is to prebuild a DP array to speed up DFS search.
 {
-    // palindrome[i][j] means s[i..j] is palindrome or not.
+    // isPalindrome[i][j] means whether s[i..j] is a palindrome or not.
     vector<vector<bool>> isPalindrome(s.length(), vector<bool>(s.length(), false));
 
-    // NOTE 1. Definition of palindrome[][] implies that always have i <= j, so only top
-    //         half of this 2D vector is used.
-    //      2. It should be filled from bottom to up, thus i starts from s.length() - 1.
-    //         Why? Take a look at formula, s[i..j] is palindrome only when s[i] == s[j]
-    //         and s[i+1][j-1] is also palindrome, if draw the 2D array, s[i][j] depends
-    //         on its bottom left element s[i+1][j-1] which is located on below row, so 
-    //         we should fill from last row, thus can get correct result.
-    // LEARNED: When filling DP array, should first find dependency between elements then
-    //          decide how to fill the array.
-    for (int i = s.length() - 1; i >= 0; --i)
+    for (int j = 0; j < s.length(); ++j)
     {
-        for (int j = i; j < s.length(); ++j)
+        for (int i = j; i >= 0; --i)
         {
-            if (s[i] == s[j])
-            {
-                isPalindrome[i][j] = i + 1 < j - 1 ? isPalindrome[i + 1][j - 1] : true;
-            }
+            // Only check isPalindrome[i + 1][j - 1] when s[i] is not adjacent to s[j].
+            isPalindrome[i][j] = s[i] == s[j] && (j - i <= 1 || isPalindrome[i + 1][j - 1]);
         }
     }
 
@@ -5778,7 +5767,50 @@ vector<vector<string>> partitionUseDFS(string& s)
 }
 vector<vector<string>> partition(string& s)
 {
-    return partitionUseDFS(s);
+    return partitionUseDFSWithDPOptimization(s);
+}
+
+// 132. Palindrome Partitioning II
+int minCutUseDP(string& s)
+{
+    // isPalindrome[i][j] means whether s[i..j] is a palindrome or not.
+    vector<vector<bool>> isPalindrome(s.length(), vector<bool>(s.length(), false));
+
+    // minCutDP[i] is the minimum cut for substring s[0..i].
+    vector<int> minCutDP(s.length(), 0);
+
+    for (int j = 0; j < s.length(); ++j)
+    {
+        minCutDP[j] = j;
+
+        for (int i = j; i >= 0; --i)
+        {
+            isPalindrome[i][j] = s[i] == s[j] && (j - i <= 1 || isPalindrome[i + 1][j - 1]);
+
+            // now we know that s[i .. j] is a palindrome
+            if (isPalindrome[i][j])
+            {
+                if (i == 0) // whole s[0..j] is a palindrome, no cut is needed.
+                {
+                    minCutDP[j] = 0;
+                }
+                else
+                {
+                    minCutDP[j] = min(minCutDP[j], minCutDP[i - 1] + 1);
+                }
+            }
+        }
+    }
+
+    return minCutDP.back();
+}
+int minCutUseSpaceOptimizedDP(string& s)
+{
+
+}
+int minCut(string s)
+{
+    return minCutUseSpaceOptimizedDP(s);
 }
 
 // 138. Copy List with Random Pointer
@@ -6381,18 +6413,12 @@ TreeNode* buildBSTFromPreOrderHelper(vector<int>& nums, const int start, const i
         return nullptr;
     }
 
-    TreeNode* root = new TreeNode(nums[start]);
-    int insert;
-    for (insert = start; insert < end; ++insert)
-    {
-        if (nums[insert] <= nums[start] && nums[insert + 1] > nums[start])
-        {
-            break;
-        }
-    }
+    int pivot;
+    for (pivot = start; pivot <= end && nums[pivot] <= nums[start]; ++pivot);
 
-    root->left = buildBSTFromPreOrderHelper(nums, start + 1, insert);
-    root->right = buildBSTFromPreOrderHelper(nums, insert + 1, end);
+    TreeNode* root = new TreeNode(nums[start]);
+    root->left = buildBSTFromPreOrderHelper(nums, start + 1, pivot - 1);
+    root->right = buildBSTFromPreOrderHelper(nums, pivot, end);
 
     return root;
 }
