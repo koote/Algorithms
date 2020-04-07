@@ -5787,7 +5787,7 @@ int minCutUseDP(string& s)
         {
             isPalindrome[i][j] = s[i] == s[j] && (j - i <= 1 || isPalindrome[i + 1][j - 1]);
 
-            // now we know that s[i .. j] is a palindrome
+            // now we know that s[i .. j] is a new palindrome.
             if (isPalindrome[i][j])
             {
                 if (i == 0) // whole s[0..j] is a palindrome, no cut is needed.
@@ -5806,7 +5806,58 @@ int minCutUseDP(string& s)
 }
 int minCutUseSpaceOptimizedDP(string& s)
 {
+    vector<int> minCutDP(s.length(), 0);
 
+    // Not like above solution, in this optimized solution, we update minCutDP[i + radius]
+    // when accessing s[i], so need to fully initialize minCutDP[] before iterating s.
+    for (int i = 0; i < s.length(); ++i)
+    {
+        minCutDP[i] = i;
+    }
+
+    for (int i = 0; i < s.length(); ++i)
+    {
+        // Thinking about the palindrome whose center is s[i] and has odd letters, it is
+        // the substring s[i-radius..i+radius] (i-radius >= 0 && i+radius < s.length()).
+        // if s[i-radius..i+radius] is a palindrome, like above solution, we can say that
+        // minCutDP[i+radius] = min(minCutDP[i+radius], 1 + minCutDP[i-radius-1]).
+        for (int radius = 0; i - radius >= 0 && radius + i < s.length() && s[i - radius] == s[i + radius]; ++radius)
+        {
+            if (i - radius == 0)
+            {
+                minCutDP[i + radius] = 0;
+            }
+            else
+            {
+                minCutDP[i + radius] = min(minCutDP[i + radius], 1 + minCutDP[i - radius - 1]);
+            }
+        }
+
+        // Thinking about the palindrome whose center is s[i] and has even letters, it is
+        // the substring s[i-radius-1..i+radius] (i-radius-1 >= 0 && i+radius < s.length()).
+        // if s[i-radius-1..i+radius] is a palindrome, like above solution, we can say that
+        // minCutDP[i+radius] = min(minCutDP[i+radius], 1 + minCutDP[i-radius-2]).
+        //
+        // NOTE: There are 2 cases when think about palindrome with even letters:
+        //       s[i-radius-1..i+radius] and s[i-radius..i+radius+1].
+        //       Why only check first case here? That is because the other case will be checked
+        //       in next iteration when i=i+1. Let's assume j=i+1, so in next iteration we will
+        //       examine the substring s[j-radius-1..j+radius] which is s[i-radius..i+radius+1].
+        //       So only checking the first case is enough.
+        for (int radius = 0; i - radius - 1 >= 0 && i + radius < s.length() && s[i - radius - 1] == s[i + radius]; ++radius)
+        {
+            if (i - radius -1 == 0)
+            {
+                minCutDP[i + radius] = 0;
+            }
+            else
+            {
+                minCutDP[i + radius] = min(minCutDP[i + radius], 1 + minCutDP[i - radius - 2]);
+            }
+        }
+    }
+
+    return minCutDP.back();
 }
 int minCut(string s)
 {
@@ -6138,7 +6189,7 @@ int numIslands(vector<vector<char>>& grid)
 
     int result = 0;
     vector<vector<bool>> visited(grid.size(), vector<bool>(grid[0].size(), false));
-    
+
     for (unsigned i = 0; i < grid.size(); ++i)
     {
         for (unsigned j = 0; j < grid[i].size(); ++j)
