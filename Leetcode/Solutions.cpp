@@ -5787,10 +5787,10 @@ int minCutUseDP(string& s)
         {
             isPalindrome[i][j] = s[i] == s[j] && (j - i <= 1 || isPalindrome[i + 1][j - 1]);
 
-            // now we know that s[i .. j] is a new palindrome.
+            // Now we know s[i .. j] is a new palindrome.
             if (isPalindrome[i][j])
             {
-                if (i == 0) // whole s[0..j] is a palindrome, no cut is needed.
+                if (i == 0) // whole substring s[0..j] is a palindrome, no cut is needed.
                 {
                     minCutDP[j] = 0;
                 }
@@ -5809,7 +5809,7 @@ int minCutUseSpaceOptimizedDP(string& s)
     vector<int> minCutDP(s.length(), 0);
 
     // Not like above solution, in this optimized solution, we update minCutDP[i + radius]
-    // when accessing s[i], so need to fully initialize minCutDP[] before iterating s.
+    // when accessing s[i], so minCutDP[] needs to be fully initialized before iterating.
     for (int i = 0; i < s.length(); ++i)
     {
         minCutDP[i] = i;
@@ -5823,7 +5823,7 @@ int minCutUseSpaceOptimizedDP(string& s)
         // minCutDP[i+radius] = min(minCutDP[i+radius], 1 + minCutDP[i-radius-1]).
         for (int radius = 0; i - radius >= 0 && radius + i < s.length() && s[i - radius] == s[i + radius]; ++radius)
         {
-            if (i - radius == 0)
+            if (i - radius == 0) // whole substring s[i-radius..i+radius] is a palindrome, no cut is needed.
             {
                 minCutDP[i + radius] = 0;
             }
@@ -5842,11 +5842,11 @@ int minCutUseSpaceOptimizedDP(string& s)
         //       s[i-radius-1..i+radius] and s[i-radius..i+radius+1].
         //       Why only check first case here? That is because the other case will be checked
         //       in next iteration when i=i+1. Let's assume j=i+1, so in next iteration we will
-        //       examine the substring s[j-radius-1..j+radius] which is s[i-radius..i+radius+1].
+        //       examine the substring s[j-radius-1..j+radius] == s[i-radius..i+radius+1].
         //       So only checking the first case is enough.
         for (int radius = 0; i - radius - 1 >= 0 && i + radius < s.length() && s[i - radius - 1] == s[i + radius]; ++radius)
         {
-            if (i - radius -1 == 0)
+            if (i - radius - 1 == 0) // whole substring s[i-radius-1..i+radius] is a palindrome, no cut is needed.
             {
                 minCutDP[i + radius] = 0;
             }
@@ -5862,6 +5862,64 @@ int minCutUseSpaceOptimizedDP(string& s)
 int minCut(string s)
 {
     return minCutUseSpaceOptimizedDP(s);
+}
+
+// 133. Clone Graph
+Node* cloneGraphUseDFS(Node* node, unordered_map<Node*, Node*>& copied)
+{
+    if (node == nullptr)
+    {
+        return nullptr;
+    }
+
+    if (copied.find(node) == copied.end())
+    {
+        copied[node] = new Node(node->val);
+        for (Node* neighbor : node->neighbors)
+        {
+            copied[node]->neighbors.push_back(cloneGraphUseDFS(neighbor, copied));
+        }
+    }
+
+    return copied[node];
+}
+Node* cloneGraphUseBFS(Node* node)
+{
+    queue<Node*> queue;
+    unordered_map<Node*, Node*> copied;
+
+    if (node == nullptr)
+    {
+        return nullptr;
+    }
+
+    // NOTE1: make sure when popping a node, it has been copied, no need to check whether
+    // copied[queue.front()] exists or not. So precopy the first node before starting BFS.
+    copied[node] = new Node(node->val);
+    for (queue.push(node); !queue.empty(); queue.pop())
+    {
+        for (Node* neighbor : queue.front()->neighbors)
+        {
+            if (copied.find(neighbor) == copied.end())
+            {
+                copied[neighbor] = new Node(neighbor->val);
+
+                // NOTE2: don't enqueue a node if it has been copied. Copied means
+                // the node has been visited.
+                queue.push(neighbor);
+            }
+
+            // Link the copied node and its neighbors.
+            copied[queue.front()]->neighbors.push_back(copied[neighbor]);
+        }
+    }
+
+    return copied[node];
+}
+Node* cloneGraph(Node* node)
+{
+    unordered_map<Node*, Node*> copied;
+    return cloneGraphUseDFS(node, copied);
 }
 
 // 138. Copy List with Random Pointer

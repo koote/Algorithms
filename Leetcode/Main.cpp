@@ -142,6 +142,7 @@ extern int sumNumbers(TreeNode* root);
 extern void solve(vector<vector<char>>& board);
 extern vector<vector<string>> partition(string& s);
 extern int minCut(string s);
+extern Node* cloneGraph(Node* node);
 
 extern RandomListNode* copyRandomList(RandomListNode *head);
 
