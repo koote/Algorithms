@@ -5922,6 +5922,36 @@ Node* cloneGraph(Node* node)
     return cloneGraphUseDFS(node, copied);
 }
 
+// 134. Gas Station
+int canCompleteCircuit(vector<int>& gas, vector<int>& cost)
+{
+    for (int i = 0, tank = 0, steps = 0, tried = 0; ; i = (i + 1) % gas.size())
+    {
+        if (steps == 0)
+        {
+            if (++tried > gas.size())
+            {
+                break;
+            }
+        }
+
+        tank += gas[i] - cost[i];
+        if (tank < 0)
+        {
+            tank = 0;
+            steps = 0;
+            continue;
+        }
+
+        if (steps++ == gas.size())
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode* copyRandomList(RandomListNode* head)
 {

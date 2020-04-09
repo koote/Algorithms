@@ -143,6 +143,7 @@ extern void solve(vector<vector<char>>& board);
 extern vector<vector<string>> partition(string& s);
 extern int minCut(string s);
 extern Node* cloneGraph(Node* node);
+extern int canCompleteCircuit(vector<int>& gas, vector<int>& cost);
 
 extern RandomListNode* copyRandomList(RandomListNode *head);
 
@@ -182,7 +183,7 @@ void main()
 {
     const auto start = clock();
 
-    reverseWords("  hello world!  ");
+    canCompleteCircuit(vector<int>({1,1,3}), vector<int>({2,2,1}));
 
     vector<vector<char>> matrix({
         {'0','1','1','0','1'},
