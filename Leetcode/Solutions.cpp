@@ -5925,31 +5925,65 @@ Node* cloneGraph(Node* node)
 // 134. Gas Station
 int canCompleteCircuit(vector<int>& gas, vector<int>& cost)
 {
-    for (int i = 0, tank = 0, steps = 0, tried = 0; ; i = (i + 1) % gas.size())
+    for (int i = 0, tank = 0, steps = 0, triedStations = 0; ; i = (i + 1) % gas.size())
     {
-        if (steps == 0)
+        if (steps == 0) // trying to start from a new gas station
         {
-            if (++tried > gas.size())
+            if (++triedStations > gas.size()) // all stations have been tried, no solution.
             {
                 break;
             }
         }
 
         tank += gas[i] - cost[i];
-        if (tank < 0)
+        if (tank < 0) // cannot reach next station.
         {
             tank = 0;
             steps = 0;
             continue;
         }
 
-        if (steps++ == gas.size())
+        if (steps++ == gas.size()) // found a solution.
         {
             return i;
         }
     }
 
     return -1;
+}
+// 1. The question says if there is a solution, it is unique.
+// 2. If SUM(gas[]) >= SUM(cost[]), there must be a solution, otherwise, no solution.
+// 3. If starting from gas[i] can reach gas[j] (j!=i) at most, then for any station gas[k]
+//    between gas[i] and gas[j] (i < k <= j), it also can only reach gas[j] at most. So 
+//    when car can only reach gas[j] when starts from gas[i], in next iteration we should
+//    start from gas[j+1], not gas[i+1]. Why? assume there exists a k (i < k <= j) that 
+//    starting from gas[k], car can reach gas[j+1], because if car starts from gas[i], it
+//    can reach gas[k], and from gas[k] can reach gas[j+1], so gas[i] can reach gas[j+1], 
+//    contradiction.
+// 4. Based on 3, we can use a loop to try every index as start, see how far it can reach,
+//    if it can reach gas[j] when stars from gas[i], then gas[i..j] won't be the answer. 
+//    Keep doing this until all indexes have been examined. From 1 we know that if there is
+//    an answer, it is unique, so after all indexes have been checked, we should have a possible
+//    candidate index, now we can check the SUM(gas[]) and SUM(cost[]), if it is not negative,
+//    the candidate is the answer.
+int canCompleteCircuitOptimized(vector<int>& gas, vector<int>& cost)
+{
+    int start = 0;
+    int total = 0;
+    int tank = 0;
+
+    for (unsigned i = 0; i < gas.size(); ++i)
+    {
+        tank += gas[i] - cost[i];
+        if (tank < 0)
+        {
+            start = i + 1;
+            total += tank;
+            tank = 0;
+        }
+    }
+
+    return (total + tank < 0) ? -1 : start;
 }
 
 // 138. Copy List with Random Pointer
