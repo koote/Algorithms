@@ -145,6 +145,7 @@ extern int minCut(string s);
 extern Node* cloneGraph(Node* node);
 extern int canCompleteCircuit(vector<int>& gas, vector<int>& cost);
 extern int candy(vector<int>& ratings);
+extern int singleNumber(vector<int>& nums);
 
 extern RandomListNode* copyRandomList(RandomListNode *head);
 

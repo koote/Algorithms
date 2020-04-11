@@ -5987,6 +5987,16 @@ int canCompleteCircuitOptimized(vector<int>& gas, vector<int>& cost)
 }
 
 // 135. Candy
+// For an ascending ratings array, candies[]={1,2,...,n}; for a descending ratings array,
+// candies[]={n,n-1,...,1}, so it is about trend. To detect ascending and descending series,
+// we can scan ratings[] from both ends. The remaining unsolved problem is regarding equal
+// adjacent elements. Drawing some samples:
+// 1. ratings[0] > ... > ratings[x] == ratings[y] > ... > ratings[n]
+// In this case we know candies[x] < cadies[y]
+// 2. ratings[0] > ... > ratings[x] == ratings[y] < ... < ratings[n]
+// In this case cadies[x] == candies[y].
+// The are case 3 and 4 but they are the mirror of case 1 and 2.
+// So there is no hidden rule behind euqal adjacent eleemnts.
 int candy(vector<int>& ratings)
 {
     vector<int> candies(ratings.size(), 1);
@@ -6014,6 +6024,18 @@ int candy(vector<int>& ratings)
     }
 
     return result;
+}
+
+// 136. Single Number
+int singleNumber(vector<int>& nums)
+{
+    int answer = 0;
+    for (int num : nums)
+    {
+        answer ^= num;
+    }
+
+    return answer;
 }
 
 // 138. Copy List with Random Pointer
