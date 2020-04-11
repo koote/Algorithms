@@ -146,7 +146,7 @@ extern Node* cloneGraph(Node* node);
 extern int canCompleteCircuit(vector<int>& gas, vector<int>& cost);
 extern int candy(vector<int>& ratings);
 extern int singleNumber(vector<int>& nums);
-
+extern int singleNumber2(vector<int>& nums);
 extern RandomListNode* copyRandomList(RandomListNode *head);
 
 extern vector<int> preorderTraversal(TreeNode* root);

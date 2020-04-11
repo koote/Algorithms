@@ -6038,6 +6038,23 @@ int singleNumber(vector<int>& nums)
     return answer;
 }
 
+// 137. Single Number II
+// 1. Remember the key is to count 1 of every bit for all integers, the straightforward
+//    way is to use a counter[32] array to record how many times 1 appears on every bit.
+// 2. To get an optimized solution, can use truth table then write the function.
+int singleNumber2(vector<int>& nums)
+{
+    int low_bits = 0;
+    int high_bits = 0;
+    for (int num : nums)
+    {
+        low_bits = (low_bits ^ num) & ~high_bits;
+        high_bits = (high_bits ^ num) & ~low_bits;
+    }
+
+    return low_bits;
+}
+
 // 138. Copy List with Random Pointer
 RandomListNode* copyRandomList(RandomListNode* head)
 {
