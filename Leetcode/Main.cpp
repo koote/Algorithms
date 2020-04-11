@@ -148,6 +148,7 @@ extern int candy(vector<int>& ratings);
 extern int singleNumber(vector<int>& nums);
 extern int singleNumber2(vector<int>& nums);
 extern RandomListNode* copyRandomList(RandomListNode *head);
+extern bool wordBreak(string s, vector<string>& wordDict);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 extern vector<int> postorderTraversal(TreeNode* root);
@@ -185,7 +186,8 @@ void main()
 {
     const auto start = clock();
 
-    canCompleteCircuit(vector<int>({1,1,3}), vector<int>({2,2,1}));
+    vector<string> dict = { "car", "ca", "rs" };
+    wordBreak("cars", dict);
 
     vector<vector<char>> matrix({
         {'0','1','1','0','1'},

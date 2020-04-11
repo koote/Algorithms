@@ -149,7 +149,8 @@ double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2)
 // 5. Longest Palindromic Substring
 string searchPalindrome(string s, int left, int right)
 {
-    // when loop ends, no matter it is because of out of bounds or s[left] and s[right] no longer equal, current palindrome is always s[left+1 .. right-1].
+    // when loop ends, no matter it is because of out of bounds or s[left] and
+    // s[right] no longer equal, current palindrome is always s[left+1 .. right-1].
     for (; left >= 0 && right < s.length() && s[left] == s[right]; left--, right++);
     return s.substr(left + 1, right - 1 - left);
 }
@@ -164,7 +165,7 @@ string longestPalindrome(string s)
             result = palindrome1;
         }
 
-        // don't worry that position+1 could exceed right bound, since searchPalindrome will check j < s.length()
+        // Don't worry position+1 could exceed right bound, searchPalindrome will check j < s.length()
         string palindrome2 = searchPalindrome(s, position, position + 1);
         if (palindrome2.length() > result.length())
         {
@@ -1753,7 +1754,7 @@ We found that, when matching pattern[l+1 .. n-1] with text[k .. m-1], the proces
 matching pattern[l+1 .. n-1] with text[k+2 .. m-1], etc., if pattern[l+1 .. n-1] cannot match with text[k .. m-1], rolling back to first '*' at
 pattern[j] is totally useless, so we can get the conclusion: every time when mismatch happens, only need to roll back to nearest '*', if we tried
 all possible branches of nearest '*' but cannot match, we can say the whole pattern won't match.
- */
+*/
 bool isMatch_Wildcard_Iterative(string text, string pattern)
 {
     // keep tracking index of nearest '*' in pattern and the index of its initial corresponding element in text.
@@ -4333,7 +4334,7 @@ bool bfsSearchInterleavingString(const string& s1, const string& s2, const strin
             return true;
         }
 
-        for (unsigned l = 0, currenQueueLength = queue.size(), i, j; l < currenQueueLength; ++l, queue.pop())
+        for (unsigned l = 0, currentQueueLength = queue.size(), i, j; l < currentQueueLength; ++l, queue.pop())
         {
             const pair<unsigned, unsigned> current = queue.front();
             i = current.first;
@@ -4360,7 +4361,7 @@ bool bfsSearchInterleavingString(const string& s1, const string& s2, const strin
 // process is recursive so can be solved by recursion.
 // The only problem is pure DFS will timeout, because it tries too many branches and most of branches we already know that cannot
 // success, the basic idea is caching the pair (i,j) when we know that s1[i..s1.length()-1] and s2[j..s2.length()-1] cannot form 
-// s3[k..s3.length()-1] via interleaving. This solution we call it cached DFS.
+// s3[k..s3.length()-1] via interleaving. This solution we call it cached DFS or memorized DFS.
 bool dfsSearchInterleavingString(unordered_set<string>& knownFailures, const string& s1, const unsigned i, const string& s2, const unsigned j, const string& s3, const unsigned k)
 {
     if (knownFailures.find(to_string(i) + "," + to_string(j)) != knownFailures.end())
@@ -6098,6 +6099,49 @@ RandomListNode* copyRandomList(RandomListNode* head)
     return newHead;
 }
 
+// 139. Word Break
+bool dfsWordBreak(const string& s, const unsigned start, const vector<string>& wordDict, unordered_map<unsigned, bool>& impossible)
+{
+    if (start == s.length())
+    {
+        return true;
+    }
+
+    for (const string& word : wordDict)
+    {
+        if (word.length() <= s.length() - start) // try word
+        {
+            unsigned i;
+            for (i = 0; i < word.length() && s[start + i] == word[i]; ++i);
+            if (i == word.length())
+            {
+                // We already know that s.substr(start+i) is impossible to be broken into words use the dictionary.
+                if (impossible.find(i + start) != impossible.end())
+                {
+                    return false;
+                }
+
+                if (dfsWordBreak(s, i + start, wordDict, impossible))
+                {
+                    return true;
+                }
+            }
+        }
+    }
+
+    impossible[start] = false;
+    return false;
+}
+bool wordBreakUseCachedDFS(string s, vector<string>& wordDict)
+{
+    unordered_map<unsigned, bool> impossible;
+    return dfsWordBreak(s, 0, wordDict, impossible);
+}
+bool wordBreak(string s, vector<string>& wordDict)
+{
+    return wordBreakUseCachedDFS(s, wordDict);
+}
+
 // 144. Binary Tree Preorder Traversal
 vector<int> preorderTraversalUseStack(TreeNode* root)
 {
@@ -6373,7 +6417,7 @@ int dfsCheckIsland(vector<vector<char>>& grid, vector<vector<bool>>& visited, un
 }
 int numIslands(vector<vector<char>>& grid)
 {
-    if (grid.size() == 0)
+    if (grid.empty())
     {
         return 0;
     }
