@@ -149,6 +149,7 @@ extern int singleNumber(vector<int>& nums);
 extern int singleNumber2(vector<int>& nums);
 extern RandomListNode* copyRandomList(RandomListNode *head);
 extern bool wordBreak(string s, vector<string>& wordDict);
+extern vector<string> wordBreak2(string s, vector<string>& wordDict);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 extern vector<int> postorderTraversal(TreeNode* root);

@@ -6100,7 +6100,7 @@ RandomListNode* copyRandomList(RandomListNode* head)
 }
 
 // 139. Word Break
-bool dfsWordBreak(const string& s, const unsigned start, const vector<string>& wordDict, unordered_map<unsigned, bool>& impossible)
+bool dfsWordBreak(const string& s, const unsigned start, const vector<string>& wordDict, unordered_set<unsigned>& impossible)
 {
     if (start == s.length())
     {
@@ -6129,17 +6129,45 @@ bool dfsWordBreak(const string& s, const unsigned start, const vector<string>& w
         }
     }
 
-    impossible[start] = false;
+    impossible.insert(start);
     return false;
 }
 bool wordBreakUseCachedDFS(string s, vector<string>& wordDict)
 {
-    unordered_map<unsigned, bool> impossible;
+    unordered_set<unsigned> impossible;
     return dfsWordBreak(s, 0, wordDict, impossible);
+}
+bool wordBreakUseDP(string s, vector<string>& wordDict)
+{
+    // dp[i] means whether s[0..i) which is the first i letters can be broken into words
+    // using given dictionary. So dp[i] = dp[j] && s.substr(j, i-j) exists in dictionary,
+    // if such a j exists, dp[i] = true.
+    vector<bool> dp(s.length() + 1, false);
+    unordered_set<string> wordDictHashSet(wordDict.begin(), wordDict.end());
+
+    for (unsigned i = 1; i <= s.length(); ++i)
+    {
+        for (unsigned j = 0; j < i; ++j)
+        {
+            dp[i] = dp[j] && wordDictHashSet.find(s.substr(j, i)) != wordDictHashSet.end();
+            if (dp[i])
+            {
+                break;
+            }
+        }
+    }
+
+    return dp.back();
 }
 bool wordBreak(string s, vector<string>& wordDict)
 {
-    return wordBreakUseCachedDFS(s, wordDict);
+    return wordBreakUseDP(s, wordDict);
+}
+
+// 140. Word Break II
+vector<string> wordBreak2(string s, vector<string>& wordDict)
+{
+
 }
 
 // 144. Binary Tree Preorder Traversal
