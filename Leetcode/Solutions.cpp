@@ -383,7 +383,7 @@ string intToRoman(int num)
     return result;
 }
 
-//13. Roman to Integer
+// 13. Roman to Integer
 int romanToInt(string s)
 {
     throw new exception();
@@ -845,7 +845,7 @@ ListNode* swapPairs(ListNode* head)
     return dummyHead.next;
 }
 
-//25. Reverse Nodes in k-Group
+// 25. Reverse Nodes in k-Group
 ListNode* reverseKGroup(ListNode* head, const int k)
 {
     ListNode dummyHead(0);
@@ -6176,7 +6176,7 @@ void dfsWordBreak2(const string& s, const unsigned start, const vector<string>& 
         return;
     }
 
-    bool deadend = true;
+    bool deadEnd = true;
     for (const string& word : wordDict)
     {
         if (word.length() <= s.length() - start) // word can be used.
@@ -6185,7 +6185,7 @@ void dfsWordBreak2(const string& s, const unsigned start, const vector<string>& 
             for (i = 0; i < word.length() && word[i] == s[start + i]; ++i);
             if (i == word.length() && impossible.find(start + i) == impossible.end())
             {
-                deadend = false;
+                deadEnd = false;
                 path.push_back(word);
                 dfsWordBreak2(s, start + i, wordDict, sentences, path, impossible);
                 path.pop_back();
@@ -6193,7 +6193,7 @@ void dfsWordBreak2(const string& s, const unsigned start, const vector<string>& 
         }
     }
 
-    if (deadend)
+    if (deadEnd)
     {
         impossible.insert(start);
     }
@@ -6205,6 +6205,16 @@ vector<string> wordBreak2(string s, vector<string>& wordDict)
     vector<string> path;
     dfsWordBreak2(s, 0, wordDict, sentences, path, impossible);
     return sentences;
+}
+
+// 141. Linked List Cycle
+bool hasCycle(ListNode* head)
+{
+    ListNode dummy(0);
+    ListNode* slow;
+    ListNode* fast;
+    for (dummy.next = head, slow = &dummy, fast = head; fast != nullptr && slow != fast && fast->next != nullptr; slow = slow->next, fast = fast->next->next);
+    return slow == fast;
 }
 
 // 144. Binary Tree Preorder Traversal
@@ -6466,17 +6476,10 @@ int dfsCheckIsland(vector<vector<char>>& grid, vector<vector<bool>>& visited, un
 
     visited[i][j] = true;
 
-    // top
-    dfsCheckIsland(grid, visited, i - 1, j);
-
-    // left
-    dfsCheckIsland(grid, visited, i, j - 1);
-
-    // bottom
-    dfsCheckIsland(grid, visited, i + 1, j);
-
-    // right
-    dfsCheckIsland(grid, visited, i, j + 1);
+    dfsCheckIsland(grid, visited, i - 1, j); // top
+    dfsCheckIsland(grid, visited, i, j - 1); // left
+    dfsCheckIsland(grid, visited, i + 1, j); // bottom
+    dfsCheckIsland(grid, visited, i, j + 1); // right
 
     return 1;
 }
@@ -6558,7 +6561,7 @@ TreeNode* invertTree(TreeNode* root)
     return root;
 }
 
-//235. Lowest Common Ancestor of a Binary Search Tree
+// 235. Lowest Common Ancestor of a Binary Search Tree
 TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
 {
     for (; root->val > p->val&& root->val > q->val || root->val < p->val && root->val < q->val; root = p->val < root->val ? root->left : root->right);
