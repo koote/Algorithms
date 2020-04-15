@@ -151,6 +151,7 @@ extern RandomListNode* copyRandomList(RandomListNode *head);
 extern bool wordBreak(string s, vector<string>& wordDict);
 extern vector<string> wordBreak2(string s, vector<string>& wordDict);
 extern bool hasCycle(ListNode* head);
+extern ListNode* detectCycle(ListNode* head);
 
 extern vector<int> preorderTraversal(TreeNode* root);
 extern vector<int> postorderTraversal(TreeNode* root);

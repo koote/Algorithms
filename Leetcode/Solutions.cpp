@@ -6217,6 +6217,36 @@ bool hasCycle(ListNode* head)
     return slow == fast;
 }
 
+// 142. Linked List Cycle II
+// Divide the whole list into two parts, from head to the start of cycle, we assume it contains d nodes;
+// when slow and fast pointers meet together, from the start of cycle to meeting node, assume it contains
+// x nodes and from the meeting node to the start of cycle, assume it contains y nodes. Here, d, x, y can
+// be understood as distance.
+// Assume both slow and start pointer start from list head, when slow and faster pointers meet, the slow
+// pointer has moved d+x distance, and fast pointer has moved d+x+y+x=d+2x+y distance. Because fast pointer
+// is twice as fast as slow one, so 2(d+x) = d+2x+y => d = y. It means, when slow and faster pointers meet,
+// if we kick off a new pointer that starts from list head and make it and fast pointer move one node every
+// step, when the third pointer meet fast pointer, where they meet is the start of cycle.
+ListNode* detectCycle(ListNode* head)
+{
+    ListNode dummy(0);
+    ListNode* slow;
+    ListNode* fast;
+    for (dummy.next = head, slow = &dummy, fast = head; fast != nullptr && fast->next != nullptr && slow != fast; slow = slow->next, fast = fast->next->next);
+
+    if (slow == fast)
+    {
+        // 1. Since there exists cycle, it is safe to omit the checking of slow and fast pointers in the second
+        // loop that whether they are null or not.
+        // 2. Because fast is initialized to head not dummy in the first loop, so fast has moved one more step
+        // than slow. So in second loop we need to move fast one step before starting the loop.
+        for (slow = &dummy, fast = fast->next; slow != fast; slow = slow->next, fast = fast->next);
+        return fast;
+    }
+
+    return nullptr;
+}
+
 // 144. Binary Tree Preorder Traversal
 vector<int> preorderTraversalUseStack(TreeNode* root)
 {
