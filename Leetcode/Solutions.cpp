@@ -6109,22 +6109,15 @@ bool dfsWordBreak(const string& s, const unsigned start, const vector<string>& w
 
     for (const string& word : wordDict)
     {
-        if (word.length() <= s.length() - start) // try word
+        if (word.length() <= s.length() - start) // word can be used
         {
             unsigned i;
             for (i = 0; i < word.length() && s[start + i] == word[i]; ++i);
-            if (i == word.length())
+            if (i == word.length() && 
+                impossible.find(i + start) == impossible.end() && // If already know s.substr(start+i) is impossible to be broken into words use the dictionary.
+                dfsWordBreak(s, i + start, wordDict, impossible))
             {
-                // We already know that s.substr(start+i) is impossible to be broken into words use the dictionary.
-                if (impossible.find(i + start) != impossible.end())
-                {
-                    return false;
-                }
-
-                if (dfsWordBreak(s, i + start, wordDict, impossible))
-                {
-                    return true;
-                }
+                return true;
             }
         }
     }
@@ -6165,9 +6158,53 @@ bool wordBreak(string s, vector<string>& wordDict)
 }
 
 // 140. Word Break II
+void dfsWordBreak2(const string& s, const unsigned start, const vector<string>& wordDict, vector<string>& sentences, vector<string>& path, unordered_set<unsigned>& impossible)
+{
+    if (start == s.length()) // found a sentence
+    {
+        stringstream sentence;
+        for (unsigned i = 0; i < path.size(); ++i)
+        {
+            sentence << path[i];
+            if (i != path.size() - 1)
+            {
+                sentence << ' ';
+            }
+        }
+
+        sentences.push_back(sentence.str());
+        return;
+    }
+
+    bool deadend = true;
+    for (const string& word : wordDict)
+    {
+        if (word.length() <= s.length() - start) // word can be used.
+        {
+            unsigned i;
+            for (i = 0; i < word.length() && word[i] == s[start + i]; ++i);
+            if (i == word.length() && impossible.find(start + i) == impossible.end())
+            {
+                deadend = false;
+                path.push_back(word);
+                dfsWordBreak2(s, start + i, wordDict, sentences, path, impossible);
+                path.pop_back();
+            }
+        }
+    }
+
+    if (deadend)
+    {
+        impossible.insert(start);
+    }
+}
 vector<string> wordBreak2(string s, vector<string>& wordDict)
 {
-
+    unordered_set<unsigned> impossible;
+    vector<string> sentences;
+    vector<string> path;
+    dfsWordBreak2(s, 0, wordDict, sentences, path, impossible);
+    return sentences;
 }
 
 // 144. Binary Tree Preorder Traversal

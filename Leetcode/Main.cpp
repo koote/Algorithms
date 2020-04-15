@@ -187,9 +187,6 @@ void main()
 {
     const auto start = clock();
 
-    vector<string> dict = { "car", "ca", "rs" };
-    wordBreak("cars", dict);
-
     vector<vector<char>> matrix({
         {'0','1','1','0','1'},
         {'1','1','0','1','0'},
