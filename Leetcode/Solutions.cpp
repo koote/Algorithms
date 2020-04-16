@@ -6113,7 +6113,7 @@ bool dfsWordBreak(const string& s, const unsigned start, const vector<string>& w
         {
             unsigned i;
             for (i = 0; i < word.length() && s[start + i] == word[i]; ++i);
-            if (i == word.length() && 
+            if (i == word.length() &&
                 impossible.find(i + start) == impossible.end() && // If already know s.substr(start+i) is impossible to be broken into words use the dictionary.
                 dfsWordBreak(s, i + start, wordDict, impossible))
             {
@@ -6237,14 +6237,41 @@ ListNode* detectCycle(ListNode* head)
     if (slow == fast)
     {
         // 1. Since there exists cycle, it is safe to omit the checking of slow and fast pointers in the second
-        // loop that whether they are null or not.
+        //    loop that whether they are null or not.
         // 2. Because fast is initialized to head not dummy in the first loop, so fast has moved one more step
-        // than slow. So in second loop we need to move fast one step before starting the loop.
+        //    than slow. So in second loop we need to move fast one step before starting the loop.
         for (slow = &dummy, fast = fast->next; slow != fast; slow = slow->next, fast = fast->next);
         return fast;
     }
 
     return nullptr;
+}
+
+// 143. Reorder List
+void reorderList(ListNode* head)
+{
+    // First, find the middle of the list, variable middle points to the last node of first half when loop ends.
+    ListNode* middle = head;
+    for (ListNode* q = head; q != nullptr && q->next != nullptr && q->next->next != nullptr; q = q->next->next, middle = middle->next);
+
+    // If list size <= 2, middle will not be moved and no changes are needed.
+    if (middle == head)
+    {
+        return;
+    }
+
+    // Second, reverse the second half, refer to problem 206.
+    ListNode* head2 = nullptr;
+    for (ListNode* q = middle->next, *r; q != nullptr; r = q->next, q->next = head2, head2 = q, q = r);
+
+    // Third, merge first half (head) and second half (head2).
+    middle->next = nullptr; // seal the first half.
+    for (ListNode* r; head2 != nullptr; head = head2->next, head2 = r) // second half won't be longer than first half, so only check head2.
+    {
+        r = head2->next;
+        head2->next = head->next;
+        head->next = head2;
+    }
 }
 
 // 144. Binary Tree Preorder Traversal
@@ -6551,25 +6578,10 @@ bool isHappy(int n)
 // 206. Reverse Linked List
 ListNode* reverseList(ListNode* head)
 {
-    if (head == nullptr)
-    {
-        return head;
-    }
-
-    ListNode* p, * q;
-    for (p = head, q = head->next; q != nullptr;)
-    {
-        ListNode* k = q->next;
-        q->next = p;
-        if (p == head)
-        {
-            p->next = nullptr;
-        }
-
-        p = q;
-        q = k;
-    }
-
+    // this is the trick, initialize p to null so no need to check if p == head, p->next = nullptr.
+    // And if head == nullptr, the loop will not be executed and return p which is also nullptr.
+    ListNode* p = nullptr;
+    for (ListNode* q = head, *r; q != nullptr; r = q->next, q->next = p, p = q, q = r);
     return p;
 }
 
