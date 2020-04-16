@@ -6248,6 +6248,8 @@ ListNode* detectCycle(ListNode* head)
 }
 
 // 143. Reorder List
+// Use example 0->1->2->3->4, it would be converted into 0->4->1->3->2, which
+// can be merged from 2 linked lists: 0->1->2 and 4->3.
 void reorderList(ListNode* head)
 {
     // First, find the middle of the list, variable middle points to the last node of first half when loop ends.
@@ -6275,12 +6277,12 @@ void reorderList(ListNode* head)
 }
 
 // 144. Binary Tree Preorder Traversal
-vector<int> preorderTraversalUseStack(TreeNode* root)
+vector<int> preorderTraversal(TreeNode* root)
 {
     vector<int> result;
     stack<TreeNode*> stack;
 
-    for (stack.push(root); !stack.empty();) // note in this solution we allow pushing nullptr to stack.
+    for (stack.push(root); !stack.empty();)
     {
         root = stack.top();
         stack.pop();
@@ -6288,55 +6290,98 @@ vector<int> preorderTraversalUseStack(TreeNode* root)
         if (root != nullptr)
         {
             result.push_back(root->val);
-            stack.push(root->right); // since we allow nullptr to be pushed to stack so no need to check left and right.
+            stack.push(root->right);
             stack.push(root->left);
         }
     }
 
     return result;
 }
-vector<int> preorderTraversal(TreeNode* root)
-{
-    return preorderTraversalUseStack(root);
-}
 
 // 145. Binary Tree Postorder Traversal
 vector<int> postorderTraversal(TreeNode* root)
 {
-    vector<int> postorder;
     if (root == nullptr)
     {
-        return postorder;
+        return {};
     }
 
+    vector<int> postorder;
     stack<TreeNode*> stack;
-    stack.push(root);
-    TreeNode* lastVisited = root;
-    while (!stack.empty())
+    TreeNode* lastVisited = nullptr;
+
+    for (stack.push(root); !stack.empty(); )
     {
-        while (stack.top()->left != nullptr)
-        {
-            stack.push(stack.top()->left);
-            lastVisited = stack.top()->left;
-        }
+        // Keep pushing stack.top()'s left child only if:
+        // (1) Left child exists and has not been visited, and
+        // (2) If right child exists, right child has not been visited.
+        // Since post order visits left child first, then right child, and we only remember
+        // last visited node, so if right child has been visited, it implies that left child
+        // has been visited too if it exists.
+        for (root = stack.top();
+             root->left != nullptr && root->left != lastVisited &&  // Condition 1
+             (root->right == nullptr || root->right != lastVisited); // Condition 2
+             root = root->left, stack.push(root));
 
-        postorder.push_back(stack.top()->val);
-        stack.pop();
-
-        if (stack.top()->right != nullptr && lastVisited != stack.top()->right)
+        // When the above loop ends, it means we cannot go left subtree any further and the
+        // above 2 conditions are no longer satisfied. So it could be either
+        // (1) Left child doesn't exist or has been visited, or
+        // (2) Right child exists and has been visited.
+        // If it is caused by (1), we can go to current stack top's right child if it exists;
+        // if it is caused by (2), it means current stack top's both children are visited, it
+        // is time to visit and pop current stack top itself.
+        if (root->right != nullptr && root->right != lastVisited) // This is the ~(condition 2)
         {
-            stack.push(stack.top()->right);
-            lastVisited = stack.top()->right;
+            stack.push(root->right);
         }
         else
         {
-            postorder.push_back(stack.top()->val);
+            postorder.push_back(root->val);
+            lastVisited = root;
             stack.pop();
         }
     }
 
     return postorder;
 }
+vector<int> postorderTraversal2(TreeNode* root)
+{
+    if (root == nullptr)
+    {
+        return {};
+    }
+
+    vector<int> postorder;
+    stack<TreeNode*> stack;
+    TreeNode* lastVisited = root;
+
+    for (stack.push(root); !stack.empty(); )
+    {
+        root = stack.top();
+        if ((root->left == nullptr && root->right == nullptr) ||        // a leaf
+            (root->right == nullptr && root->left == lastVisited) ||    // not a leaf, only has left child which has been visited.
+            (root->right == lastVisited))                               // not a leaf, has two children and right child has been visited.
+        {
+            postorder.push_back(root->val);
+            lastVisited = root;
+            stack.pop();
+        }
+        else
+        {
+            if (root->right != nullptr)
+            {
+                stack.push(root->right);
+            }
+            if (root->left != nullptr)
+            {
+                stack.push(root->left);
+            }
+        }
+    }
+
+    return postorder;
+}
+
 
 // 151. Reverse Words in a String
 string reverseWordsUseSplitAndExtraSpace(string s)
@@ -6371,7 +6416,7 @@ void reverseSubstring(string& s, int i, int j)
         s[j] = temp;
     }
 }
-string reverseWordsInPlace(string s)
+string reverseWordsInPlace(string& s)
 {
     reverseSubstring(s, 0, s.length() - 1); // reverse whole string
 
@@ -6384,7 +6429,7 @@ string reverseWordsInPlace(string s)
 
     // trim extra whitespace.
     int last = 0;
-    for (int probe = 0; probe < s.length(); )
+    for (unsigned probe = 0; probe < s.length(); )
     {
         for (; probe < s.length() && s[probe] == ' '; ++probe);
         for (; probe < s.length() && s[probe] != ' '; s[last++] = s[probe++]);
@@ -6523,7 +6568,7 @@ int maxProfit4(int k, vector<int>& prices)
 }
 
 // 200. Number of Islands
-int dfsCheckIsland(vector<vector<char>>& grid, vector<vector<bool>>& visited, unsigned i, unsigned j)
+int dfsCheckIsland(vector<vector<char>>& grid, vector<vector<bool>>& visited, const unsigned i, const unsigned j)
 {
     if (i < 0 || i >= grid.size() || j < 0 || j >= grid[i].size() ||
         grid[i][j] != '1' || visited[i][j])
@@ -6606,7 +6651,7 @@ TreeNode* invertTree(TreeNode* root)
 // 235. Lowest Common Ancestor of a Binary Search Tree
 TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
 {
-    for (; root->val > p->val&& root->val > q->val || root->val < p->val && root->val < q->val; root = p->val < root->val ? root->left : root->right);
+    for (; root->val > p->val && root->val > q->val || root->val < p->val && root->val < q->val; root = p->val < root->val ? root->left : root->right);
     return root;
 }
 
