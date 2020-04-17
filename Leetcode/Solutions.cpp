@@ -6279,23 +6279,23 @@ void reorderList(ListNode* head)
 // 144. Binary Tree Preorder Traversal
 vector<int> preorderTraversal(TreeNode* root)
 {
-    vector<int> result;
+    vector<int> preorder;
     stack<TreeNode*> stack;
 
     for (stack.push(root); !stack.empty();)
     {
-        root = stack.top();
+        root = stack.top(); // root is reused.
         stack.pop();
 
         if (root != nullptr)
         {
-            result.push_back(root->val);
+            preorder.push_back(root->val);
             stack.push(root->right);
             stack.push(root->left);
         }
     }
 
-    return result;
+    return preorder;
 }
 
 // 145. Binary Tree Postorder Traversal
@@ -6319,9 +6319,9 @@ vector<int> postorderTraversal(TreeNode* root)
         // last visited node, so if right child has been visited, it implies that left child
         // has been visited too if it exists.
         for (root = stack.top();
-             root->left != nullptr && root->left != lastVisited &&  // Condition 1
-             (root->right == nullptr || root->right != lastVisited); // Condition 2
-             root = root->left, stack.push(root));
+            root->left != nullptr && root->left != lastVisited &&  // Condition 1
+            (root->right == nullptr || root->right != lastVisited); // Condition 2
+            root = root->left, stack.push(root));
 
         // When the above loop ends, it means we cannot go left subtree any further and the
         // above 2 conditions are no longer satisfied. So it could be either
@@ -6382,6 +6382,57 @@ vector<int> postorderTraversal2(TreeNode* root)
     return postorder;
 }
 
+// 146. LRU Cache
+class LRUCache
+{
+    int maxSize;
+    list<int> keyTempList; // Store keys, list front is hot key (MRU), tail is cold key (LRU).
+    unordered_map<int, int> kv;
+    unordered_map<int, list<int>::iterator> kp; // map key to the position of node in keyTempList.
+
+    void refresh(const int key)
+    {
+        // Each time when a key is refreshed, move/add it to the front of list.
+        // First delete the key from list if it exists.
+        if (kp.find(key) != kp.end())
+        {
+            keyTempList.erase(kp[key]);
+        }
+
+        // Second insert the key to the front of list.
+        keyTempList.push_front(key);
+        kp[key] = keyTempList.begin();
+
+        // Last, check if oversized, delete tail node (evict least recent used key) from list and maps.
+        if (keyTempList.size() > maxSize)
+        {
+            const int evictedKey = keyTempList.back();
+            keyTempList.pop_back();
+            kv.erase(evictedKey);
+            kp.erase(evictedKey);
+        }
+    }
+
+public:
+    explicit LRUCache(const int capacity) : maxSize(capacity) {}
+
+    int get(const int key)
+    {
+        if (kv.find(key) != kv.end())
+        {
+            refresh(key);
+            return kv[key];
+        }
+
+        return -1;
+    }
+
+    void put(const int key, const int value)
+    {
+        refresh(key);
+        kv[key] = value;
+    }
+};
 
 // 151. Reverse Words in a String
 string reverseWordsUseSplitAndExtraSpace(string s)
@@ -6656,115 +6707,119 @@ TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
 }
 
 // 297. Serialize and Deserialize Binary Tree
-void getBTPreOrderHelper(TreeNode* root, ostringstream& os)
+class BinaryTreeCodec
 {
-    if (root == nullptr)
+public:
+    void getBinaryTreePreOrderHelper(TreeNode* root, ostringstream& os)
     {
-        os << "#" << " ";
-        return;
-    }
-
-    os << root->val << " ";
-    getBTPreOrderHelper(root->left, os);
-    getBTPreOrderHelper(root->right, os);
-}
-string serializeBTUsePreOrder(TreeNode* root)
-{
-    ostringstream os;
-    getBTPreOrderHelper(root, os);
-    return os.str();
-}
-TreeNode* buildBTFromPreOrderHelper(istringstream& is)
-{
-    string val;
-    if (!(is >> val) || val == "#")
-    {
-        return nullptr;
-    }
-
-    TreeNode* root = new TreeNode(stoi(val));
-    root->left = buildBTFromPreOrderHelper(is);
-    root->right = buildBTFromPreOrderHelper(is);
-
-    return root;
-}
-TreeNode* deserializeBTUsePreOrder(string data)
-{
-    istringstream is(data);
-    return buildBTFromPreOrderHelper(is);
-}
-string serializeBTUseLevelOrder(TreeNode* root) // Encodes a tree to a single string.
-{
-    ostringstream os;
-    queue<TreeNode*> queue;
-    for (queue.push(root); !queue.empty();)
-    {
-        for (unsigned i = 0, queueLength = queue.size(); i < queueLength; ++i, queue.pop())
+        if (root == nullptr)
         {
-            TreeNode* current = queue.front();
-            if (current != nullptr)
-            {
-                os << current->val << " ";
-                queue.push(current->left);
-                queue.push(current->right);
-            }
-            else
-            {
-                os << "#" << " ";
-            }
+            os << "#" << " ";
+            return;
         }
+
+        os << root->val << " ";
+        getBinaryTreePreOrderHelper(root->left, os);
+        getBinaryTreePreOrderHelper(root->right, os);
     }
-
-    return os.str();
-}
-TreeNode* deserializeBTFromLevelOrder(string data) // Decodes your encoded data to tree.
-{
-    istringstream is(data);
-    vector<string> nums;
-    for (string num; is >> num; nums.push_back(num));
-
-    TreeNode* root = nullptr;
-    if (!nums.empty() && nums[0] != "#")
+    string serializeBinaryTreeUsePreOrder(TreeNode* root)
     {
+        ostringstream os;
+        getBinaryTreePreOrderHelper(root, os);
+        return os.str();
+    }
+    TreeNode* buildBinaryTreeFromPreOrderHelper(istringstream& is)
+    {
+        string val;
+        if (!(is >> val) || val == "#")
+        {
+            return nullptr;
+        }
+
+        TreeNode* root = new TreeNode(stoi(val));
+        root->left = buildBinaryTreeFromPreOrderHelper(is);
+        root->right = buildBinaryTreeFromPreOrderHelper(is);
+
+        return root;
+    }
+    TreeNode* deserializeBinaryTreeUsePreOrder(string data)
+    {
+        istringstream is(data);
+        return buildBinaryTreeFromPreOrderHelper(is);
+    }
+    string serializeBinaryTreeUseLevelOrder(TreeNode* root) // Encodes a tree to a single string.
+    {
+        ostringstream os;
         queue<TreeNode*> queue;
-        root = new TreeNode(stoi(nums[0]));
-        queue.push(root);
-
-        for (unsigned i = 1; i < nums.size() - 1 && !queue.empty(); i += 2, queue.pop())
+        for (queue.push(root); !queue.empty();)
         {
-            TreeNode* current = queue.front();
-            if (nums[i] == "#")
+            for (unsigned i = 0, queueLength = queue.size(); i < queueLength; ++i, queue.pop())
             {
-                current->left = nullptr;
-            }
-            else
-            {
-                current->left = new TreeNode(stoi(nums[i]));
-                queue.push(current->left);
-            }
-
-            if (nums[i + 1] == "#")
-            {
-                current->right = nullptr;
-            }
-            else
-            {
-                current->right = new TreeNode(stoi(nums[i + 1]));
-                queue.push(current->right);
+                TreeNode* current = queue.front();
+                if (current != nullptr)
+                {
+                    os << current->val << " ";
+                    queue.push(current->left);
+                    queue.push(current->right);
+                }
+                else
+                {
+                    os << "#" << " ";
+                }
             }
         }
-    }
 
-    return root;
-}
-string serializeBT(TreeNode* root)
-{
-    return serializeBTUseLevelOrder(root);
-}
-TreeNode* deserializeBT(string data)
-{
-    return deserializeBTFromLevelOrder(data);
-}
+        return os.str();
+    }
+    TreeNode* deserializeBinaryTreeFromLevelOrder(string data) // Decodes your encoded data to tree.
+    {
+        istringstream is(data);
+        vector<string> nums;
+        for (string num; is >> num; nums.push_back(num));
+
+        TreeNode* root = nullptr;
+        if (!nums.empty() && nums[0] != "#")
+        {
+            queue<TreeNode*> queue;
+            root = new TreeNode(stoi(nums[0]));
+            queue.push(root);
+
+            for (unsigned i = 1; i < nums.size() - 1 && !queue.empty(); i += 2, queue.pop())
+            {
+                TreeNode* current = queue.front();
+                if (nums[i] == "#")
+                {
+                    current->left = nullptr;
+                }
+                else
+                {
+                    current->left = new TreeNode(stoi(nums[i]));
+                    queue.push(current->left);
+                }
+
+                if (nums[i + 1] == "#")
+                {
+                    current->right = nullptr;
+                }
+                else
+                {
+                    current->right = new TreeNode(stoi(nums[i + 1]));
+                    queue.push(current->right);
+                }
+            }
+        }
+
+        return root;
+    }
+    string serialize(TreeNode* root)
+    {
+        return serializeBinaryTreeUseLevelOrder(root);
+    }
+    TreeNode* deserialize(string data)
+    {
+        return deserializeBinaryTreeFromLevelOrder(data);
+    }
+};
 
 // 334. Increasing Triplet Subsequence
 bool increasingTriplet(vector<int>& nums)

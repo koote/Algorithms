@@ -155,6 +155,7 @@ extern ListNode* detectCycle(ListNode* head);
 extern void reorderList(ListNode* head);
 extern vector<int> preorderTraversal(TreeNode* root);
 extern vector<int> postorderTraversal(TreeNode* root);
+class LRUCache;
 
 extern string reverseWords(string s);
 
@@ -170,7 +171,7 @@ extern TreeNode* invertTree(TreeNode* root);
 
 extern TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q);
 
-extern string serializeBT(TreeNode* root); extern TreeNode* deserializeBT(string data);
+class BinaryTreeCodec;
 
 extern bool increasingTriplet(vector<int>& nums);
 
