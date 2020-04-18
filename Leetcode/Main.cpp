@@ -156,6 +156,7 @@ extern void reorderList(ListNode* head);
 extern vector<int> preorderTraversal(TreeNode* root);
 extern vector<int> postorderTraversal(TreeNode* root);
 class LRUCache;
+extern ListNode* insertionSortList(ListNode* head);
 
 extern string reverseWords(string s);
 

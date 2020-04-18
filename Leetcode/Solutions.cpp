@@ -6403,7 +6403,7 @@ class LRUCache
         keyTempList.push_front(key);
         kp[key] = keyTempList.begin();
 
-        // Last, check if oversized, delete tail node (evict least recent used key) from list and maps.
+        // Last, check if oversized, evict cold key from list and maps.
         if (keyTempList.size() > maxSize)
         {
             const int evictedKey = keyTempList.back();
@@ -6433,6 +6433,30 @@ public:
         kv[key] = value;
     }
 };
+
+// 147. Insertion Sort List
+// Don't try to think it by logically splitting the linked list into sorted and unsorted portions
+// and keep moving node from unsorted portion to sorted portion. Just imagining that keep removing
+// the head of original linked list and insert it into a new linked list, which is initially empty.
+ListNode* insertionSortList(ListNode* head)
+{
+    ListNode dummy(0);
+    // NOTE: we can make dummy.next = head here, so all operations will be doing on the original linked
+    // list, that makes things complicate. Soon we will find that when dealing the first node, as
+    // current == head, so current->next = p->next is actually let current->next = current, a cycle 
+    // is created and we will get TLE, need additional code to deal with the first node.
+    for (ListNode* current = head, *p, *q; current != nullptr; current = q)
+    {
+        for (p = &dummy; p->next != nullptr && p->next->val < current->val; p = p->next);
+
+        // insert the current node after p.
+        q = current->next;
+        current->next = p->next;
+        p->next = current;
+    }
+
+    return dummy.next;
+}
 
 // 151. Reverse Words in a String
 string reverseWordsUseSplitAndExtraSpace(string s)
