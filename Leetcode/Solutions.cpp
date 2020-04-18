@@ -604,9 +604,9 @@ ListNode* removeNthFromEnd(ListNode* head, int n)
 
     // The algorithms is to use two pointers and let distance between first and last is n+1, when first reaches 
     // end of list, last->next is the one needs to be deleted.
-    // We start counting from dummy other than real head, this can solve the condition that list length is 1 and
-    // n == 1, pointer first stops at real head, pointer last points to dummy head, no special handling is needed.
-    // If we start counting from real head, then when first loop ends, first is null.
+    // We start counting from dummy head other than real head, this can solve the condition that list length is
+    // 1 and n == 1, pointer first stops at real head, pointer last points to dummy head, no special handling is
+    // needed. If we start counting from real head, then when first loop ends, first is null.
     ListNode* first;
     for (first = &dummyHead; n > 0 && first != nullptr; first = first->next, --n);
 
@@ -4946,11 +4946,11 @@ vector<vector<int>> pathSum(TreeNode* root, int sum)
 // 114. Flatten Binary Tree to Linked List
 void flattenUseStack(TreeNode* root)
 {
-    TreeNode dummy(0);
+    TreeNode dummyHead(0);
     stack<TreeNode*> stack;
 
     stack.push(root);
-    for (TreeNode* last = &dummy; !stack.empty(); )
+    for (TreeNode* last = &dummyHead; !stack.empty(); )
     {
         TreeNode* current = stack.top();
         stack.pop();
@@ -6210,10 +6210,10 @@ vector<string> wordBreak2(string s, vector<string>& wordDict)
 // 141. Linked List Cycle
 bool hasCycle(ListNode* head)
 {
-    ListNode dummy(0);
+    ListNode dummyHead(0);
     ListNode* slow;
     ListNode* fast;
-    for (dummy.next = head, slow = &dummy, fast = head; fast != nullptr && slow != fast && fast->next != nullptr; slow = slow->next, fast = fast->next->next);
+    for (dummyHead.next = head, slow = &dummyHead, fast = head; fast != nullptr && slow != fast && fast->next != nullptr; slow = slow->next, fast = fast->next->next);
     return slow == fast;
 }
 
@@ -6229,18 +6229,18 @@ bool hasCycle(ListNode* head)
 // step, when the third pointer meet fast pointer, where they meet is the start of cycle.
 ListNode* detectCycle(ListNode* head)
 {
-    ListNode dummy(0);
+    ListNode dummyHead(0);
     ListNode* slow;
     ListNode* fast;
-    for (dummy.next = head, slow = &dummy, fast = head; fast != nullptr && fast->next != nullptr && slow != fast; slow = slow->next, fast = fast->next->next);
+    for (dummyHead.next = head, slow = &dummyHead, fast = head; fast != nullptr && fast->next != nullptr && slow != fast; slow = slow->next, fast = fast->next->next);
 
     if (slow == fast)
     {
         // 1. Since there exists cycle, it is safe to omit the checking of slow and fast pointers in the second
         //    loop that whether they are null or not.
-        // 2. Because fast is initialized to head not dummy in the first loop, so fast has moved one more step
+        // 2. Because fast is initialized to head not dummyHead in the first loop, so fast has moved one more step
         //    than slow. So in second loop we need to move fast one step before starting the loop.
-        for (slow = &dummy, fast = fast->next; slow != fast; slow = slow->next, fast = fast->next);
+        for (slow = &dummyHead, fast = fast->next; slow != fast; slow = slow->next, fast = fast->next);
         return fast;
     }
 
@@ -6440,14 +6440,14 @@ public:
 // the head of original linked list and insert it into a new linked list, which is initially empty.
 ListNode* insertionSortList(ListNode* head)
 {
-    ListNode dummy(0);
-    // NOTE: we can make dummy.next = head here, so all operations will be doing on the original linked
-    // list, that makes things complicate. Soon we will find that when dealing the first node, as
-    // current == head, so current->next = p->next is actually let current->next = current, a cycle 
-    // is created and we will get TLE, need additional code to deal with the first node.
+    ListNode dummyHead(0);
+    // NOTE: we can let dummyHead.next = head here, so all operations will be doing on the original
+    // linked list, that makes things complicate. Soon we will find that when dealing the first
+    // node, as current==head, so current->next = p->next is actually let current->next=current,
+    // a cycle is created and we will get TLE, need additional code to deal with the first node.
     for (ListNode* current = head, *p, *q; current != nullptr; current = q)
     {
-        for (p = &dummy; p->next != nullptr && p->next->val < current->val; p = p->next);
+        for (p = &dummyHead; p->next != nullptr && p->next->val < current->val; p = p->next);
 
         // insert the current node after p.
         q = current->next;
@@ -6455,7 +6455,100 @@ ListNode* insertionSortList(ListNode* head)
         p->next = current;
     }
 
-    return dummy.next;
+    return dummyHead.next;
+}
+
+// 148. Sort List
+// In place merge a list's two sorted portion: (head1, tail1], (tail1, tail2].
+ListNode* mergeSortedLists(ListNode* head1, ListNode* tail1, ListNode* tail2)
+{
+    //      left                                          right
+    //        ↓                                            ↓
+    // ... -> x) -> (a -> ... -> b) -> (c -> ... -> d) -> (y -> ...
+    //        ↑                  ↑                  ↑
+    //      head1              tail1              tail2
+    ListNode* left = head1;
+    ListNode* right = tail2->next;
+
+    // Extract [head1->next, tail2] from original list and split into two sealed linked lists.
+    ListNode dummyHead(0);
+    ListNode* last = &dummyHead;
+    ListNode* head2 = tail1->next;
+    for (head1 = head1->next, tail1->next = nullptr, tail2->next = nullptr; head1 != nullptr || head2 != nullptr; last = last->next)
+    {
+        if (head1 != nullptr && head2 != nullptr)
+        {
+            if (head1->val < head2->val)
+            {
+                last->next = head1;
+                head1 = head1->next;
+            }
+            else
+            {
+                last->next = head2;
+                head2 = head2->next;
+            }
+        }
+        else if (head1 != nullptr)
+        {
+            last->next = head1;
+            head1 = head1->next;
+        }
+        else if (head2 != nullptr)
+        {
+            last->next = head2;
+            head2 = head2->next;
+        }
+    }
+
+    // relink merged list into the original list.
+    left->next = dummyHead.next;
+    last->next = right;
+
+    return last;
+}
+ListNode* sortList(ListNode* head)
+{
+    ListNode dummyHead(0);
+    dummyHead.next = head;
+
+    for (int length = 1; head != nullptr; length <<= 1)
+    {
+        for (ListNode* p = &dummyHead; p->next != nullptr; )
+        {
+            // list1: [p->next, tail1]
+            ListNode* tail1 = p;
+            for (int i = length; i > 0 && tail1->next != nullptr; --i, tail1 = tail1->next);
+
+            // If found the list2 will be empty, then it means we have merged whole list.
+            if (p == &dummyHead && tail1->next == nullptr)
+            {
+                return dummyHead.next;
+            }
+
+            // list2: [tail1->next, tail2]
+            ListNode* tail2 = tail1;
+            for (int i = length; i > 0 && tail2->next != nullptr; --i, tail2 = tail2->next);
+
+            // NOTE: Here does the trick. Before calling this function, tail2->next is the first
+            // node of next sub-list to be merged. For example (assume length == 2):
+            // ... -> x) -> (2 -> 5) -> (1 -> 4) -> (y -> z) -> ...
+            //        ↑           ↑           ↑
+            //        p         tail1       tail2
+            // In next iteration, should let p=tail2 to start measuring the next pair of sub-list.
+            // However, after this merge function returns, the list has been modified to:
+            // ... -> x) -> (1 -> 2 -> 4 -> 5) -> (y -> z) -> ...
+            //        ↑                ↑    ↑
+            //        p              tail2  next_p
+            // The tail2 could have been moved, if we still let p=tail2 and start next iteration,
+            // that could lead to wrong result, should let p points to 5 here, which is the last
+            // node of merged sub-list. Thus we let the merge function return the last node of
+            // merged sub-list.
+            p = mergeSortedLists(p, tail1, tail2);
+        }
+    }
+
+    return dummyHead.next;
 }
 
 // 151. Reverse Words in a String
@@ -6486,7 +6579,7 @@ void reverseSubstring(string& s, int i, int j)
 {
     for (; i < j; ++i, --j)
     {
-        char temp = s[i];
+        const char temp = s[i];
         s[i] = s[j];
         s[j] = temp;
     }
@@ -6698,7 +6791,7 @@ bool isHappy(int n)
 // 206. Reverse Linked List
 ListNode* reverseList(ListNode* head)
 {
-    // this is the trick, initialize p to null so no need to check if p == head, p->next = nullptr.
+    // this does the trick, initialize p to null so no need to check if p == head, p->next = nullptr.
     // And if head == nullptr, the loop will not be executed and return p which is also nullptr.
     ListNode* p = nullptr;
     for (ListNode* q = head, *r; q != nullptr; r = q->next, q->next = p, p = q, q = r);
@@ -6726,7 +6819,7 @@ TreeNode* invertTree(TreeNode* root)
 // 235. Lowest Common Ancestor of a Binary Search Tree
 TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
 {
-    for (; root->val > p->val && root->val > q->val || root->val < p->val && root->val < q->val; root = p->val < root->val ? root->left : root->right);
+    for (; root->val > p->val&& root->val > q->val || root->val < p->val && root->val < q->val; root = p->val < root->val ? root->left : root->right);
     return root;
 }
 

@@ -157,6 +157,7 @@ extern vector<int> preorderTraversal(TreeNode* root);
 extern vector<int> postorderTraversal(TreeNode* root);
 class LRUCache;
 extern ListNode* insertionSortList(ListNode* head);
+extern ListNode* sortList(ListNode* head);
 
 extern string reverseWords(string s);
 
@@ -190,6 +191,9 @@ extern vector<vector<int>> kClosest(vector<vector<int>>& points, int k);
 void main()
 {
     const auto start = clock();
+
+    ListNode* head = createList(vector<int>({ 4,2,1,3 }));
+    sortList(head);
 
     vector<vector<char>> matrix({
         {'0','1','1','0','1'},
