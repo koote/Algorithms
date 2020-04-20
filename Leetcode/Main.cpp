@@ -158,7 +158,8 @@ extern vector<int> postorderTraversal(TreeNode* root);
 class LRUCache;
 extern ListNode* insertionSortList(ListNode* head);
 extern ListNode* sortList(ListNode* head);
-
+extern int maxPoints(vector<vector<int>>& points);
+extern int evalRPN(vector<string>& tokens);
 extern string reverseWords(string s);
 
 extern int maxProfit4(int k, vector<int>& prices);
@@ -180,7 +181,7 @@ extern bool increasingTriplet(vector<int>& nums);
 extern int thirdMax(vector<int>& nums);
 extern string addStrings(const string& num1, const string& num2);
 
-extern string serializeBST(TreeNode* root); extern TreeNode* deserializeBST(string data);
+class BinarySearchTreeCodec;
 
 extern int findLengthOfLCIS(vector<int>& nums);
 
@@ -192,8 +193,7 @@ void main()
 {
     const auto start = clock();
 
-    ListNode* head = createList(vector<int>({ 4,2,1,3 }));
-    sortList(head);
+    evalRPN(vector<string>({ "4","13","5","/","+" }));
 
     vector<vector<char>> matrix({
         {'0','1','1','0','1'},

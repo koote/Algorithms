@@ -2266,7 +2266,7 @@ vector<Interval> mergeUseSortAndNewVector(vector<Interval>& intervals)
 
     if (!intervals.empty())
     {
-        std::sort(intervals.begin(), intervals.end(), [](const Interval a, const Interval b) { return a.start < b.start; });
+        sort(intervals.begin(), intervals.end(), [](const Interval a, const Interval b) { return a.start < b.start; });
         result.push_back(intervals[0]);
         for (unsigned i = 1; i < intervals.size(); ++i)
         {
@@ -2964,7 +2964,7 @@ int climbStairs(int n)
 // 71. Simplify Path
 string simplifyPathWithStack(string& path)
 {
-    vector<string> stack; // slash, no matter it is root or not, will not be pushed to stack. Note std::stack doesn't support iteration.
+    vector<string> stack; // slash, no matter it is root or not, will not be pushed to stack. Note stack doesn't support iteration.
     for (unsigned i = 0, j; i < path.length(); i = j)
     {
         if (path[i] == '/')
@@ -6435,18 +6435,20 @@ public:
 };
 
 // 147. Insertion Sort List
-// Don't try to think it by logically splitting the linked list into sorted and unsorted portions
-// and keep moving node from unsorted portion to sorted portion. Just imagining that keep removing
-// the head of original linked list and insert it into a new linked list, which is initially empty.
+// Don't think it in the way that logically splitting the whole linked list into sorted/unsorted
+// portions and keep moving node from unsorted portion to sorted portion. Just imagine that keep
+// removing the head of original linked list and insert it into a new linked list.
 ListNode* insertionSortList(ListNode* head)
 {
     ListNode dummyHead(0);
-    // NOTE: we can let dummyHead.next = head here, so all operations will be doing on the original
-    // linked list, that makes things complicate. Soon we will find that when dealing the first
-    // node, as current==head, so current->next = p->next is actually let current->next=current,
-    // a cycle is created and we will get TLE, need additional code to deal with the first node.
+    // NOTE: we can let dummyHead.next=head here, all operations will be doing on the original
+    // linked list, that makes things complicate. Soon we will find that when dealing with the
+    // first node, as current==head, so current->next=p->next actually lets current->next=current,
+    // a cycle is created and will get TLE, need additional code to handle the first node. In
+    // fact, treat dummyHead as a new empty list would make everything straightforward.
     for (ListNode* current = head, *p, *q; current != nullptr; current = q)
     {
+        // find the insert location in new list for current node.
         for (p = &dummyHead; p->next != nullptr && p->next->val < current->val; p = p->next);
 
         // insert the current node after p.
@@ -6501,7 +6503,7 @@ ListNode* mergeSortedLists(ListNode* head1, ListNode* tail1, ListNode* tail2)
         }
     }
 
-    // relink merged list into the original list.
+    // relink merged portion into the original list.
     left->next = dummyHead.next;
     last->next = right;
 
@@ -6549,6 +6551,183 @@ ListNode* sortList(ListNode* head)
     }
 
     return dummyHead.next;
+}
+
+// 149. Max Points on a Line
+// For every 3 points A(x1, y1), B(x2, y2) and C(x3, y3), if they are on same line, then
+//  y2-y1     y3-y1
+// ------- = --------, this is the necessary and sufficient condition.
+//  x2-x1     x3-x1
+// It means if two lines have the same slope and share a common point, then the two lines
+// must be the same one. So we can do this, for each point, we check all other points and
+// calculate the slope, if the slopes are the same, then those points are one same line.
+template <typename T>
+T GreatestCommonDivisor(T a, T b)
+{
+    while (b != 0) 
+    {
+        T temp = a % b;
+        a = b;
+        b = temp;
+    }
+
+    return a;
+}
+int maxPoints(vector<vector<int>>& points)
+{
+    if (points.size() <= 2) return points.size();
+
+    unsigned globalMax = 0;
+
+    for (unsigned i = 0; i < points.size(); ++i)
+    {
+        unsigned localMax = 0;
+        unsigned overlaps = 0;
+        unordered_map<string, unsigned> pointsOnLine;
+
+        // For points[i], we try all other points and calculate slope, if two points
+        // have same slope, they and the points[i] are one same line.
+        for (unsigned j = i + 1; j < points.size(); ++j)
+        {
+            int deltaX = points[j][0] - points[i][0];
+            int deltaY = points[j][1] - points[i][1];
+
+            if (deltaX == 0 && deltaY == 0)
+            {
+                ++overlaps;
+                continue;
+            }
+
+            const int gcd = GreatestCommonDivisor<int>(deltaX, deltaY);
+            deltaX /= gcd;
+            deltaY /= gcd;
+
+            stringstream slope;
+            slope << deltaX << "," << deltaY;
+
+            ++pointsOnLine[slope.str()];
+
+            if (pointsOnLine[slope.str()] > localMax)
+            {
+                localMax = pointsOnLine[slope.str()];
+            }
+        }
+
+        // Now we know that for all other points[j] (j > i), there are max points are on same
+        // straight line, but here the max doesn't include overlaps, and the points[i] itself.
+        // So in total, we have max + overlaps + 1 points on same straight line.
+        if (localMax + overlaps + 1 > globalMax)
+        {
+            globalMax = localMax + overlaps + 1;
+        }
+    }
+
+    return globalMax;
+}
+int maxPoints2(vector<vector<int>>& points)
+{
+    if (points.size() <= 2)
+    {
+        return points.size();
+    }
+
+    unsigned maxCount = 0;
+    unordered_map<string, unordered_set<int>> pointsOnLine;
+
+    for (unsigned i = 0; i < points.size(); ++i)
+    {
+        // points[i], points[j]
+        // x1 = points[i][0], y1 = points[i][1]
+        // x2 = points[j][0], y2 = points[j][1]
+        for (unsigned j = i + 1; j < points.size(); ++j)
+        {
+            long long a, b, c;
+            if (points[i][0] == points[j][0]) // x1 == x2, x = x1
+            {
+                a = 1;
+                b = 0;
+                c = -points[i][0];
+            }
+            else if (points[i][1] == points[j][1]) // y1 == y2, y = y1
+            {
+                a = 0;
+                b = 1;
+                c = -points[i][1];
+            }
+            else
+            {
+                a = static_cast<long long>(points[j][1]) - static_cast<long long>(points[i][1]);
+                b = static_cast<long long>(points[i][0]) - static_cast<long long>(points[j][0]);
+                c = static_cast<long long>(points[i][1])* static_cast<long long>(points[j][0]) - static_cast<long long>(points[i][0])* static_cast<long long>(points[j][1]);
+
+                // Normalize a b c
+                if (a < 0)
+                {
+                    a = -a;
+                    b = -b;
+                    c = -c;
+                }
+
+                long long gcd = GreatestCommonDivisor<long long>(a, b);
+                gcd = GreatestCommonDivisor<long long>(gcd, c);
+                a /= gcd;
+                b /= gcd;
+                c /= gcd;
+            }
+
+            stringstream line;
+            line << a << "," << b << "," << c;
+            pointsOnLine[line.str()].insert(i);
+            pointsOnLine[line.str()].insert(j);
+
+            if (pointsOnLine[line.str()].size() > maxCount)
+            {
+                maxCount = pointsOnLine[line.str()].size();
+            }
+        }
+    }
+
+    return maxCount;
+}
+
+// 150. Evaluate Reverse Polish Notation
+int evalRPN(vector<string>& tokens)
+{
+    stack<int> stack;
+    for (string& token : tokens)
+    {
+        if (token.length() == 1 && !isdigit(token[0]))
+        {
+            const int operand1 = stack.top();
+            stack.pop();
+            const int operand2 = stack.top();
+            stack.pop();
+
+            // NOTE: the first pop is r-value and second pop is l-value
+            if (token == "+")
+            {
+                stack.push(operand2 + operand1);
+            }
+            else if (token == "-")
+            {
+                stack.push(operand2 - operand1);
+            }
+            else if (token == "*")
+            {
+                stack.push(operand2 * operand1);
+            }
+            else if (token == "/")
+            {
+                stack.push(operand2 / operand1);
+            }
+        }
+        else
+        {
+            stack.push(stoi(token));
+        }
+    }
+
+    return stack.top();
 }
 
 // 151. Reverse Words in a String
@@ -6965,7 +7144,7 @@ bool increasingTriplet(vector<int>& nums)
 // 414. Third Maximum Number
 int thirdMax(vector<int>& nums)
 {
-    vector<long long> maxes(3, LLONG_MIN); // 0: max, 1: 2ndmax, 3: 3rdmax
+    vector<long long> maxes(3, LLONG_MIN); // 0: max, 1: 2nd max, 3: 3rd max
     for (int num : nums)
     {
         if (num > maxes[0])
@@ -7002,46 +7181,50 @@ string addStrings(const string& num1, const string& num2)
 }
 
 // 449. Serialize and Deserialize BST
-void getBSTPreOrderHelper(TreeNode* root, ostringstream& os) // Encodes a tree to a single string.
+class BinarySearchTreeCodec
 {
-    if (root == nullptr)
+public:
+    void getBinarySearchTreePreOrderHelper(TreeNode* root, ostringstream& os) // Encodes a tree to a single string.
     {
-        return;
-    }
+        if (root == nullptr)
+        {
+            return;
+        }
 
-    os << root->val << " ";
-    getBSTPreOrderHelper(root->left, os);
-    getBSTPreOrderHelper(root->right, os);
-}
-string serializeBST(TreeNode* root)
-{
-    ostringstream os;
-    getBSTPreOrderHelper(root, os);
-    return os.str();
-}
-TreeNode* buildBSTFromPreOrderHelper(vector<int>& nums, const int start, const int end)
-{
-    if (start > end)
+        os << root->val << " ";
+        getBinarySearchTreePreOrderHelper(root->left, os);
+        getBinarySearchTreePreOrderHelper(root->right, os);
+    }
+    string serialize(TreeNode* root)
     {
-        return nullptr;
+        ostringstream os;
+        getBinarySearchTreePreOrderHelper(root, os);
+        return os.str();
     }
+    TreeNode* buildBinarySearchTreeFromPreOrderHelper(vector<int>& nums, const int start, const int end)
+    {
+        if (start > end)
+        {
+            return nullptr;
+        }
 
-    int pivot;
-    for (pivot = start; pivot <= end && nums[pivot] <= nums[start]; ++pivot);
+        int pivot;
+        for (pivot = start; pivot <= end && nums[pivot] <= nums[start]; ++pivot);
 
-    TreeNode* root = new TreeNode(nums[start]);
-    root->left = buildBSTFromPreOrderHelper(nums, start + 1, pivot - 1);
-    root->right = buildBSTFromPreOrderHelper(nums, pivot, end);
+        TreeNode* root = new TreeNode(nums[start]);
+        root->left = buildBinarySearchTreeFromPreOrderHelper(nums, start + 1, pivot - 1);
+        root->right = buildBinarySearchTreeFromPreOrderHelper(nums, pivot, end);
 
-    return root;
-}
-TreeNode* deserializeBST(string data) // Decodes your encoded data to tree.
-{
-    vector<int> nums;
-    istringstream is(data);
-    for (string num; is >> num; nums.push_back(stoi(num)));
-    return buildBSTFromPreOrderHelper(nums, 0, nums.size() - 1); // No need to check if string is empty as nums.size()-1 = -1 < 0.
-}
+        return root;
+    }
+    TreeNode* deserialize(const string data) // Decodes your encoded data to tree.
+    {
+        vector<int> nums;
+        istringstream is(data);
+        for (string num; is >> num; nums.push_back(stoi(num)));
+        return buildBinarySearchTreeFromPreOrderHelper(nums, 0, nums.size() - 1); // No need to check if string is empty as nums.size()-1 = -1 < 0.
+    }
+};
 
 // 674. Longest Continuous Increasing Subsequence
 int findLengthOfLCIS(vector<int>& nums)
