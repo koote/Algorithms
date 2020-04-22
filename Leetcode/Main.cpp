@@ -162,6 +162,8 @@ extern int maxPoints(vector<vector<int>>& points);
 extern int evalRPN(vector<string>& tokens);
 extern string reverseWords(string s);
 extern int maxProduct(vector<int>& nums);
+extern int findMin(vector<int>& nums);
+extern int findMin2(vector<int>& nums);
 
 extern int maxProfit4(int k, vector<int>& prices);
 
@@ -190,11 +192,11 @@ extern int maxAreaOfIsland(vector<vector<int>>& grid);
 
 extern vector<vector<int>> kClosest(vector<vector<int>>& points, int k);
 
+extern int mincostTickets(vector<int>& days, vector<int>& costs);
+
 void main()
 {
     const auto start = clock();
-
-    maxProduct(vector<int>({2,3,-2,4 }));
 
     vector<vector<char>> matrix({
         {'0','1','1','0','1'},

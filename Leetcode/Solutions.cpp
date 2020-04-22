@@ -6804,6 +6804,68 @@ int maxProduct(vector<int>& nums)
     return maxProduction;
 }
 
+// 153. Find Minimum in Rotated Sorted Array
+int findMin(vector<int>& nums)
+{
+    unsigned start = 0;
+    unsigned end = nums.size() - 1;
+    while (start < end && nums[start] > nums[end]) // if nums[start] < nums[end], nums[start..end] is not rotated.
+    {
+        const unsigned mid = (start + end) / 2;
+
+        // Check nums[start], nums[mid] and nums[end], note if nums array is rotated, then nums[i] > nums[j].
+        if (nums[mid] > nums[start]) // nums[mid] > nums[start] > nums[end]
+        {
+            start = mid;
+        }
+        else if (nums[mid] < nums[end]) // nums[mid] < nums[end] < nums[start]
+        {
+            end = mid;
+        }
+        else
+        {
+            return nums[end];
+        }
+    }
+
+    return nums[start];
+}
+int findMinOptimized(vector<int>& nums)
+{
+    unsigned start = 0;
+    unsigned end = nums.size() - 1;
+    while (start < end)
+    {
+        const unsigned mid = (start + end) / 2;
+
+        // NOTE here we always compare nums[mid] with nums[end], the reason is how mid is calculated.
+        // mid is rounded, so mid would never be the same as end, however, mid could equals to start.
+        // e.g.: when start=0, end=1, mid==0, if we compare nums[mid] with nums[start], then it can
+        // lead to infinity loop, in first solution, a return statement in loop is added to deal with
+        // such condition.
+        if (nums[mid] > nums[end]) // nums[mid] > nums[start] > nums[end]
+        {
+            // Why add 1? Since nums[mid] > nums[start] > nums[end], nums[mid] can't be the minimum,
+            // it is safe to jump over mid (start = mid + 1 means we will skip checking nums[mid]).
+            start = mid + 1;
+        }
+        else if (nums[mid] < nums[end]) // nums[mid] < nums[end] < nums[start]
+        {
+            // Here we cannot let end = mid - 1, as nums[mid] is the smallest among nums[mid], nums[end]
+            // and nums[start], we cannot skip it as it might be the minimum element.
+            end = mid;
+        }
+    }
+
+    return nums[start];
+}
+
+// 154. Find Minimum in Rotated Sorted Array II
+int findMin2(vector<int>& nums)
+{
+    return 0;
+}
+
 // 188. Best Time to Buy and Sell Stock IV
 // Let profits[k][j] represent the max profit when we only trade from prices[0] to prices[j] (inclusive) using at most k
 // transactions.
@@ -7408,4 +7470,32 @@ vector<vector<int>> kClosestUsePartitioning(vector<vector<int>>& points, const i
 vector<vector<int>> kClosest(vector<vector<int>>& points, const int k)
 {
     return kClosestUsePartitioning(points, k);
+}
+
+// 983. Minimum Cost For Tickets
+// Denote minCost[i] is the minimum cost from day 1 travel to day i. so we have equation:
+//                      / minCosts[day-1] + cost[0]                   \
+//  minCosts[day] = min | (day < 7 ? 0 : minCosts[day-7]) + cost[1]   |
+//                      \ (day < 30 ? 0 : minCosts[day-30]) + cost[2] /
+// NOTE, if day < 7, we still can buy a weekly pass ticket on day 1 directly; if day >= 7,
+// we need to travel to day-7 first, then buy a weekly pass on day-6.
+int mincostTickets(vector<int>& days, vector<int>& costs)
+{
+    vector<int> minCosts(days.back() + 1, 0); // let minCosts[0] = 0, as day starts from 1.
+    unordered_set<int> travelDays(days.begin(), days.end());
+
+    for (int day = 1; day <= days.back(); ++day)
+    {
+        if (travelDays.find(day) == travelDays.end()) // we don't travel today.
+        {
+            minCosts[day] = minCosts[day - 1];
+            continue;
+        }
+
+        minCosts[day] = minCosts[day - 1] + costs[0]; // travel to yesterday and buy a 1 day pass for today.
+        minCosts[day] = min(minCosts[day], (day >= 7 ? minCosts[day - 7] : 0) + costs[1]); // travel to 1 week ago and buy a weekly pass.
+        minCosts[day] = min(minCosts[day], (day >= 30 ? minCosts[day - 30] : 0) + costs[2]); // travel to 1 month ago and buy a monthly pass.
+    }
+
+    return minCosts.back();
 }
