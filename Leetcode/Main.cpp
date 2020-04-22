@@ -161,6 +161,7 @@ extern ListNode* sortList(ListNode* head);
 extern int maxPoints(vector<vector<int>>& points);
 extern int evalRPN(vector<string>& tokens);
 extern string reverseWords(string s);
+extern int maxProduct(vector<int>& nums);
 
 extern int maxProfit4(int k, vector<int>& prices);
 
@@ -193,7 +194,7 @@ void main()
 {
     const auto start = clock();
 
-    evalRPN(vector<string>({ "4","13","5","/","+" }));
+    maxProduct(vector<int>({2,3,-2,4 }));
 
     vector<vector<char>> matrix({
         {'0','1','1','0','1'},

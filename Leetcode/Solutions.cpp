@@ -265,21 +265,14 @@ int myAtoi(string str)
 // 9. Palindrome Number
 bool isPalindrome(int x)
 {
-    if (x < 0)
+    if (x < 0 || (x != 0 && x % 10 == 0))
     {
         return false;
     }
 
-    // First calculate how many digits the number x has.
-    int numOfDigits = 0;
-    for (int temp = x; temp > 0; temp /= 10, ++numOfDigits);
-
-    // calculate low half value of x. Lets say x = 12321, lower half is 21.
-    int lowhalf = 0;
-    for (int i = 1, k = numOfDigits / 2; i <= k; lowhalf = lowhalf * 10 + x % 10, x /= 10, ++i);
-
-    // after above loop, we got low half value, then we need to get high half value and compare.
-    return (numOfDigits & 0x1 ? x / 10 : x) == lowhalf;
+    int rev;
+    for (rev = 0; x > rev; rev = rev * 10 + x % 10, x = x / 10);
+    return x == rev || x == rev / 10;
 }
 
 // 10. Regular Expression Matching
@@ -2148,13 +2141,12 @@ int totalNQueens(int n)
 // i = 2, because dp[1] = -1, if 3 join previous subarray, new sum is 3-1=2, if we start a new subarray from 3,
 //        the sum of new subarray is 3, 3>2 so we should start a new subarray.
 // From this we can see, actually it doesn't matter nums[i] is positive or negative, as long as dp[i-1] is positive,
-// nums[i] should always join previous subarray other than start a new subarray.
-// Why? If nums[i] is positive, obviously joining the previous subarray can make its sum greater;
-// if nums[i] is negative, joining previous subarray is better than starting a new subarray from it if dp[i-1] is
-// positive. But if dp[i-1] is negative, we should choose to start a new subarray.
-// So we get the state transition function: 
-//          dp[i] = dp[i-1] > 0 ? dp[i-1] + nums[i] : nums[i]
-// And since every dp[i] only depends on dp[i-1], so we can actually use 1 additional variable to store dp[i-1], 
+// nums[i] should always join previous subarray other than start a new subarray. Why? If nums[i] is positive,
+// obviously joining the previous subarray can make its sum greater; if nums[i] is negative, joining previous
+// subarray is better than starting a new subarray from it if dp[i-1] is positive. But if dp[i-1] is negative,
+// we should choose to start a new subarray. So we get the state transition function: 
+//      dp[i] = dp[i-1] > 0 ? dp[i-1] + nums[i] : nums[i]
+// And since every dp[i] only depends on dp[i-1], so we can actually use 1 additional variable to store dp[i-1],
 // reducing space complexity from O(n) to O(1).
 int maxSubArrayDP(vector<int>& nums)
 {
@@ -6792,6 +6784,24 @@ string reverseWordsInPlace(string& s)
 string reverseWords(string s)
 {
     return reverseWordsInPlace(s);
+}
+
+// 152. Maximum Product Subarray
+int maxProduct(vector<int>& nums)
+{
+    int maxProduction = nums[0]; // the maximum production we have ever seen.
+    int dpMin = nums[0];  // For any subarries that ends at nums[i], the minimum production we can get.
+    int dpMax = nums[0];  // For any subarries that ends at nums[i], the maximum production we can get.
+    for (unsigned i = 1; i < nums.size(); ++i)
+    {
+        int a = nums[i] * dpMax;
+        int b = nums[i] * dpMin;
+        dpMax = max(nums[i], max(a, b));
+        dpMin = min(nums[i], min(a, b));
+        maxProduction = max(maxProduction, dpMax);
+    }
+
+    return maxProduction;
 }
 
 // 188. Best Time to Buy and Sell Stock IV
