@@ -2127,7 +2127,7 @@ int totalNQueens(int n)
 // information is very important because we need to decide whether nums[i] is possible to join previous subarray,
 // or become a start of new subarray. It is very like to the question 32 (longest valid parentheses), which
 // inspires me to change the definition of dp[i] to:
-//      Given range nums[0..i], for all subarraies end at num[i], the maximum sum of those subarraies.
+//      Given range nums[0..i], for all subarrays end at num[i], the maximum sum of those subarrays.
 // With this new definition, given a dp[i], we know that the max subarray
 // ends at nums[i], and the final answer is the maximum number in dp[0..n-1]. Why? 
 // Back to the original question, given an array nums[0..n-1], its max subarray must ends at a certain element
@@ -2169,7 +2169,7 @@ int maxSubArrayDP(vector<int>& nums)
 // can make sum greater by comparing this two sums.
 int maxSubArrayStraightforward(vector<int>& nums)
 {
-    int sum = 0; // sum will be the maximum sum of subarries in nums[0..i] and ending at nums[i].
+    int sum = 0; // sum will be the maximum sum of subarrays in nums[0..i] and ending at nums[i].
     int maxSum = INT_MIN;
     for (int num : nums)
     {
@@ -3252,7 +3252,7 @@ bool searchMatrix(vector<vector<int>>& matrix, int target)
     // first search in first column, use binary search
     for (low = 0, high = matrix.size() - 1; low <= high;)
     {
-        const int middle = (low + high) / 2;
+        const int middle = low + (high - low) / 2;
         if (matrix[middle][0] < target)
         {
             low = middle + 1;
@@ -3273,7 +3273,7 @@ bool searchMatrix(vector<vector<int>>& matrix, int target)
     {
         for (low = 0, high = matrix[row].size() - 1; low <= high;)
         {
-            const int middle = (low + high) / 2;
+            const int middle = low + (high - low) / 2;
             if (matrix[row][middle] < target)
             {
                 low = middle + 1;
@@ -4827,7 +4827,7 @@ TreeNode* sortedArrayToBSTHelper(vector<int>& nums, const int start, const int e
         return nullptr;
     }
 
-    const int mid = (start + end) / 2;
+    const int mid = start + (end - start) / 2;
     TreeNode* root = new TreeNode(nums[mid]);
     root->left = sortedArrayToBSTHelper(nums, start, mid - 1);
     root->right = sortedArrayToBSTHelper(nums, mid + 1, end);
@@ -6790,8 +6790,8 @@ string reverseWords(string s)
 int maxProduct(vector<int>& nums)
 {
     int maxProduction = nums[0]; // the maximum production we have ever seen.
-    int dpMin = nums[0];  // For any subarries that ends at nums[i], the minimum production we can get.
-    int dpMax = nums[0];  // For any subarries that ends at nums[i], the maximum production we can get.
+    int dpMin = nums[0];  // For any subarrays that ends at nums[i], the minimum production we can get.
+    int dpMax = nums[0];  // For any subarrays that ends at nums[i], the maximum production we can get.
     for (unsigned i = 1; i < nums.size(); ++i)
     {
         int a = nums[i] * dpMax;
@@ -6809,11 +6809,14 @@ int findMin(vector<int>& nums)
 {
     unsigned start = 0;
     unsigned end = nums.size() - 1;
-    while (start < end && nums[start] > nums[end]) // if nums[start] < nums[end], nums[start..end] is not rotated.
-    {
-        const unsigned mid = (start + end) / 2;
 
-        // Check nums[start], nums[mid] and nums[end], note if nums array is rotated, then nums[i] > nums[j].
+    // NOTE: If nums[start] < nums[end], nums[start..end] is not rotated, the smallest element
+    // in a sorted array is its first element. So we exit the loop and return nums[start] when
+    // we find that current subarray nums[start..end] is not rotated.
+    while (start < end && nums[start] > nums[end])
+    {
+        const unsigned mid = start + (end - start) / 2;
+
         if (nums[mid] > nums[start]) // nums[mid] > nums[start] > nums[end]
         {
             start = mid;
@@ -6836,13 +6839,14 @@ int findMinOptimized(vector<int>& nums)
     unsigned end = nums.size() - 1;
     while (start < end)
     {
-        const unsigned mid = (start + end) / 2;
+        const unsigned mid = start + (end - start) / 2;
 
         // NOTE here we always compare nums[mid] with nums[end], the reason is how mid is calculated.
-        // mid is rounded, so mid would never be the same as end, however, mid could equals to start.
-        // e.g.: when start=0, end=1, mid==0, if we compare nums[mid] with nums[start], then it can
-        // lead to infinity loop, in first solution, a return statement in loop is added to deal with
-        // such condition.
+        // mid is rounded down to start, so mid would never equals to end, however, mid could equals
+        // to start. e.g.: when start=i, end=i+1, mid==(2i+1)/2==i==start. So if we compare nums[mid]
+        // with nums[start], it can lead to an infinity loop. In first solution, the return statement
+        // inside the loop is used to deal with such condition. But if we only compare nums[mid] with
+        // nums[end], that makes everything concise.
         if (nums[mid] > nums[end]) // nums[mid] > nums[start] > nums[end]
         {
             // Why add 1? Since nums[mid] > nums[start] > nums[end], nums[mid] can't be the minimum,
@@ -6861,9 +6865,73 @@ int findMinOptimized(vector<int>& nums)
 }
 
 // 154. Find Minimum in Rotated Sorted Array II
+// There are many cases if we try to draw some of them to help thinking, and we may get more confused
+// and lost soon; however, the key is the fact that whole array is sorted(ascending) before rotation.
+// No matter where the pivot is, the whole array is split into two sorted(ascending) subarrays after
+// rotation. Actually we only need to think about three elements nums[start], nums[mid] and nums[end]
+// in this problem and problem 153, there are 3 cases, the 3rd case is introduced in this problem.
+// Case 1: nums[mid] > nums[start] >= nums[end] (Note, nums[start]==nums[end] or nums[start]>nums[end]
+// won't change the conclusion we will get here).
+//                             mid
+//                              o
+//                 start
+//                   o    x               end
+//                        o                o
+// Remember that we know there are 2 ascending subarrays, so it is easy to infer that nums[start..mid]
+// is sorted(ascending), why?
+// Assume that there is an index x between start and end which makes nums[x] < nums[start] < nums[mid]
+// then we know that the pivot is between start and x since in the original array, index x is before
+// index start. Denote the index of pivot is y (start < y < x < mid < end), according to the fact that
+// whole array is sorted before rotation and y is the pivot index, so nums[start..y], and nums[y..end]
+// are both ascending arrays, we should have nums[y] < nums[mid] < nums[end], which is not true as we
+// already know nums[mid] > nums[start] >= nums[end] which means nums[mid] > nums[end], so such a x
+// doesn't exist, so nums[start..mid] is sorted(ascending).
+// Since nums[start..mid] is sorted(ascending), it means the pivot falls in right half, and nums[start]
+// is the smallest element in left half, but we are sure it is not the smallest element in whole array
+// as nums[start] >= nums[end], so we should go to search in right half, in short:
+// when nums[mid] > nums[start] >= nums[end], let start = mid + 1, skip mid because we know it is not
+// the smallest element in whole array.
+// Case 2: nums[mid] < nums[end] <= nums[start].
+// In this case, we can know nums[mid..end] is sorted(ascending), pivot is in left half. nums[mid] is the
+// smallest element in nums[mid..end] but it MAY not be the smallest in the whole array, so next step we
+// should search the left half and we cannot skip mid:
+// when nums[mid] < nums[end] <= nums[start], let end = mid.
+// Case 3, nums[mid] == nums[start] == nums[end]. This is the new case introduced in this problem. In this
+// case we cannot say which part is sorted(ascending), so it degenerates to an O(n) algorithm, we need to
+// check every element to get the smallest one, to achieve this, we decrease end by 1 or increase start by
+// 1. Increasing start by 1 is not safe as we only know nums[mid]==nums[end], not sure whether nums[start]
+// is smaller or greater than nums[end], if the array is rotated then nums[start]>=nums[end], it is safe to
+// increase start by 1, but if the array is not rotated then increasing start misses the smallest element.
+// To deal with this condition, we can compare nums[start] and nums[end] at the beginning of every iteration,
+// if it is false then break and return nums[start].
 int findMin2(vector<int>& nums)
 {
-    return 0;
+    unsigned start = 0;
+    unsigned end = nums.size() - 1;
+    while (start < end && nums[start] >= nums[end]) // it is unnecessary to compare nums[start] and nums[end], but it is an optimization.
+    {
+        const unsigned mid = start + (end - start) / 2; // Prevent overflow.
+
+        if (nums[mid] > nums[end])
+        {
+            start = mid + 1;
+        }
+        else if (nums[mid] < nums[end])
+        {
+            end = mid;
+        }
+        else // nums[mid] == nums[end] <= nums[start]
+        {
+            if (nums[end - 1] > nums[end]) // e.g.: 1 1 1 1 2 1 1, when nums[end-1]>nums[end], nums[end] is the pivot.
+            {
+                return nums[end];
+            }
+
+            --end;
+        }
+    }
+
+    return nums[start];
 }
 
 // 188. Best Time to Buy and Sell Stock IV
