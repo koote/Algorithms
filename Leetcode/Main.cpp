@@ -164,6 +164,7 @@ extern string reverseWords(string s);
 extern int maxProduct(vector<int>& nums);
 extern int findMin(vector<int>& nums);
 extern int findMin2(vector<int>& nums);
+class MinStack;
 
 extern int maxProfit4(int k, vector<int>& prices);
 

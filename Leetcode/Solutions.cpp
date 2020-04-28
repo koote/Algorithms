@@ -6870,8 +6870,9 @@ int findMinOptimized(vector<int>& nums)
 // No matter where the pivot is, the whole array is split into two sorted(ascending) subarrays after
 // rotation. Actually we only need to think about three elements nums[start], nums[mid] and nums[end]
 // in this problem and problem 153, there are 3 cases, the 3rd case is introduced in this problem.
-// Case 1: nums[mid] > nums[start] >= nums[end] (Note, nums[start]==nums[end] or nums[start]>nums[end]
-// won't change the conclusion we will get here).
+// Case 1: nums[mid] > nums[start] >= nums[end] 
+// Note 1, nums[start]==nums[end] or nums[start]>nums[end] won't change the conclusion we will get;
+// Note 2, it is impossible that nums[start] > nums[mid] > nums[end].
 //                             mid
 //                              o
 //                 start
@@ -6920,19 +6921,51 @@ int findMin2(vector<int>& nums)
         {
             end = mid;
         }
-        else // nums[mid] == nums[end] <= nums[start]
+        else if (nums[++start] < nums[start]) // e.g.: 1 1 1 1 2 1 1, when nums[start+1]>nums[start], nums[start+1] is the pivot.
         {
-            if (nums[end - 1] > nums[end]) // e.g.: 1 1 1 1 2 1 1, when nums[end-1]>nums[end], nums[end] is the pivot.
-            {
-                return nums[end];
-            }
-
-            --end;
+            break;
         }
     }
 
     return nums[start];
 }
+
+// 155. Min Stack
+class MinStack
+{
+public:
+    void push(const int x)
+    {
+        _stack.push_back(Node {
+            .min = _stack.empty() ? x : min(_stack.back().min, x), // current min value is stored in stack top.
+            .val = x
+            });
+    }
+
+    void pop()
+    {
+        _stack.pop_back();
+    }
+
+    int top()
+    {
+        return _stack.back().val;
+    }
+
+    int getMin()
+    {
+        return _stack.back().min;
+    }
+
+private:
+    struct Node
+    {
+        int min;
+        int val;
+    };
+
+    vector<Node> _stack;
+};
 
 // 188. Best Time to Buy and Sell Stock IV
 // Let profits[k][j] represent the max profit when we only trade from prices[0] to prices[j] (inclusive) using at most k
