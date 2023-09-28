@@ -1,3 +1,4 @@
+#include <list>
 #include <stack>
 #include <queue>
 #include <string>
@@ -102,7 +103,7 @@ double findKthSortedArrays(vector<int>& nums1, vector<int>& nums2, const unsigne
     // Ideally every step we reduce k by half, however since we assume that nums1.size() >= nums2.size(), so
     // it is possible that k/2 > nums2.size(), to ensure that it doesn't cause out of boundary exception, we
     // compare k/2 and nums2.size().
-    const unsigned j = min(k / 2, nums2.size());
+    const unsigned j = min(static_cast<unsigned long>(k) / 2, nums2.size());
     const unsigned i = k - j;
 
     // now we get an index i in nums1 and index j in nums2. So we can compare nums1[i-1] and nums2[j-1] (Note that k is
@@ -6921,8 +6922,9 @@ int findMin2(vector<int>& nums)
         {
             end = mid;
         }
-        else if (nums[++start] < nums[start]) // e.g.: 1 1 1 1 2 1 1, when nums[start+1]>nums[start], nums[start+1] is the pivot.
+        else if (nums[start+1] < nums[start]) // e.g.: 1 1 1 1 2 1 1, when nums[start+1]>nums[start], nums[start+1] is the pivot.
         {
+            start++;
             break;
         }
     }
